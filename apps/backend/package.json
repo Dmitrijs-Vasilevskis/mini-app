@@ -1,0 +1,31 @@
+{
+    "name": "@uno/backend",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "@colyseus/core": "^0.17.43",
+        "@colyseus/schema": "^4.0.25",
+        "@colyseus/ws-transport": "^0.17.13",
+        "@prisma/client": "^7.8.0",
+        "@uno/shared": "file:../../packages/shared",
+        "colyseus": "^0.17.10",
+        "cors": "^2.8.6",
+        "dotenv": "^16.0.3",
+        "express": "^5.2.1",
+        "prisma": "^6.19.3",
+        "uuid": "^14.0.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "@types/node": "^22.19.19",
+        "@types/uuid": "^10.0.0",
+        "tsx": "^4.22.0",
+        "typescript": "^5.9.2"
+    }
+}
