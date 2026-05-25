@@ -54,7 +54,7 @@ function App() {
       return true;
     }
 
-    if (card.value === discardTop.value) {
+    if (card.value === discardTop?.value) {
       return true;
     }
 
@@ -66,12 +66,15 @@ function App() {
   };
 
   const onWildCardColorSelect = (color: Color) => {
+    if(!wildCard) return;
+    
     colyseusService.playCard(wildCard.id, color);
 
     setWildCard(null);
   };
 
   const currentTurnPlayer = players.find((p) => p.id === currentTurn);
+  const currentTurnPlayerName = currentTurnPlayer ? currentTurnPlayer.name : "Unknown";
 
   if (!joined) {
     return (
@@ -110,12 +113,12 @@ function App() {
           Copy
         </button>
         <div>Players: {players.map((p) => p.name).join(", ")}</div>
-        <div>Current turn: {currentTurnPlayer.name}</div>
+        <div>Current turn: {currentTurnPlayerName}</div>
         <div>Your cards: {localPlayer.hand.length}</div>
         <div>
           <span>Last played card:</span>
-          <span>{discardTop.color}</span>
-          <span>{discardTop.value}</span>
+          <span>{discardTop?.color}</span>
+          <span>{discardTop?.value}</span>
         </div>
         {isMyTurn && <div className="text-green-400 font-bold">YOUR TURN!</div>}
       </div>

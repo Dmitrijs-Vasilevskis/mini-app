@@ -1,5 +1,7 @@
+import type { Color } from "../types/game";
+
 type Props = {
-  onSelect: (color: string) => void;
+  onSelect: (color: Color) => void;
 };
 
 const colors = [
@@ -20,7 +22,7 @@ export function WildColorPicker({ onSelect }: Props) {
           {colors.map((c) => (
             <button
               key={c.color}
-              onClick={() => onSelect(c.color)}
+              onClick={() => onSelect(c.color as Color)}
               className={`
                 w-24 h-24 rounded-xl capitalize text-white font-bold
                 flex items-center justify-center relative shadow-xl

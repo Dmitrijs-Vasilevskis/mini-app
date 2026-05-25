@@ -12,6 +12,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["@uno/shared"],
+    exclude: ["@uno/shared"],
   }
 })

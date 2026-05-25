@@ -8,7 +8,7 @@ export class ColyseusService {
 
   constructor() {
     this.client = new Client(
-      import.meta.env.VITE_COLYSEUS_SERVER_URL ||
+      import.meta.env.VITE_COLYSEUS_URL ||
       "ws://localhost:2567"
     );
   }
