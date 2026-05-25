@@ -11,13 +11,11 @@
         "@colyseus/core": "^0.17.43",
         "@colyseus/schema": "^2.0.37",
         "@colyseus/ws-transport": "^0.17.13",
-        "@prisma/client": "^6.19.3",
         "@uno/shared": "file:../../packages/shared",
         "colyseus": "^0.17.10",
         "cors": "^2.8.6",
         "dotenv": "^16.0.3",
         "express": "^5.2.1",
-        "prisma": "^6.19.3",
         "uuid": "^14.0.0"
     },
     "devDependencies": {
