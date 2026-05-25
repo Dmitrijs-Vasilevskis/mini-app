@@ -21,4 +21,8 @@ RUN chmod +x /app/apps/backend/docker-entrypoint.sh
 
 EXPOSE 2567
 
-ENTRYPOINT ["/app/apps/backend/docker-entrypoint.sh"]
+# ENTRYPOINT ["/app/apps/backend/docker-entrypoint.sh"]
+
+EXPOSE 10000
+
+CMD ["node", "dist/index.js"]
