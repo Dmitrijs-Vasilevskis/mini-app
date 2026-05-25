@@ -14,7 +14,7 @@ import { VictoryOverlay } from "./game/VictoryOverlay";
 import { DrawButton } from "./game/DrawButton";
 
 function App() {
-  const { user, ready } = useTelegramContext();
+  const { user } = useTelegramContext();
   const [roomId, setRoomId] = useState<string>("");
   const [joined, setJoined] = useState<boolean>(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -66,15 +66,19 @@ function App() {
   };
 
   const onWildCardColorSelect = (color: Color) => {
-    if(!wildCard) return;
-    
+    if (!wildCard) return;
+
     colyseusService.playCard(wildCard.id, color);
 
     setWildCard(null);
   };
 
   const currentTurnPlayer = players.find((p) => p.id === currentTurn);
-  const currentTurnPlayerName = currentTurnPlayer ? currentTurnPlayer.name : "Unknown";
+  const currentTurnPlayerName = currentTurnPlayer
+    ? currentTurnPlayer.name
+    : "Unknown";
+
+  if (!user) return <div>Loading...</div>;
 
   if (!joined) {
     return (
@@ -145,7 +149,10 @@ function App() {
         selectedCardId={selectedCardId}
         setSelectedCardId={setSelectedCardId}
       />
-      <DrawButton isMyTurn={isMyTurn} onDraw={() => colyseusService.drawCard()} />
+      <DrawButton
+        isMyTurn={isMyTurn}
+        onDraw={() => colyseusService.drawCard()}
+      />
 
       {wildCard && <WildColorPicker onSelect={onWildCardColorSelect} />}
     </div>
