@@ -1,10 +1,7 @@
 import { Text } from "@react-three/drei";
 import type { ThreeElements } from "@react-three/fiber";
-
 import { useFrame } from "@react-three/fiber";
-
 import { useRef } from "react";
-
 import type { Group } from "three";
 
 type Props = ThreeElements["group"] & {
@@ -14,7 +11,9 @@ type Props = ThreeElements["group"] & {
 
 export function AvatarPlayer({ name, active, ...props }: Props) {
   const groupRef = useRef<Group>(null);
-  const textRef = useRef(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const textRef = useRef<any>(null);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) {
