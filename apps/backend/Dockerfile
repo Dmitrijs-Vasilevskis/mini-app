@@ -1,16 +1,24 @@
-FROM node:22.2.0-alpine
+FROM node:22-alpine
+
+RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY turbo.json ./
+# Workspace manifests for reproducible npm ci
+COPY package.json package-lock.json turbo.json ./
+COPY apps/backend/package.json ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/typescript-config/package.json ./packages/typescript-config/
 
-COPY apps/backend/package*.json ./apps/backend/
-
-RUN npm install
+RUN npm ci
 
 COPY . .
 
+RUN chmod +x /app/apps/backend/docker-entrypoint.sh
+
 EXPOSE 2567
 
-CMD ["npm", "run", "dev", "--workspace=@uno/backend"]
+ENTRYPOINT ["/app/apps/backend/docker-entrypoint.sh"]

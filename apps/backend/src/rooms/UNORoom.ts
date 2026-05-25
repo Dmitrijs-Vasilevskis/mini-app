@@ -2,12 +2,18 @@ import { Room, Client } from '@colyseus/core';
 import { GameState, Card, Player, Color, Value } from '@uno/shared';
 import { createDeck, shuffle } from '../game/UNODeck';
 import { ArraySchema } from '@colyseus/schema';
+import { generateRoomCode } from '../utils/roomCode';
 
 export class UNORoom extends Room {
   onCreate(options: any) {
     this.setState(new GameState());
 
+    const roomCode = generateRoomCode();
+
+    this.setMetadata({ roomCode });
+
     this.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color }) => {
+      console.log(">> playCard payload", payload)
       this.handlePlayCard(client.sessionId, payload.cardId, payload.chosenColor);
     });
 
@@ -18,14 +24,23 @@ export class UNORoom extends Room {
 
   onLeave(client: Client, code?: number) {
     const state = this.state as GameState;
+    const playerIndex = state.playerOrder.indexOf(client.sessionId);
+
+    if (playerIndex !== -1) {
+      state.playerOrder.splice(
+        playerIndex,
+        1
+      );
+    }
+
     state.players.delete(client.sessionId);
+
     if (state.currentTurn === client.sessionId) {
       this.nextTurn();
     }
   }
 
   onJoin(client: Client, options: { name: string; telegramId?: string }) {
-    console.log(">> ", client, options);
     const state = this.state as GameState;
     if (state.players.size === 0) {
       this.initGame();
@@ -52,6 +67,7 @@ export class UNORoom extends Room {
     }
 
     state.players.set(client.sessionId, newPlayer);
+    state.playerOrder.push(client.sessionId);
 
     if (state.players.size === 1) {
       state.currentTurn = client.sessionId;
@@ -84,6 +100,7 @@ export class UNORoom extends Room {
     firstCard.id = firstCardData.id;
     firstCard.color = firstCardData.color;
     firstCard.value = firstCardData.value;
+    state.activeColor = firstCard.color!;
     const discardPile = new ArraySchema<Card>();
     discardPile.push(firstCard);
 
@@ -94,6 +111,8 @@ export class UNORoom extends Room {
   private handlePlayCard(playerId: string, cardId: string, chosenColor?: Color) {
     const state = this.state as GameState;
     const player = state.players.get(playerId);
+    let turnsToAdvance = 1;
+
     if (!player || !player.isTurn) return;
 
     const cardIndex = player.hand.findIndex((c: Card) => c.id === cardId);
@@ -104,36 +123,82 @@ export class UNORoom extends Room {
 
     if (!this.isValidPlay(card, topCard)) return;
 
+    if (
+      card.value === 'wild' ||
+      card.value === 'wildDrawFour'
+    ) {
+      if (!chosenColor) return;
+
+      state.activeColor = chosenColor;
+    } else {
+      state.activeColor = card.color!;
+    }
+
     player.hand.splice(cardIndex, 1);
     state.discardPile.push(card);
 
     // Special card handling
     if (card.value === 'skip') {
-      this.nextTurn();
-    } else if (card.value === 'reverse') {
-      state.direction = (state.direction === 1 ? -1 : 1) as 1 | -1;
-    } else if (card.value === 'drawTwo') {
-      const nextPlayerId = this.getNextPlayerId(playerId);
-      this.addCardsToPlayer(nextPlayerId, 2);
-    } else if (card.value === 'wild' || card.value === 'wildDrawFour') {
-      if (chosenColor) {
-        this.broadcast('wildColorChosen', { playerId, color: chosenColor });
-      }
-      if (card.value === 'wildDrawFour') {
-        const nextPlayerId = this.getNextPlayerId(playerId);
-        this.addCardsToPlayer(nextPlayerId, 4);
+      turnsToAdvance = 2;
+    }
+    else if (card.value === 'reverse') {
+      if (state.players.size === 2) {
+        turnsToAdvance = 2;
+      } else {
+        state.direction = state.direction === 1
+          ? -1
+          : 1;
       }
     }
+    else if (card.value === 'drawTwo') {
+      const nextPlayerId = this.getNextPlayerId(playerId);
+
+      this.addCardsToPlayer(
+        nextPlayerId,
+        2
+      );
+
+      turnsToAdvance = 2;
+    }
+    else if (card.value === 'wildDrawFour') {
+      if (!chosenColor) return;
+      state.activeColor = chosenColor;
+      const nextPlayerId = this.getNextPlayerId(playerId);
+
+      this.addCardsToPlayer(
+        nextPlayerId,
+        4
+      );
+
+      turnsToAdvance = 2;
+    }
+    else if (card.value === 'wild') {
+      if (!chosenColor) return;
+
+      state.activeColor = chosenColor;
+    }
+    // else if (card.value === 'wild' || card.value === 'wildDrawFour') {
+    //   if (chosenColor) {
+    //     this.broadcast('wildColorChosen', { playerId, color: chosenColor });
+    //   }
+    //   if (card.value === 'wildDrawFour') {
+    //     const nextPlayerId = this.getNextPlayerId(playerId);
+    //     this.addCardsToPlayer(nextPlayerId, 4);
+    //   }
+    // }
 
     // Win check
     if (player.hand.length === 0) {
       state.winnerId = playerId;
       this.broadcast('gameEnd', { winnerId: playerId, winnerName: player.name });
-      this.disconnect();
+      state.gameEnded = true;
       return;
     }
 
-    this.nextTurn();
+    for (let i = 0; i < turnsToAdvance; i++) {
+      this.nextTurn();
+    }
+
     this.broadcast('cardPlayed', { playerId, card, remainingCards: player.hand.length });
   }
 
@@ -150,16 +215,26 @@ export class UNORoom extends Room {
       newCard.color = newCardData.color;
       newCard.value = newCardData.value;
       player.hand.push(newCard);
-      this.broadcast('cardDrawn', { playerId, card: newCard });
+      this.broadcast('cardDrawn', { playerId, count: player.hand.length });
     }
 
     this.nextTurn();
   }
 
   private isValidPlay(card: Card, topCard: Card): boolean {
-    if (card.color === null) return true;
-    if (card.color === topCard.color) return true;
-    if (card.value === topCard.value) return true;
+    const state = this.state as GameState;
+
+    if (card.color === null) {
+      return true;
+    }
+
+    if (card.color === state.activeColor) {
+      return true;
+    }
+
+    if (card.value === topCard.value) {
+      return true;
+    }
     return false;
   }
 
@@ -184,35 +259,85 @@ export class UNORoom extends Room {
 
   private nextTurn() {
     const state = this.state as GameState;
-    const players = Array.from(state.players.keys());
-    if (players.length === 0) return;
-    let currentIdx = players.indexOf(state.currentTurn);
-    let nextIdx = currentIdx + state.direction;
-    if (nextIdx < 0) nextIdx = players.length - 1;
-    if (nextIdx >= players.length) nextIdx = 0;
+    const players = state.playerOrder;
+
+    if (players.length === 0) {
+      return;
+    }
+
+    const currentIndex = players.indexOf(state.currentTurn);
+    let nextIndex = currentIndex + state.direction;
+
+    if (nextIndex < 0) {
+      nextIndex = players.length + 1;
+    }
+
+    if (nextIndex >= players.length) {
+      nextIndex = 0;
+    }
 
     const currentPlayer = state.players.get(state.currentTurn);
-    if (currentPlayer) currentPlayer.isTurn = false;
 
-    state.currentTurn = players[nextIdx];
+    if (currentPlayer) {
+      currentPlayer.isTurn = false;
+    }
+
+    state.currentTurn = players[nextIndex];
+
     const nextPlayer = state.players.get(state.currentTurn);
-    if (nextPlayer) nextPlayer.isTurn = true;
 
-    this.broadcast('turnChanged', { playerId: state.currentTurn });
+    if (nextPlayer) {
+      nextPlayer.isTurn = true;
+    }
+
+
+    // if (players.length === 0) return;
+    // let currentIdx = players.indexOf(state.currentTurn);
+    // let nextIdx = currentIdx + state.direction;
+    // if (nextIdx < 0) nextIdx = players.length - 1;
+    // if (nextIdx >= players.length) nextIdx = 0;
+
+    // const currentPlayer = state.players.get(state.currentTurn);
+    // if (currentPlayer) currentPlayer.isTurn = false;
+
+    // state.currentTurn = players[nextIdx];
+    // const nextPlayer = state.players.get(state.currentTurn);
+    // if (nextPlayer) nextPlayer.isTurn = true;
+
+    this.broadcast('turnChanged',
+      {
+        playerId: state.currentTurn
+      }
+    );
   }
 
   private getNextPlayerId(currentId: string): string {
     const state = this.state as GameState;
-    const players = Array.from(state.players.keys());
+
+    const players = state.playerOrder;
     const idx = players.indexOf(currentId);
     let next = idx + state.direction;
-    if (next < 0) next = players.length - 1;
-    if (next >= players.length) next = 0;
+
+    if (next < 0) {
+      next = players.length - 1;
+    }
+
+    if (next >= players.length) {
+      next = 0;
+    }
+    // const players = Array.from(state.players.keys());
+    // const idx = players.indexOf(currentId);
+    // let next = idx + state.direction;
+    // if (next < 0) next = players.length - 1;
+    // if (next >= players.length) next = 0;
     return players[next];
   }
 
   private reshuffleDiscard() {
     const state = this.state as GameState;
+    if (state.discardPile.length <= 1) {
+      return;
+    }
     // Remove the top card from discard pile
     const top = state.discardPile.pop()!;
     // Convert remaining discard pile to plain objects for shuffling

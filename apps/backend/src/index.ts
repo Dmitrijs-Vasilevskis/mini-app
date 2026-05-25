@@ -13,15 +13,20 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: [
-      'http://localhost:3000', // docker frontend
-      'http://localhost:5173', // local vite dev
-    ],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
+
+const PORT = Number(process.env.PORT) || 2567;
 
 app.use(express.json());
 
@@ -37,18 +42,14 @@ const httpServer = createServer(app);
 const gameServer = new Server({
   transport: new WebSocketTransport({
     server: httpServer,
+    pingInterval: 6000,
+    pingMaxRetries: 4,
+    maxPayload: 1024 * 1024 * 1, // 1 MB
   }),
+  devMode: true, // enables hot-reload for development
 });
 
-gameServer.define('uno', UNORoom);
+gameServer.define('uno', UNORoom).filterBy(['roomCode']);
 
 // Mount Colyseus matchmaker routes
-listen(gameServer, httpServer);
-
-const PORT = Number(process.env.PORT) || 2567;
-
-httpServer.listen(PORT, () => {
-  console.log(`✅ Backend + Colyseus running on port ${PORT}`);
-  console.log(`🎮 Colyseus WS endpoint: ws://localhost:${PORT}`);
-  console.log(`❤️ Health check: http://localhost:${PORT}/health`);
-});
+listen(gameServer);

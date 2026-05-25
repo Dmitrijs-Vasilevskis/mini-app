@@ -1,51 +1,78 @@
+name: uno-mini-app
+
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile
-    container_name: turborepo-frontend
+  postgres:
+    image: postgres:16-alpine
+    container_name: uno-postgres
+    restart: unless-stopped
     ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/frontend/node_modules
-    depends_on:
-      - backend
+      - "${POSTGRES_PORT:-5433}:5432"
     environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: npm run dev --workspace=@uno/frontend
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-game_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-game_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
-    container_name: turborepo-backend
+    container_name: uno-backend
+    restart: unless-stopped
     ports:
-      - "2567:2567"
+      - "${BACKEND_PORT:-2567}:2567"
     volumes:
       - .:/app
-      - /app/node_modules
-      - /app/apps/backend/node_modules
+      - root_node_modules:/app/node_modules
+      - backend_node_modules:/app/apps/backend/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/game_db
       NODE_ENV: development
-    command: npm run dev --workspace=@uno/backend
+      PORT: 2567
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-game_db}
+      FRONTEND_URL: http://localhost:${FRONTEND_PORT:-3000}
+    env_file:
+      - path: .env
+        required: false
 
-  postgres:
-    image: postgres:16
-    container_name: turborepo-postgres
-    restart: always
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: uno-frontend
+    restart: unless-stopped
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: game_db
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - .:/app
+      - root_node_modules:/app/node_modules
+      - frontend_node_modules:/app/apps/frontend/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_COLYSEUS_URL: ${VITE_COLYSEUS_URL:-ws://localhost:2567}
+    env_file:
+      - path: .env
+        required: false
 
 volumes:
   postgres_data:
+  root_node_modules:
+  frontend_node_modules:
+  backend_node_modules:
+  shared_node_modules:

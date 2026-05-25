@@ -9,9 +9,9 @@
     },
     "dependencies": {
         "@colyseus/core": "^0.17.43",
-        "@colyseus/schema": "^4.0.25",
+        "@colyseus/schema": "^2.0.37",
         "@colyseus/ws-transport": "^0.17.13",
-        "@prisma/client": "^7.8.0",
+        "@prisma/client": "^6.19.3",
         "@uno/shared": "file:../../packages/shared",
         "colyseus": "^0.17.10",
         "cors": "^2.8.6",
