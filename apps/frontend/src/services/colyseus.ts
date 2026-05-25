@@ -21,6 +21,10 @@ export class ColyseusService {
       this.room.roomId
     );
 
+    if (!this.room) {
+      throw new Error("Failed to create room");
+    }
+
     return this.room;
   }
 
