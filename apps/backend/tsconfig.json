@@ -2,7 +2,6 @@
   "extends": "../../packages/tsconfig/base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "ES2022",
