@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
 import { createServer } from 'http';
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
+import { listen } from '@colyseus/tools';
 
 import { UNORoom } from './rooms/UNORoom';
 
@@ -50,7 +50,5 @@ const gameServer = new Server({
 
 gameServer.define('uno', UNORoom).filterBy(['roomCode']);
 
-httpServer.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🎮 Colyseus UNO server ready`);
-});
+// Mount Colyseus matchmaker routes
+listen(gameServer);
