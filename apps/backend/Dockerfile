@@ -16,7 +16,8 @@ RUN npm ci
 
 COPY . .
 
-RUN chmod +x /app/apps/backend/docker-entrypoint.sh
+RUN npm run build --workspace=@uno/shared
+RUN npm run build --workspace=@uno/backend
 
 EXPOSE 2567
 EXPOSE 10000
