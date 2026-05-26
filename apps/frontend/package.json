@@ -16,7 +16,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@twa-dev/sdk": "^8.0.2",
-    "@uno/shared": "*",
+    "@uno/shared": "workspace:*",
     "framer-motion": "^12.40.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
