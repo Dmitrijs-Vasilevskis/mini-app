@@ -17,6 +17,7 @@ RUN npm ci
 COPY . .
 
 # IMPORTANT: build backend
+RUN npm run build --workspace=@uno/shared
 RUN npm run build --workspace=@uno/backend
 
 RUN chmod +x /app/apps/backend/docker-entrypoint.sh

@@ -1,7 +1,7 @@
 {
   "extends": "../../packages/tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "ES2022",
@@ -11,5 +11,5 @@
       "@shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": ["src", "../../packages/shared/src"]
+  "include": ["src"]
 }
