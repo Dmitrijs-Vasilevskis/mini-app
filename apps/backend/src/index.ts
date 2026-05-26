@@ -4,8 +4,6 @@ import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
-import { listen } from '@colyseus/tools';
-
 import { UNORoom } from './rooms/UNORoom';
 
 dotenv.config();
@@ -43,12 +41,14 @@ const gameServer = new Server({
     server: httpServer,
     pingInterval: 8000,
     pingMaxRetries: 3,
-    maxPayload: 1024 * 1024 * 1, // 1 MB
   }),
-  devMode: false, // enables hot-reload for development
 });
 
 gameServer.define('uno', UNORoom).filterBy(['roomCode']);
 
 // Mount Colyseus matchmaker routes
-listen(gameServer);
+
+
+httpServer.listen(Number(process.env.PORT) || 2567, () => {
+  console.log("🚀 HTTP + Colyseus server running");
+});
