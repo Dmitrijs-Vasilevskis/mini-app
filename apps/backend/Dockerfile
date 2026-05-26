@@ -16,12 +16,9 @@ RUN npm ci
 
 COPY . .
 
-# IMPORTANT: build backend
-RUN npm run build --workspace=@uno/backend
-
 RUN chmod +x /app/apps/backend/docker-entrypoint.sh
 
 EXPOSE 2567
 EXPOSE 10000
 
-CMD ["node", "apps/backend/dist/index.js"]
+CMD ["node", "dist/index.js"]
