@@ -14,7 +14,7 @@ export class ColyseusService {
   }
 
   async createRoom(username: string) {
-    this.room = await this.client.create("uno", { name: username });
+    this.room = await this.client.joinOrCreate("uno", { name: username });
 
     console.log(
       "ROOM CREATED",
@@ -29,7 +29,7 @@ export class ColyseusService {
   }
 
   async joinRoomById(roomId: string, username: string) {
-    this.room = await this.client.joinById(
+    this.room = await this.client.join(
       roomId,
       {
         name: username
