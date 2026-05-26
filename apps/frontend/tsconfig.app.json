@@ -9,6 +9,7 @@
     "paths": {
       "@uno/shared": ["../../packages/shared/dist"]
     },
+    "baseUrl": ".",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
