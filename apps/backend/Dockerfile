@@ -4,7 +4,6 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Workspace manifests for reproducible npm ci
 COPY package.json package-lock.json turbo.json ./
 COPY apps/backend/package.json ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
@@ -17,12 +16,12 @@ RUN npm ci
 
 COPY . .
 
+# IMPORTANT: build backend
+RUN npm run build --workspace=@uno/backend
+
 RUN chmod +x /app/apps/backend/docker-entrypoint.sh
 
 EXPOSE 2567
-
-# ENTRYPOINT ["/app/apps/backend/docker-entrypoint.sh"]
-
 EXPOSE 10000
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "apps/backend/dist/index.js"]
