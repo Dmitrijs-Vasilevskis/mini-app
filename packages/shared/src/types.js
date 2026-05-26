@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,85 +7,95 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameState = exports.Player = exports.Card = void 0;
-const schema_1 = require("@colyseus/schema");
-class Card extends schema_1.Schema {
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
+export class Card extends Schema {
     id = "";
     color = null;
     value = "0";
 }
-exports.Card = Card;
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], Card.prototype, "id", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", Object)
 ], Card.prototype, "color", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], Card.prototype, "value", void 0);
-class Player extends schema_1.Schema {
+export class Player extends Schema {
     id = "";
     name = "";
-    hand = new schema_1.ArraySchema();
+    hand = new ArraySchema();
     isTurn = false;
     telegramId; // optional
 }
-exports.Player = Player;
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], Player.prototype, "id", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
 __decorate([
-    (0, schema_1.type)([Card]),
+    type([Card]),
     __metadata("design:type", Object)
 ], Player.prototype, "hand", void 0);
 __decorate([
-    (0, schema_1.type)("boolean"),
+    type("boolean"),
     __metadata("design:type", Boolean)
 ], Player.prototype, "isTurn", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], Player.prototype, "telegramId", void 0);
-class GameState extends schema_1.Schema {
-    players = new schema_1.MapSchema();
-    deck = new schema_1.ArraySchema();
-    discardPile = new schema_1.ArraySchema();
+export class GameState extends Schema {
+    players = new MapSchema();
+    deck = new ArraySchema();
+    discardPile = new ArraySchema();
+    playerOrder = new ArraySchema();
+    activeColor = "red";
     currentTurn = "";
     direction = 1;
     winnerId = "";
+    gameEnded = false;
 }
-exports.GameState = GameState;
 __decorate([
-    (0, schema_1.type)({ map: Player }),
+    type({ map: Player }),
     __metadata("design:type", Object)
 ], GameState.prototype, "players", void 0);
 __decorate([
-    (0, schema_1.type)([Card]),
+    type([Card]),
     __metadata("design:type", Object)
 ], GameState.prototype, "deck", void 0);
 __decorate([
-    (0, schema_1.type)([Card]),
+    type([Card]),
     __metadata("design:type", Object)
 ], GameState.prototype, "discardPile", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type(["string"]),
+    __metadata("design:type", Object)
+], GameState.prototype, "playerOrder", void 0);
+__decorate([
+    type("string"),
+    __metadata("design:type", String)
+], GameState.prototype, "activeColor", void 0);
+__decorate([
+    type("string"),
     __metadata("design:type", String)
 ], GameState.prototype, "currentTurn", void 0);
 __decorate([
-    (0, schema_1.type)("int8"),
+    type("int8"),
     __metadata("design:type", Number)
 ], GameState.prototype, "direction", void 0);
 __decorate([
-    (0, schema_1.type)("string"),
+    type("string"),
     __metadata("design:type", String)
 ], GameState.prototype, "winnerId", void 0);
+__decorate([
+    type("boolean"),
+    __metadata("design:type", Object)
+], GameState.prototype, "gameEnded", void 0);
