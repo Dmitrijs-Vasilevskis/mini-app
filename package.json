@@ -8,7 +8,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d",
-    "docker:dev:build": "docker compose -f docker-compose.dev.yml build"
+    "docker:dev:build": "docker compose -f docker-compose.dev.yml build",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:dev:down-v": "docker compose -f docker-compose.dev.yml down -v"
   },
   "devDependencies": {
     "@types/node": "^25.8.0",
