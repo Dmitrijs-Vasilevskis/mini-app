@@ -13,7 +13,7 @@
     "@colyseus/core": "^0.17.43",
     "@colyseus/schema": "^2.0.37",
     "@colyseus/ws-transport": "^0.17.13",
-    "@uno/shared": "file:../../packages/shared",
+    "@uno/shared": "*",
     "colyseus": "^0.17.10",
     "cors": "^2.8.6",
     "dotenv": "^16.0.3",
