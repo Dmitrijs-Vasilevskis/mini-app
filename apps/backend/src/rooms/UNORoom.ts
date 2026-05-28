@@ -49,7 +49,7 @@ export class UNORoom extends Room {
     const newPlayer = new Player();
     newPlayer.id = client.sessionId;
     newPlayer.name = options.name;
-    newPlayer.hand = new ArraySchema();
+    newPlayer.hand = new ArraySchema<Card>();
     newPlayer.isTurn = false;
     if (options.telegramId) newPlayer.telegramId = options.telegramId;
 
