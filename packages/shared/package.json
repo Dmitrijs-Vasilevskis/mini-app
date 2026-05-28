@@ -20,6 +20,6 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@colyseus/schema": "^4.0.25"
+    "@colyseus/schema": "^2.0.37"
   }
 }
