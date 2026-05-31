@@ -15,7 +15,7 @@ import { DrawButton } from "./game/DrawButton";
 import { GameHUD } from "./game/hud/GameHUD";
 
 function App() {
-  const { user, ready } = useTelegramContext();
+  const { user } = useTelegramContext();
   const [roomId, setRoomId] = useState<string>("");
   const [joined, setJoined] = useState<boolean>(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -67,10 +67,16 @@ function App() {
   };
 
   const onWildCardColorSelect = (color: Color) => {
+    if (!wildCard) return;
+
     colyseusService.playCard(wildCard.id, color);
 
     setWildCard(null);
   };
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   const currentTurnPlayer = players.find((p) => p.id === currentTurn);
 
