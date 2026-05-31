@@ -53,13 +53,15 @@ export class ColyseusService {
   }
 
   playCard(cardId: string, chosenColor?: string) {
+    if (!this.room) return;
+
     this.room.send('playCard', { cardId, chosenColor });
   }
 
   drawCard() {
-    if (this.room) {
-      this.room.send('drawCard');
-    }
+    if (!this.room) return;
+    
+    this.room.send('drawCard');
   }
 }
 
