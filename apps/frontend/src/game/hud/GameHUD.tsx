@@ -11,7 +11,7 @@ import { RoomInfoPanel } from "./RoomInfoPanel";
 type Props = {
   roomId: string;
   players: PlayerDTO[];
-  currentTurnPlayer: PlayerDTO;
+  currentTurnPlayer: PlayerDTO | null;
   discardTop: CardDTO;
   activeColor: Color;
   isMyTurn: boolean;
@@ -30,7 +30,7 @@ export function GameHUD({
   return (
     <>
     <MatchInfoPanel
-        currentTurnPlayer={currentTurnPlayer.name}
+        currentTurnPlayer={currentTurnPlayer.name ?? ""}
         activeColor={activeColor}
         discardTop={discardTop}
       />

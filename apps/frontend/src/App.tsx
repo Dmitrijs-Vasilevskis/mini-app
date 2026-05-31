@@ -20,24 +20,6 @@ function App() {
   const [joined, setJoined] = useState<boolean>(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
-  const handleCreateRoom = async () => {
-    const room = await colyseusService.createRoom(user.username);
-
-    GameEvents.initialize(room);
-
-    setRoomId(room.roomId);
-
-    setJoined(true);
-  };
-
-  const handleJoinRoom = async () => {
-    const room = await colyseusService.joinRoomById(roomId, user.username);
-
-    GameEvents.initialize(room);
-
-    setJoined(true);
-  };
-
   const localPlayer = useGameStore((s) => s.localPlayer);
   const players = useGameStore((s) => s.players);
   const discardTop = useGameStore((s) => s.discardTop);
@@ -55,7 +37,7 @@ function App() {
       return true;
     }
 
-    if (card.value === discardTop.value) {
+    if (card.value === discardTop?.value) {
       return true;
     }
 
@@ -78,7 +60,25 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  const currentTurnPlayer = players.find((p) => p.id === currentTurn);
+  const handleCreateRoom = async () => {
+    const room = await colyseusService.createRoom(user.username);
+
+    GameEvents.initialize(room);
+
+    setRoomId(room.roomId);
+
+    setJoined(true);
+  };
+
+  const handleJoinRoom = async () => {
+    const room = await colyseusService.joinRoomById(roomId, user.username);
+
+    GameEvents.initialize(room);
+
+    setJoined(true);
+  };
+
+  const currentTurnPlayer = players.find((p) => p.id === currentTurn) ?? null;
 
   if (!joined) {
     return (
