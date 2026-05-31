@@ -38,13 +38,18 @@ export function Table3D() {
         fov: 50,
       }}
     >
-      <ambientLight intensity={1} />
-      <directionalLight position={[5, 10, 5]} intensity={2} />
+      <ambientLight intensity={0.4} />
+
+      <hemisphereLight intensity={0.8} color="#bcd6ff" groundColor="#2b2b3a" />
+
+      <directionalLight position={[5, 10, 5]} intensity={1.2} />
+
+      <fog attach="fog" args={["#1e2633", 8, 25]} />
 
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[30, 30]} />
-        <meshStandardMaterial color="#1a1a1a" />
+        <meshStandardMaterial color="#283042" />
       </mesh>
 
       {/* Table */}
