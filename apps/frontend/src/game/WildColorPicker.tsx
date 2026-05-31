@@ -1,7 +1,7 @@
 import type { Color } from "../types/game";
 
 type Props = {
-  onSelect: (color: string) => void;
+  onSelect: (color: Color) => void;
 };
 
 const colors = [
