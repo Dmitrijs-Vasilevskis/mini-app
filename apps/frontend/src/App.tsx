@@ -12,6 +12,7 @@ import { WildColorPicker } from "./game/WildColorPicker";
 import type { Color } from "@uno/shared";
 import { VictoryOverlay } from "./game/VictoryOverlay";
 import { DrawButton } from "./game/DrawButton";
+import { GameHUD } from "./game/hud/GameHUD";
 
 function App() {
   const { user, ready } = useTelegramContext();
@@ -92,33 +93,21 @@ function App() {
 
   return (
     <div
-      className="relative h-screen w-screen bg-gray-900 text-white overflow-hidden"
+      className="relative h-screen w-screen text-white overflow-hidden bg-gradient-to-b from-[#ac61a3] to-[#2a57c0]"
       onClick={() => {
         setSelectedCardId(null);
       }}
     >
       {/* 2D UI Overlay */}
-      <div className="absolute top-0 left-0 z-10 p-4 bg-black/50 rounded-br-lg">
-        <h1 className="text-2xl font-bold">UNO Mini App</h1>
-        <div>Room ID: {colyseusService.room?.roomId}</div>
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText(colyseusService.room?.roomId || "");
-          }}
-          className="bg-gray-700 px-2 py-1 rounded"
-        >
-          Copy
-        </button>
-        <div>Players: {players.map((p) => p.name).join(", ")}</div>
-        <div>Current turn: {currentTurnPlayer.name}</div>
-        <div>Your cards: {localPlayer.hand.length}</div>
-        <div>
-          <span>Last played card:</span>
-          <span>{discardTop.color}</span>
-          <span>{discardTop.value}</span>
-        </div>
-        {isMyTurn && <div className="text-green-400 font-bold">YOUR TURN!</div>}
-      </div>
+      <GameHUD
+        roomId={roomId}
+        players={players}
+        currentTurnPlayer={currentTurnPlayer}
+        discardTop={discardTop}
+        activeColor={activeColor}
+        isMyTurn={isMyTurn}
+        localPlayer={localPlayer}
+      />
 
       {winner && (
         <VictoryOverlay
@@ -142,7 +131,10 @@ function App() {
         selectedCardId={selectedCardId}
         setSelectedCardId={setSelectedCardId}
       />
-      <DrawButton isMyTurn={isMyTurn} onDraw={() => colyseusService.drawCard()} />
+      <DrawButton
+        isMyTurn={isMyTurn}
+        onDraw={() => colyseusService.drawCard()}
+      />
 
       {wildCard && <WildColorPicker onSelect={onWildCardColorSelect} />}
     </div>
