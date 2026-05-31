@@ -29,7 +29,7 @@ export function MatchInfoPanel({
           <div>
             <div className="text-gray-400">Top Card</div>
             <div>
-              {discardTop.color} {discardTop.value}
+              {discardTop?.color} {discardTop?.value}
             </div>
           </div>
         </div>

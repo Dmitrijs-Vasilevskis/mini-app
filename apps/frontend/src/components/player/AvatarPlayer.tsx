@@ -14,7 +14,9 @@ type Props = ThreeElements["group"] & {
 
 export function AvatarPlayer({ name, active, ...props }: Props) {
   const groupRef = useRef<Group>(null);
-  const textRef = useRef(null);
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const textRef = useRef<any>(null);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) {

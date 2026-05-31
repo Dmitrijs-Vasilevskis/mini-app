@@ -12,7 +12,7 @@ type Props = {
   roomId: string;
   players: PlayerDTO[];
   currentTurnPlayer: PlayerDTO | null;
-  discardTop: CardDTO;
+  discardTop: CardDTO | null;
   activeColor: Color;
   isMyTurn: boolean;
   localPlayer: LocalPlayerDTO;
