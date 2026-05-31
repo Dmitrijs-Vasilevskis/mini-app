@@ -3,7 +3,7 @@ import type { CardDTO, Color } from "../../types/game";
 type Props = {
   currentTurnPlayer: string;
   activeColor: Color;
-  discardTop: CardDTO;
+  discardTop: CardDTO | null;
 };
 
 export function MatchInfoPanel({

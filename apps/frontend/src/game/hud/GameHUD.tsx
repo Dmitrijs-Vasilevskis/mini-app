@@ -30,7 +30,7 @@ export function GameHUD({
   return (
     <>
     <MatchInfoPanel
-        currentTurnPlayer={currentTurnPlayer.name ?? ""}
+        currentTurnPlayer={currentTurnPlayer?.name ?? ""}
         activeColor={activeColor}
         discardTop={discardTop}
       />

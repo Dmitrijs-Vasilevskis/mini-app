@@ -12,7 +12,7 @@ export class GameEvents {
         const effects = useEffectStore.getState();
 
         // players listener
-        $(room.state).players.onAdd((player: any, key: string) => {
+        $(room.state).players.onAdd((player: any) => {
 
             const updatePlayer = (updates: Partial<any>) => {
                 const players = useGameStore.getState().players;
