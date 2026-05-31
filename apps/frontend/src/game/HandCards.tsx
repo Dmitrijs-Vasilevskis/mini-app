@@ -54,20 +54,23 @@ export function HandCards({
   };
 
   const center = (cards.length - 1) / 2;
-  const spacing = Math.max(22, 70 - cards.length * 2.2);
+  const spacing = Math.max(18, 68 - cards.length * 1.8);
   const cardScale = Math.max(0.72, 1 - cards.length * 0.018);
+  const curveStrength = Math.min(38, 16 + cards.length * 0.9);
+  const maxRotation = Math.min(14, 6 + cards.length * 0.35);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-80 z-20 pointer-events-none overflow-visible">
+    <div className="absolute bottom-[max(3rem,env(safe-area-inset-bottom))] left-0 right-0 z-20 pointer-events-none overflow-visible">
       <AnimatePresence mode="popLayout">
         {cards.map((card, index) => {
           const playable = isPlayable(card);
 
           const selected = selectedCardId === card.id;
           const offset = index - center;
+          const normalized = center === 0 ? 0 : offset / center;
           const x = offset * spacing;
-          const rotate = offset * 5;
-          const curve = Math.abs(offset) * 6;
+          const rotate = normalized * maxRotation;
+          const curve = Math.pow(Math.abs(normalized), 1.7) * curveStrength;
 
           return (
             <motion.div
@@ -90,25 +93,32 @@ export function HandCards({
                 scale: 0.5,
                 rotate: rotate * 2,
               }}
+              whileHover={{
+                y: selected ? curve - 120 : curve - 45,
+                scale: selected ? cardScale * 1.35 : cardScale * 1.25,
+                rotate: 0,
+                zIndex: 999,
+                transition: {
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 22,
+                },
+              }}
               transition={{
                 type: "spring",
                 stiffness: 700,
                 damping: 28,
                 mass: 0.4,
               }}
-              whileHover={{
-                y: selected ? curve - 90 : curve - 35,
-                zIndex: 999,
-              }}
-              className={`absolute left-1/2 bottom-0 -translate-x-1/2 origin-bottom pointer-events-auto transition-all
-                ${
-                  selected
-                    ? `drop-shadow-[0_0_40px_rgba(255,255,255,0.9)]`
-                    : playable
-                      ? `drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]`
-                      : `opacity-40 grayscale`
-                }
-              `}
+              className={`absolute left-1/2 bottom-0 -translate-x-1/2 origin-bottom pointer-events-auto
+              ${
+                selected
+                  ? `drop-shadow-[0_0_40px_rgba(255,255,255,0.9)]`
+                  : playable
+                    ? `drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]`
+                    : `opacity-40 grayscale`
+              }
+            `}
               style={{
                 zIndex: selected ? 999 : index,
               }}
