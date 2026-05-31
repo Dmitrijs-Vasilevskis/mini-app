@@ -10,8 +10,5 @@ export default defineConfig({
     watch: {
       usePolling: process.env.CHOKIDAR_USEPOLLING === 'true',
     },
-  },
-  optimizeDeps: {
-    include: ["@uno/shared"],
   }
 })
