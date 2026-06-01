@@ -68,6 +68,7 @@ export function Table3D() {
         rotation={[0, Math.PI, 0]}
         active={currentTurn === localPlayer.id}
         name={localPlayer?.name || "You"}
+        cardCount={localPlayer.handCount}
       />
 
       {otherPlayers.map((player, index) => {
@@ -81,6 +82,8 @@ export function Table3D() {
             active={currentTurn === player.id}
             position={seat.position as [number, number, number]}
             rotation={seat.rotation as [number, number, number]}
+            cardCount={player.handCount}
+            showCardsCount={true}
           />
         );
       })}
