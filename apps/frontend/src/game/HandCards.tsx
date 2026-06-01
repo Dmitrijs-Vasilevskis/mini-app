@@ -114,9 +114,7 @@ export function HandCards({
               ${
                 selected
                   ? `drop-shadow-[0_0_40px_rgba(255,255,255,0.9)]`
-                  : playable
-                    ? `drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]`
-                    : `opacity-40 grayscale`
+                  : `drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]`
               }
             `}
               style={{
