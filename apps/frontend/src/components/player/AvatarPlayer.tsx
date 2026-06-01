@@ -1,10 +1,7 @@
 import { Text } from "@react-three/drei";
 import type { ThreeElements } from "@react-three/fiber";
-
 import { useFrame } from "@react-three/fiber";
-
 import { useRef } from "react";
-
 import type { Group } from "three";
 
 type Props = ThreeElements["group"] & {
@@ -17,7 +14,7 @@ type Props = ThreeElements["group"] & {
 export function AvatarPlayer({
   name,
   active,
-  cardCount,
+  cardCount = 0,
   showCardsCount = false,
   ...props
 }: Props) {

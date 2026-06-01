@@ -37,7 +37,7 @@ export function Card({ card, onClick }: Props) {
       role="article"
       style={{
         ["--uno-primary" as string]:
-          CARD_COLORS[card.color] || CARD_COLORS.wild,
+          CARD_COLORS[card.color ?? 'wild'] || CARD_COLORS.wild,
       }}
     >
       <div className="card-watermark">

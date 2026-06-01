@@ -63,7 +63,7 @@ export function HandCards({
     <div className="absolute bottom-[max(3rem,env(safe-area-inset-bottom))] left-0 right-0 z-20 pointer-events-none overflow-visible">
       <AnimatePresence mode="popLayout">
         {cards.map((card, index) => {
-          const playable = isPlayable(card);
+          // const playable = isPlayable(card);
 
           const selected = selectedCardId === card.id;
           const offset = index - center;
