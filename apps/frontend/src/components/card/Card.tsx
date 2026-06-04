@@ -1,10 +1,11 @@
-import type { CardDTO, CardValue } from "../../types/game";
+import type { CardDTO } from "../../types/game";
 import { Skip } from "./icons/Skip";
 import "./style.css";
 import { Reverse } from "./icons/Reverse";
 import { DrawTwo } from "./icons/DrawTwo";
 import { Wild } from "./icons/Wild";
 import { WildDrawFour } from "./icons/WildDrawFour";
+import type { JSX } from "react";
 
 interface Props {
   card: CardDTO;
@@ -17,26 +18,6 @@ const CARD_COLORS = {
   green: "#43a047",
   blue: "#1e88e5",
   wild: "#212121",
-};
-
-const CARD_SYMBOLS = {
-  skip: {
-    icon: Skip,
-  },
-  reverse: {
-    icon: Reverse,
-  },
-  drawTwo: {
-    icon: DrawTwo,
-    label: "+2",
-  },
-  wild: {
-    icon: Wild,
-  },
-  wildDrawFour: {
-    icon: WildDrawFour,
-    label: "+4",
-  },
 };
 
 export function Card({ card, onClick }: Props) {
@@ -76,8 +57,36 @@ export function Card({ card, onClick }: Props) {
 
 type FaceSize = "corner" | "center" | "watermark";
 
+type CardSymbol = {
+  icon: () => JSX.Element;
+  label?: string;
+};
+
+const CARD_SYMBOLS: Record<string, CardSymbol> = {
+  skip: {
+    icon: Skip,
+  },
+  reverse: {
+    icon: Reverse,
+  },
+  drawTwo: {
+    icon: DrawTwo,
+    label: "+2",
+  },
+  wild: {
+    icon: Wild,
+  },
+  wildDrawFour: {
+    icon: WildDrawFour,
+    label: "+4",
+  },
+};
+
 function CardFace({ value, size }: { value: string; size: FaceSize }) {
-  const specialCard = CARD_SYMBOLS[value as CardValue];
+  const isSpecialCard = value in CARD_SYMBOLS;
+  const specialCard = isSpecialCard
+    ? CARD_SYMBOLS[value as keyof typeof CARD_SYMBOLS]
+    : undefined;
 
   const className = `card-face card-face-${size}`;
 
