@@ -4,7 +4,7 @@ export type Color =
     | 'blue'
     | 'yellow';
 
-export type Value =
+export type CardValue =
     | '0'
     | '1'
     | '2'
@@ -24,7 +24,7 @@ export type Value =
 export interface CardDTO {
     id: string;
     color: Color | null;
-    value: Value;
+    value: CardValue;
 }
 
 export interface PlayerDTO {

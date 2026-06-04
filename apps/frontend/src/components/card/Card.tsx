@@ -1,9 +1,10 @@
-import type { CardDTO } from "../../types/game";
+import type { CardDTO, CardValue } from "../../types/game";
 import { Skip } from "./icons/Skip";
 import "./style.css";
 import { Reverse } from "./icons/Reverse";
 import { DrawTwo } from "./icons/DrawTwo";
 import { Wild } from "./icons/Wild";
+import { WildDrawFour } from "./icons/WildDrawFour";
 
 interface Props {
   card: CardDTO;
@@ -19,11 +20,23 @@ const CARD_COLORS = {
 };
 
 const CARD_SYMBOLS = {
-  skip: Skip,
-  reverse: Reverse,
-  drawTwo: DrawTwo,
-  wild: Wild,
-  wildDrawFour: Wild,
+  skip: {
+    icon: Skip,
+  },
+  reverse: {
+    icon: Reverse,
+  },
+  drawTwo: {
+    icon: DrawTwo,
+    label: "+2",
+  },
+  wild: {
+    icon: Wild,
+  },
+  wildDrawFour: {
+    icon: WildDrawFour,
+    label: "+4",
+  },
 };
 
 export function Card({ card, onClick }: Props) {
@@ -37,7 +50,7 @@ export function Card({ card, onClick }: Props) {
       role="article"
       style={{
         ["--uno-primary" as string]:
-          CARD_COLORS[card.color ?? 'wild'] || CARD_COLORS.wild,
+          CARD_COLORS[card.color ?? "wild"] || CARD_COLORS.wild,
       }}
     >
       <div className="card-watermark">
@@ -64,11 +77,16 @@ export function Card({ card, onClick }: Props) {
 type FaceSize = "corner" | "center" | "watermark";
 
 function CardFace({ value, size }: { value: string; size: FaceSize }) {
-  const Icon = CARD_SYMBOLS[value as keyof typeof CARD_SYMBOLS];
+  const specialCard = CARD_SYMBOLS[value as CardValue];
 
   const className = `card-face card-face-${size}`;
 
-  if (Icon) {
+  if (size === "corner" && specialCard?.label) {
+    return <span className={className}>{specialCard.label}</span>;
+  }
+
+  if (specialCard) {
+    const Icon = specialCard.icon;
     return (
       <span className={className}>
         <Icon />

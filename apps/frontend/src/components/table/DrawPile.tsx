@@ -64,8 +64,8 @@ export function DrawPile({
             <Text
                 position={[0, 0.14, -1.3]}
                 rotation={[-Math.PI / 2, 0, 0]}
-                fontSize={0.14}
-                color="#e5e7eb"
+                fontSize={0.28}
+                color="#000"
                 anchorX="center"
                 anchorY="middle"
             >

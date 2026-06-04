@@ -5,10 +5,10 @@ type Props = {
 };
 
 const colors = [
-  { color: "red", style: "rounded-ss-full" },
-  { color: "green", style: "rounded-se-full" },
-  { color: "blue", style: "rounded-es-full" },
-  { color: "yellow", style: "rounded-ee-full" },
+  { color: "red", style: "rounded-ss-full wild-color-red" },
+  { color: "blue", style: "rounded-se-full wild-color-blue" },
+  { color: "yellow", style: "rounded-es-full wild-color-yellow" },
+  { color: "green", style: "rounded-ee-full wild-color-green" },
 ];
 
 export function WildColorPicker({ onSelect }: Props) {
@@ -26,7 +26,6 @@ export function WildColorPicker({ onSelect }: Props) {
               className={`
                 w-24 h-24 rounded-xl capitalize text-white font-bold
                 flex items-center justify-center relative shadow-xl
-                bg-${c.color}-500
                 hover:bg-opacity-80
                 ${c.style}
                 `}

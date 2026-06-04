@@ -110,3 +110,19 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.wild-color-red {
+  background-color: #e53935;
+}
+
+.wild-color-green {
+  background-color: #43a047;
+}
+
+.wild-color-blue {
+  background-color: #1e88e5;
+}
+
+.wild-color-yellow {
+  background-color: #fdd835;
+} 
