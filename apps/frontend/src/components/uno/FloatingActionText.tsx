@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffectStore } from "../store/effectsStore";
+import { useEffectStore } from "../../store/effectsStore";
 
 export function FloatingActionText() {
   const effects = useEffectStore((e) => e.effects);

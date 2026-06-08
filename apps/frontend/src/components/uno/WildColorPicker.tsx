@@ -1,4 +1,4 @@
-import type { Color } from "../types/game";
+import type { Color } from "../../types/game";
 
 type Props = {
   onSelect: (color: Color) => void;

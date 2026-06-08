@@ -6,7 +6,6 @@ import type {
 } from "../../types/game";
 import { MatchInfoPanel } from "./MatchInfoPanel";
 import { PlayerInfoPanel } from "./PlayerInfoPanel";
-import { RoomInfoPanel } from "./RoomInfoPanel";
 
 type Props = {
   roomId: string;
@@ -19,8 +18,6 @@ type Props = {
 };
 
 export function GameHUD({
-  roomId,
-  players,
   currentTurnPlayer,
   discardTop,
   activeColor,
@@ -29,13 +26,11 @@ export function GameHUD({
 }: Props) {
   return (
     <>
-    <MatchInfoPanel
+      <MatchInfoPanel
         currentTurnPlayer={currentTurnPlayer?.name ?? ""}
         activeColor={activeColor}
         discardTop={discardTop}
       />
-      
-      <RoomInfoPanel roomId={roomId} playerCount={players.length} />
 
       <PlayerInfoPanel cardsCount={localPlayer.handCount} isMyTurn={isMyTurn} />
     </>

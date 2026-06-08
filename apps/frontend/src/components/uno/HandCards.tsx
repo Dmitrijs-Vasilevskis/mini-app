@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Card } from "../components/card/Card";
-import type { CardDTO } from "../types/game";
-import { useAnimationStore } from "../store/animationStore";
-import { colyseusService } from "../services/colyseus";
+import { Card } from "../card/Card";
+import type { CardDTO } from "../../types/game";
+import { useAnimationStore } from "../../store/animationStore";
+import { colyseusService } from "../../services/colyseus";
 
 type Props = {
   cards: CardDTO[];
