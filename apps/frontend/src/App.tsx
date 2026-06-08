@@ -15,6 +15,10 @@ function App() {
   const [roomId, setRoomId] = useState<string>("");
 
   const handleCreateRoom = async () => {
+    if (!user?.username) {
+      console.error("User is not available");
+      return;
+    }
     const room = await colyseusService.createRoom(user?.username);
 
     room.onStateChange.once(() => {
@@ -23,6 +27,10 @@ function App() {
   };
 
   const handleJoinRoom = async () => {
+    if (!user?.username) {
+      console.error("User is not available");
+      return;
+    }
     const room = await colyseusService.joinRoomByCode(roomId, user?.username);
 
     room.onStateChange.once(() => {
