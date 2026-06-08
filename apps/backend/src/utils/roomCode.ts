@@ -1,11 +1,8 @@
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-export function generateRoomCode(length: number = 6): string {
-    let code = '';
-
-    for (let i = 0; i < length; i++) {
-        code += CHARS[Math.random() * CHARS.length];
-    }
-
-    return code;
+export function generateRoomCode(length = 6): string {
+    return Array.from(
+        { length },
+        () => CHARS[Math.floor(Math.random() * CHARS.length)]
+    ).join('');
 }
