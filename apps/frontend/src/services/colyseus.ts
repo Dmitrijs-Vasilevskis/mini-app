@@ -24,10 +24,11 @@ export class ColyseusService {
     return this.room;
   }
 
-  async joinRoomById(roomId: string, username: string) {
-    this.room = await this.client.joinById(
-      roomId,
+  async joinRoomByCode(roomCode: string, username: string) {
+    this.room = await this.client.join(
+      "uno",
       {
+        roomCode,
         name: username
       }
     );
@@ -36,6 +37,12 @@ export class ColyseusService {
       "JOINED ROOM",
       this.room.roomId
     );
+
+    return this.room;
+  }
+
+  async reconnect(roomId: string, sessionId: string) {
+    this.room = await this.client.reconnect(roomId, sessionId);
 
     return this.room;
   }
@@ -60,8 +67,24 @@ export class ColyseusService {
 
   drawCard() {
     if (!this.room) return;
-    
+
     this.room.send('drawCard');
+  }
+
+  toggleReady() {
+    this.room?.send('toggleReady');
+  }
+
+  startGame() {
+    this.room?.send('startGame');
+  }
+
+  callUno() {
+    this.room?.send('uno');
+  }
+
+  challengeUno() {
+    this.room?.send('challengeUno');
   }
 }
 

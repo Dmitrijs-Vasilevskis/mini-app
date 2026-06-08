@@ -1,3 +1,5 @@
+import type { RoomStatus } from "@uno/shared";
+
 export type Color =
     | 'red'
     | 'green'
@@ -32,6 +34,9 @@ export interface PlayerDTO {
     name: string;
     isTurn: boolean;
     handCount: number;
+    isReady: boolean;
+    isConnected: boolean;
+    saidUno: boolean;
 }
 
 export interface LocalPlayerDTO
@@ -47,19 +52,31 @@ export interface GameWinner {
 export interface GameStore {
     connected: boolean;
     roomId: string | null;
+    roomCode: string | null;
+    status: RoomStatus;
+    hostId: string;
     currentTurn: string;
     activeColor: Color;
     discardTop: CardDTO | null;
     players: PlayerDTO[];
     localPlayer: LocalPlayerDTO | null;
     winner: GameWinner | null;
+    isPaused: boolean;
+    pausedPlayerId: string | null;
+    reconnectRemaining: number | null;
+    unoWindowPlayerId: string | null;
     setConnected: (value: boolean) => void;
     setRoomId: (roomId: string) => void;
+    setRoomCode: (roomCode: string) => void;
     setCurrentTurn: (playerId: string) => void;
     setPlayers: (players: PlayerDTO[]) => void;
     setLocalPlayer: (player: LocalPlayerDTO) => void;
     setDiscardTop: (card: CardDTO) => void;
     setActiveColor: (color: Color) => void;
+    setHostId: (hostId: string) => void;
+    setStatus: (status: RoomStatus) => void;
     setWinner: (winner: GameWinner) => void;
     resetGame: () => void;
+    setPaused: (paused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) => void;
+    setUnoWindowPlayerId: (playerId: string | null) => void;
 }

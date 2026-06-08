@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { type Color } from "@uno/shared";
+import { RoomStatus, type Color } from "@uno/shared";
 
 import type {
     CardDTO,
@@ -13,12 +13,19 @@ export const useGameStore =
     create<GameStore>((set) => ({
         connected: false,
         roomId: null,
+        roomCode: null,
+        status: null,
+        hostId: '',
         currentTurn: '',
         activeColor: 'red',
         discardTop: null,
         players: [],
         localPlayer: null,
         winner: null,
+        isPaused: false,
+        pausedPlayerId: null,
+        reconnectRemaining: null,
+        unoWindowPlayerId: null,
         setConnected: (value: boolean) => {
             set({ connected: value })
         },
@@ -44,6 +51,33 @@ export const useGameStore =
             set({ winner });
         },
         resetGame: () => {
-            set({ winner: null });
-        }
+            set({
+                winner: null,
+                isPaused: false,
+                pausedPlayerId: null,
+                reconnectRemaining: null,
+                unoWindowPlayerId: null,
+            });
+        },
+        setRoomCode: (roomCode: string) => {
+            set({ roomCode });
+        },
+        setStatus: (status: RoomStatus) => {
+            set({ status });
+        },
+        setHostId: (hostId: string) => {
+            set({ hostId });
+        },
+        setPaused(isPaused: boolean, pausedPlayerId: string, reconnectRemaining: number) {
+            set({
+                isPaused,
+                pausedPlayerId: pausedPlayerId ?? null,
+                reconnectRemaining: reconnectRemaining ?? null,
+            });
+        },
+        setUnoWindowPlayerId(playerId) {
+            set({
+                unoWindowPlayerId: playerId
+            });
+        },
     }));
