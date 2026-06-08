@@ -15,7 +15,9 @@ export function LobbyScreen() {
 
   // todo: implemet copy link https://t.me/<bot_username>?startapp=${roomCode}
   const copyRoomCode = async () => {
-    await navigator.clipboard.writeText(roomCode);
+    if (roomCode) {
+      await navigator.clipboard.writeText(roomCode);
+    }
   };
 
   return (
@@ -55,7 +57,7 @@ export function LobbyScreen() {
       </div>
 
       <LobbyActions
-        isReady={localPlayer?.isReady}
+        isReady={localPlayer?.isReady ?? false}
         isHost={isHost}
         canStart={canStart}
       />

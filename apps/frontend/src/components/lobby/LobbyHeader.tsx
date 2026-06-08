@@ -1,5 +1,5 @@
 interface Props {
-    roomCode: string;
+    roomCode: string | null;
     onClick: () => void;
 }
 
@@ -8,7 +8,7 @@ export function LobbyHeader({ roomCode, onClick }: Props) {
     <div className=" w-full max-w-md flex justify-around mb-4">
       <div className="text-center">
         <div className="text-sm opacity-70">Room Code</div>
-        <div className=" text-4xl font-black tracking-widest">{roomCode}</div>
+        <div className=" text-4xl font-black tracking-widest">{roomCode ?? ""}</div>
       </div>
 
       <button

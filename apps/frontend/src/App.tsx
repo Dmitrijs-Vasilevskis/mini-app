@@ -15,7 +15,7 @@ function App() {
   const [roomId, setRoomId] = useState<string>("");
 
   const handleCreateRoom = async () => {
-    const room = await colyseusService.createRoom(user.username);
+    const room = await colyseusService.createRoom(user?.username);
 
     room.onStateChange.once(() => {
       GameEvents.initialize(room);
@@ -23,7 +23,7 @@ function App() {
   };
 
   const handleJoinRoom = async () => {
-    const room = await colyseusService.joinRoomByCode(roomId, user.username);
+    const room = await colyseusService.joinRoomByCode(roomId, user?.username);
 
     room.onStateChange.once(() => {
       GameEvents.initialize(room);

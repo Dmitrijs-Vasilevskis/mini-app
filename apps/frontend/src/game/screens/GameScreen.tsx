@@ -24,6 +24,11 @@ export function GameScreen() {
   const winner = useGameStore((s) => s.winner);
   const roomCode = useGameStore((s) => s.roomCode);
 
+  // todo: add reloader/name input field to a join screen
+  if (!localPlayer || !roomCode) {
+    return <div className="text-white">Loading game...</div>;
+  }
+
   const currentTurnPlayer = players.find((p) => p.id === currentTurn) ?? null;
   const isMyTurn = localPlayer.id === currentTurn;
 

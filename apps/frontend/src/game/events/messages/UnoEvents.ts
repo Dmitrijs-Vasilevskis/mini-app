@@ -29,7 +29,7 @@ export function RegisterUnoEvents(room: GameRoom) {
         const player = useGameStore.getState().players.find(p => p.id === data.playerId);
 
         effects.addEffect({
-            text: `${player.name ?? "Player"} UNO?`,
+            text: `${player?.name ?? "Player"} UNO?`,
             color: "#f59e0b",
             emphasis: "special"
         });

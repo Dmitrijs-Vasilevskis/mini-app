@@ -14,7 +14,7 @@ export const useGameStore =
         connected: false,
         roomId: null,
         roomCode: null,
-        status: null,
+        status: null as unknown as RoomStatus,
         hostId: '',
         currentTurn: '',
         activeColor: 'red',
@@ -68,14 +68,14 @@ export const useGameStore =
         setHostId: (hostId: string) => {
             set({ hostId });
         },
-        setPaused(isPaused: boolean, pausedPlayerId: string, reconnectRemaining: number) {
+        setPaused(isPaused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) {
             set({
                 isPaused,
                 pausedPlayerId: pausedPlayerId ?? null,
                 reconnectRemaining: reconnectRemaining ?? null,
             });
         },
-        setUnoWindowPlayerId(playerId) {
+        setUnoWindowPlayerId(playerId: string | null) {
             set({
                 unoWindowPlayerId: playerId
             });
