@@ -20,7 +20,6 @@ export class Player extends Schema {
   @type([Card]) hand = new ArraySchema<Card>();
   @type("boolean") isTurn: boolean = false;
   @type("boolean") saidUno: boolean = false;
-  // @type("boolean") unoPending: boolean = false;
   @type("string") telegramId?: string; // optional
 }
 
