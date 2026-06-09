@@ -32,6 +32,7 @@ export interface CardDTO {
 export interface PlayerDTO {
     id: string;
     name: string;
+    score: number;
     isTurn: boolean;
     handCount: number;
     isReady: boolean;
@@ -49,6 +50,13 @@ export interface GameWinner {
     name: string;
 }
 
+export interface RoundResults {
+    roundWinnerId: string;
+    roundWinnerName: string;
+    pointsAwarded: number;
+    totalScore: number;
+}
+
 export interface GameStore {
     connected: boolean;
     roomId: string | null;
@@ -61,6 +69,7 @@ export interface GameStore {
     players: PlayerDTO[];
     localPlayer: LocalPlayerDTO | null;
     winner: GameWinner | null;
+    roundResults: RoundResults | null;
     isPaused: boolean;
     pausedPlayerId: string | null;
     reconnectRemaining: number | null;
@@ -79,4 +88,5 @@ export interface GameStore {
     resetGame: () => void;
     setPaused: (paused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) => void;
     setUnoWindowPlayerId: (playerId: string | null) => void;
+    setRoundResults: (results: RoundResults | null) => void;
 }

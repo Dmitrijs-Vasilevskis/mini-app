@@ -1,12 +1,13 @@
 import { useEffectStore } from "../../../store/effectsStore";
 import { useGameStore } from "../../../store/gameStore";
-import type { GameRoom } from "../types";
+import type { RoundResults } from "../../../types/game";
+import { GameEvents, type GameRoom } from "../types";
 
 export function RegisterGameLifecycleEvents(room: GameRoom) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
 
-    room.onMessage("gameEnd", (data: { winnerId: string, winnerName: string }) => {
+    room.onMessage(GameEvents.GAME_END, (data: { winnerId: string, winnerName: string }) => {
         store.setWinner({ id: data.winnerId, name: data.winnerName });
 
         effects.addEffect({
@@ -16,7 +17,15 @@ export function RegisterGameLifecycleEvents(room: GameRoom) {
         });
     });
 
-    room.onMessage("gameStarted", () => {
+    room.onMessage(GameEvents.GAME_START, () => {
         store.resetGame()
+    });
+
+    room.onMessage(GameEvents.ROUND_STARTED, () => {
+        store.setRoundResults(null);
+    });
+
+    room.onMessage(GameEvents.ROUND_ENDED, (results: RoundResults) => {
+        store.setRoundResults(results);
     });
 }

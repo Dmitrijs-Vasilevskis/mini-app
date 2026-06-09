@@ -1,6 +1,6 @@
 import { useEffectStore } from "../../../store/effectsStore";
 import { useGameStore } from "../../../store/gameStore";
-import type { GameRoom } from "../types";
+import { GameEvents, type GameRoom } from "../types";
 
 interface UnoPenalty {
     offenderId: string;
@@ -11,7 +11,7 @@ export function RegisterUnoEvents(room: GameRoom) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
 
-    room.onMessage("unoCalled", ({ playerId }: { playerId: string }) => {
+    room.onMessage(GameEvents.UNO_CALLED, ({ playerId }: { playerId: string }) => {
         const player = useGameStore.getState().players.find(p => p.id === playerId);
 
         effects.addEffect({
@@ -23,7 +23,7 @@ export function RegisterUnoEvents(room: GameRoom) {
         store.setUnoWindowPlayerId(null);
     });
 
-    room.onMessage("unoAvailable", (data: { playerId: string }) => {
+    room.onMessage(GameEvents.UNO_AVAILABLE, (data: { playerId: string }) => {
         store.setUnoWindowPlayerId(data.playerId);
 
         const player = useGameStore.getState().players.find(p => p.id === data.playerId);
@@ -35,7 +35,7 @@ export function RegisterUnoEvents(room: GameRoom) {
         });
     });
 
-    room.onMessage("unoPenalty",
+    room.onMessage(GameEvents.UNO_PENALTY,
         (data: UnoPenalty) => {
             const offender = useGameStore.getState()
                 .players.find(p => p.id === data.offenderId);
@@ -50,7 +50,7 @@ export function RegisterUnoEvents(room: GameRoom) {
         });
 
     room.onMessage(
-        "unoWindowClosed",
+        GameEvents.UNO_WINDOW_CLOSE,
         () => {
             store.setUnoWindowPlayerId(null);
         }

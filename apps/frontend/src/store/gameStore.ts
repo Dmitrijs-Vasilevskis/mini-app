@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { RoomStatus, type Color } from "@uno/shared";
+import type { RoundResults } from '../types/game';
 
 import type {
     CardDTO,
@@ -26,6 +27,7 @@ export const useGameStore =
         pausedPlayerId: null,
         reconnectRemaining: null,
         unoWindowPlayerId: null,
+        roundResults: null,
         setConnected: (value: boolean) => {
             set({ connected: value })
         },
@@ -53,6 +55,7 @@ export const useGameStore =
         resetGame: () => {
             set({
                 winner: null,
+                roundResults: null,
                 isPaused: false,
                 pausedPlayerId: null,
                 reconnectRemaining: null,
@@ -79,5 +82,8 @@ export const useGameStore =
             set({
                 unoWindowPlayerId: playerId
             });
+        },
+        setRoundResults(roundResults: RoundResults | null) {
+            set({ roundResults });
         },
     }));

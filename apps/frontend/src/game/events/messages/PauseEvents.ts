@@ -1,10 +1,10 @@
 import { useGameStore } from "../../../store/gameStore";
-import type { GameRoom } from "../types";
+import { GameEvents, type GameRoom } from "../types";
 
 export function RegisterPauseEvents(room: GameRoom) {
     const store = useGameStore.getState();
 
-    room.onMessage("gamePaused",
+    room.onMessage(GameEvents.GAME_PAUSED,
         (data: { playerId: string, remainingMs: number }) => {
             store.setPaused(
                 true,
@@ -13,7 +13,7 @@ export function RegisterPauseEvents(room: GameRoom) {
             );
         });
 
-    room.onMessage("gameResumed", () => {
+    room.onMessage(GameEvents.GAME_RESUMED, () => {
         store.setPaused(
             false,
             undefined,

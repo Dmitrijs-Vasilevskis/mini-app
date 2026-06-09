@@ -21,7 +21,8 @@ export function RegisterPlayerEvents(
                 isTurn: player.isTurn,
                 isReady: player.isReady,
                 isConnected: player.isConnected,
-                saidUno: player.saidUno
+                saidUno: player.saidUno,
+                score: player.score
             },
         ]);
 
@@ -53,7 +54,8 @@ export function RegisterPlayerEvents(
                 isTurn: player.isTurn,
                 isConnected: player.isConnected,
                 isReady: player.isReady,
-                saidUno: player.saidUno
+                saidUno: player.saidUno,
+                score: player.score
             });
         }
     });
