@@ -192,7 +192,8 @@ export class UNORoom extends Room {
     state.currentTurn = '';
     state.direction = 1;
 
-    state.winnerId = '';
+    state.roundWinnerId = '';
+    state.matchWinnerId = '';
     state.gameEnded = false;
 
     state.isPaused = false;

@@ -1,0 +1,1 @@
+export const MATCH_WINNING_SCORE = 500;

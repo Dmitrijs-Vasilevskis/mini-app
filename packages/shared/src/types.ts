@@ -14,6 +14,7 @@ export class Card extends Schema {
 export class Player extends Schema {
   @type("string") id: string = "";
   @type("string") name: string = "";
+  @type("number") score: number = 0;
   @type("boolean") isConnected: boolean = true;
   @type("number") disconnectedAt: number = 0;
   @type("boolean") isReady: boolean = false;
@@ -34,7 +35,8 @@ export class GameState extends Schema {
   @type("string") activeColor: Color = "red";
   @type("string") currentTurn: string = "";
   @type("int8") direction: 1 | -1 = 1;
-  @type("string") winnerId?: string = "";
+  @type("string") roundWinnerId?: string = "";
+  @type("string") matchWinnerId?: string = "";
   @type("boolean") gameEnded: boolean = false;
   @type("boolean") isPaused: boolean = false;
   @type("string") pausedPlayerId: string = "";

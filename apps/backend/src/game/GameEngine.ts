@@ -3,6 +3,8 @@ import { Color, GameState, RoomStatus } from "@uno/shared";
 import { DeckManager } from './DeckManager';
 import { TurnManager } from './TurnManager';
 import { CardValidator } from "./validators/CardValidator";
+import { ScodeCalculator } from "./ScoreCalculator";
+import { MATCH_WINNING_SCORE } from "./constants";
 
 export class GameEngine {
     constructor(
@@ -13,12 +15,29 @@ export class GameEngine {
     ) { }
 
     startGame() {
+        for (const player of this.state.players.values()) {
+            player.score = 0;
+        }
+        this.state.matchWinnerId = "";
+
+        const firstPlayer = this.state.playerOrder[0];
+
+        this.setupRound(firstPlayer);
+    }
+
+    private setupRound(startingPlayerId: string) {
         this.deckManager.initialize();
 
-        this.state.winnerId = "";
+        this.state.isPaused = false;
+        this.state.pausedPlayerId = "";
+
+        this.state.roundWinnerId = "";
         this.state.unoPendingPlayerId = "";
+
         this.state.gameEnded = false;
+
         this.state.direction = 1;
+        this.state.currentTurn = "";
 
         for (const playerId of this.state.players.values()) {
             playerId.hand.clear();
@@ -33,14 +52,20 @@ export class GameEngine {
                 }
             }
         }
-
-        this.state.unoPendingPlayerId = "";
-
-        const firstPlayerId = this.state.playerOrder[0];
-
-        this.turnManager.assignTurn(firstPlayerId);
+        
+        this.turnManager.assignTurn(startingPlayerId);
 
         this.state.status = RoomStatus.PLAYING;
+    }
+
+    private startNextRound(roundWinnerId: string) {
+        this.setupRound(roundWinnerId);
+
+        this.room.broadcast("roundStarted",
+            {
+                starterPlayerId: roundWinnerId
+            }
+        );
     }
 
     drawCard(playerId: string) {
@@ -183,20 +208,7 @@ export class GameEngine {
 
         // check for win condition before next turn
         if (player.hand.length === 0) {
-            this.state.unoPendingPlayerId = "";
-
-            this.room.broadcast("unoWindowClosed");
-
-            this.state.winnerId = playerId;
-
-            this.room.broadcast(
-                'gameEnd',
-                {
-                    winnerId: playerId,
-                    winnerName: player.name
-                }
-            );
-            this.state.gameEnded = true;
+            this.handleRoundWin(playerId);
 
             return;
         }
@@ -226,6 +238,63 @@ export class GameEngine {
                 }
             );
         }
+    }
+
+    private handleRoundWin(playerId: string) {
+        const winner = this.state.players.get(playerId);
+
+        if (!winner) {
+            return;
+        }
+
+        const points = ScodeCalculator.CalculateRoundPoints(
+            this.state.players.values(),
+            playerId
+        );
+
+        winner.score += points;
+
+        this.state.unoPendingPlayerId = "";
+        this.state.roundWinnerId = playerId;
+
+        this.room.broadcast("unoWindowClosed");
+
+        this.room.broadcast("roundEnded",
+            {
+                roundWinnerId: playerId,
+                roundWinnerName: winner.name,
+                pointsAwarded: points,
+                totalScore: winner.score
+            }
+        );
+
+        if (winner.score >= MATCH_WINNING_SCORE) {
+            this.state.matchWinnerId = playerId;
+            this.state.gameEnded = true;
+
+            this.room.broadcast("gameEnd",
+                {
+                    matchWinnerId: playerId,
+                    winnerName: winner.name,
+                    winnerScore: winner.score
+                }
+            );
+
+            return;
+        };
+
+        // prevent stuck match if a round winner leaves
+        setTimeout(() => {
+            if (this.state.players.size < 2) return;
+
+            const starterId = this.state.players.has(playerId)
+                ? playerId
+                : this.state.playerOrder[0];
+
+            if (!starterId) return;
+
+            this.startNextRound(starterId);
+        }, 10000);
     }
 
     callUno(playerId: string) {
