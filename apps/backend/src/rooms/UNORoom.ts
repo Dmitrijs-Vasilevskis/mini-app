@@ -135,6 +135,11 @@ export class UNORoom extends Room {
   onJoin(client: Client, options: { name: string; telegramId?: string }) {
     const state = this.state as GameState;
 
+    if (state.players.has(client.sessionId)) {
+      console.warn(`Player ${client.sessionId} already exists`);
+      return;
+    }
+
     if (!state.hostId) {
       state.hostId = client.sessionId;
     }
@@ -183,7 +188,7 @@ export class UNORoom extends Room {
     state.discardPile.clear();
 
     state.status = RoomStatus.LOBBY;
-    
+
     state.currentTurn = '';
     state.direction = 1;
 

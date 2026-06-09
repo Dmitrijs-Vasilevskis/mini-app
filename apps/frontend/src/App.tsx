@@ -13,29 +13,52 @@ function App() {
 
   const status = useGameStore((s) => s.status);
   const [roomId, setRoomId] = useState<string>("");
+  const [joining, setJoining] = useState<boolean>(false);
 
   const handleCreateRoom = async () => {
+    if (joining) return;
+
     if (!user?.username) {
       console.error("User is not available");
       return;
     }
-    const room = await colyseusService.createRoom(user?.username);
 
-    room.onStateChange.once(() => {
-      GameEvents.initialize(room);
-    });
+    setJoining(true);
+
+    try {
+      const room = await colyseusService.createRoom(user?.username);
+
+      room.onStateChange.once(() => {
+        GameEvents.initialize(room);
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setJoining(false);
+    }
   };
 
   const handleJoinRoom = async () => {
+    if (joining) return;
+
     if (!user?.username) {
       console.error("User is not available");
       return;
     }
-    const room = await colyseusService.joinRoomByCode(roomId, user?.username);
 
-    room.onStateChange.once(() => {
-      GameEvents.initialize(room);
-    });
+    setJoining(true);
+
+    try {
+      const room = await colyseusService.joinRoomByCode(roomId, user?.username);
+
+      room.onStateChange.once(() => {
+        GameEvents.initialize(room);
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setJoining(false);
+    }
   };
 
   switch (status) {
@@ -47,6 +70,7 @@ function App() {
       return (
         <JoinRoomScreen
           roomId={roomId}
+          joining={joining}
           setRoomId={setRoomId}
           onCreate={handleCreateRoom}
           onJoin={handleJoinRoom}
