@@ -1,6 +1,19 @@
 import { GameState, Card, Color, Value } from "@uno/shared";
 import { createDeck, shuffle } from "./UNODeck";
 
+const NUMBER_VALUES: Value[] = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+];
+
 export class DeckManager {
     constructor(private state: GameState) { }
 
@@ -10,13 +23,9 @@ export class DeckManager {
         this.state.discardPile.clear();
 
         let deckCards = createDeck();
-        let firstCardData = deckCards.pop()!;
-        // avoid wild as first card
-        while (firstCardData.value === 'wild' || firstCardData.value === 'wildDrawFour') {
-            deckCards.push(firstCardData);
-            deckCards = shuffle(deckCards);
-            firstCardData = deckCards.pop()!;
-        }
+        const firstCardIndex = deckCards.findIndex(card => NUMBER_VALUES.includes(card.value));
+        const [firstCardData] = deckCards.splice(firstCardIndex, 1);
+
         // Convert plain objects to Card instances
         for (const c of deckCards) {
             const card = new Card();
