@@ -11,6 +11,7 @@ import { colyseusService } from "../../services/colyseus";
 import { UnoButton } from "../../components/uno/UnoButton";
 import { ChallengeUnoButton } from "../../components/uno/ChallengeUnoButton";
 import { VictoryOverlay } from "../../components/uno/VictoryOverlay";
+import { RoundEndOverlay } from "../../components/uno/RoundEndOverlay";
 
 export function GameScreen() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -18,6 +19,7 @@ export function GameScreen() {
 
   const localPlayer = useGameStore((s) => s.localPlayer);
   const players = useGameStore((s) => s.players);
+  const roundResults = useGameStore((s) => s.roundResults);
   const discardTop = useGameStore((s) => s.discardTop);
   const currentTurn = useGameStore((s) => s.currentTurn);
   const activeColor = useGameStore((s) => s.activeColor);
@@ -82,6 +84,13 @@ export function GameScreen() {
         <VictoryOverlay
           winnerName={winner.name}
           isLocalWinner={winner.id === localPlayer.id}
+        />
+      )}
+
+      {roundResults && (
+        <RoundEndOverlay
+          roundResults={roundResults}
+          isLocalWinner={roundResults.roundWinnerId === localPlayer.id}
         />
       )}
 
