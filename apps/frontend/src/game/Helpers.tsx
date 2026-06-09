@@ -4,7 +4,7 @@ export interface ButtonPosition {
 }
 
 export const generateRandomButtonPosition = (): ButtonPosition => {
-  const left = 5 + Math.random() * 90;
+  const left = 10 + Math.random() * 70;
   const bottom = 5 + Math.random() * 45;
 
   return {
