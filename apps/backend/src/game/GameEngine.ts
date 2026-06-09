@@ -52,7 +52,7 @@ export class GameEngine {
                 }
             }
         }
-        
+
         this.turnManager.assignTurn(startingPlayerId);
 
         this.state.status = RoomStatus.PLAYING;
@@ -257,6 +257,12 @@ export class GameEngine {
         this.state.unoPendingPlayerId = "";
         this.state.roundWinnerId = playerId;
 
+        const standings = Array.from(this.state.players.values()).map(player => ({
+            playerId: player.id,
+            playerName: player.name,
+            score: player.score
+        })).sort((a, b) => b.score - a.score);
+
         this.room.broadcast("unoWindowClosed");
 
         this.room.broadcast("roundEnded",
@@ -264,7 +270,8 @@ export class GameEngine {
                 roundWinnerId: playerId,
                 roundWinnerName: winner.name,
                 pointsAwarded: points,
-                totalScore: winner.score
+                totalScore: winner.score,
+                standings
             }
         );
 
@@ -284,17 +291,17 @@ export class GameEngine {
         };
 
         // prevent stuck match if a round winner leaves
-        setTimeout(() => {
-            if (this.state.players.size < 2) return;
+        // setTimeout(() => {
+        //     if (this.state.players.size < 2) return;
 
-            const starterId = this.state.players.has(playerId)
-                ? playerId
-                : this.state.playerOrder[0];
+        //     const starterId = this.state.players.has(playerId)
+        //         ? playerId
+        //         : this.state.playerOrder[0];
 
-            if (!starterId) return;
+        //     if (!starterId) return;
 
-            this.startNextRound(starterId);
-        }, 10000);
+        //     this.startNextRound(starterId);
+        // }, 10000);
     }
 
     callUno(playerId: string) {

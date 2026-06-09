@@ -55,6 +55,11 @@ export interface RoundResults {
     roundWinnerName: string;
     pointsAwarded: number;
     totalScore: number;
+    standings: {
+        playerId: string;
+        playerName: string;
+        score: number;
+    }[];
 }
 
 export interface GameStore {
