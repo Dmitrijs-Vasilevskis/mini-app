@@ -1,5 +1,4 @@
 import { useGameStore } from "./store/gameStore";
-import { useTelegramContext } from "./providers/telegram/TelegramContext";
 import { colyseusService } from "./services/colyseus";
 import { useState } from "react";
 import { GameEvents } from "./game/GameEvents";
@@ -7,6 +6,7 @@ import { LobbyScreen } from "./game/screens/LobbyScreen";
 import { RoomStatus } from "@uno/shared";
 import { JoinRoomScreen } from "./game/screens/JoinRoomScreen";
 import { GameScreen } from "./game/screens/GameScreen";
+import { useTelegramContext } from "./providers/telegram/TelegramProvider";
 
 function App() {
   const { user, playerId, telegramId, setUsername } = useTelegramContext();

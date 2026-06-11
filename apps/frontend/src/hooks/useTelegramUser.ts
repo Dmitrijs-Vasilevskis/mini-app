@@ -83,9 +83,9 @@ export function useTelegramUser(): UseTelegramUserInterface {
       tg.ready();
       tg.expand();
 
-      // if (tg.requestFullscreen) {
-      //   tg.requestFullscreen();
-      // }
+      if (tg.requestFullscreen) {
+        tg.requestFullscreen();
+      }
 
       const realUser = tg.initDataUnsafe?.user;
       if (realUser) {

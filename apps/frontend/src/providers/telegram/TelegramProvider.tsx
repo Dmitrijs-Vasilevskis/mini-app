@@ -1,8 +1,8 @@
+import { createContext, useContext } from "react";
 import {
   useTelegramUser,
   type TelegramUser,
 } from "../../hooks/useTelegramUser";
-import { TelegramContext } from "./TelegramContext";
 
 interface TelegramContextInterface {
   user: TelegramUser | null;
@@ -12,24 +12,34 @@ interface TelegramContextInterface {
   setUsername: (username: string) => void;
 }
 
+export const TelegramContext = createContext<TelegramContextInterface | null>(null);
+
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
   const { user, ready, playerId, telegramId, setUsername } = useTelegramUser();
 
   if (!ready) {
-    return <div>Loading...</div>; // or null
+    return <div>Loading...</div>;
   }
 
-  const contextValue: TelegramContextInterface = {
-    user,
-    ready,
-    playerId,
-    telegramId,
-    setUsername,
-  };
-
   return (
-    <TelegramContext.Provider value={contextValue}>
+    <TelegramContext.Provider
+      value={{
+        user,
+        ready,
+        playerId,
+        telegramId,
+        setUsername,
+      }}
+    >
       {children}
     </TelegramContext.Provider>
   );
+}
+
+export const useTelegramContext = () => {
+    const context = useContext(TelegramContext);
+    if (!context) {
+        throw new Error('useTelegram must be used within a TelegramProvider');
+    }
+    return context;
 }
