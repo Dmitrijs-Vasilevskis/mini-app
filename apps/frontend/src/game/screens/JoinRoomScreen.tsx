@@ -23,29 +23,26 @@ export function JoinRoomScreen({
     <div className="h-screen flex flex-col items-center justify-center gap-4 p-4 bg-gradient-to-b from-[#ac61a3] to-[#2a57c0] text-white">
       <div className="w-full max-w-5xl rounded-3xl bg-black/20 backdrop-blur-md border border-white/10 p-6">
         <div className="flex flex-row gap-6">
-          
           <div className="flex-1 flex flex-col justify-center">
             <h2 className="text-xl font-bold mb-4">👤 Player</h2>
 
-            {!isTelegramUser && (
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-white/70">Nickname</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-white/70">Nickname</label>
 
-                <input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter nickname"
-                  maxLength={20}
-                  className="
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter nickname"
+                maxLength={20}
+                className="
                     h-12
                     rounded-xl
                     px-4
                     text-black
                     outline-none
                   "
-                />
-              </div>
-            )}
+              />
+            </div>
 
             {isTelegramUser && (
               <div className="text-white/80">Connected through Telegram</div>
@@ -121,7 +118,6 @@ export function JoinRoomScreen({
               Got an invite? Enter the room code and join instantly.
             </p>
           </div>
-          
         </div>
       </div>
     </div>
