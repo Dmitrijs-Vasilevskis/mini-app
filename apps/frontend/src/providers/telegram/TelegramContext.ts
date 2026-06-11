@@ -9,7 +9,7 @@ interface TelegramContextInterface {
     setUsername: (username: string) => void;
 }
 
-export const TelegramContext = createContext<TelegramContextInterface>(null);
+export const TelegramContext = createContext<TelegramContextInterface | null>(null);
 
 export const useTelegramContext = () => {
     const context = useContext(TelegramContext);

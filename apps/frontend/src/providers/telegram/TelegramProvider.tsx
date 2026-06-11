@@ -5,10 +5,10 @@ import {
 import { TelegramContext } from "./TelegramContext";
 
 interface TelegramContextInterface {
-  user: TelegramUser;
+  user: TelegramUser | null;
   ready: boolean;
   playerId: string;
-  telegramId: string;
+  telegramId: string | null;
   setUsername: (username: string) => void;
 }
 
@@ -20,7 +20,7 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
     ready,
     playerId,
     telegramId,
-    setUsername
+    setUsername,
   };
 
   return (
