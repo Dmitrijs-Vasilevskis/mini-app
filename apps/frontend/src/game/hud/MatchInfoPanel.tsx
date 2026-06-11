@@ -12,7 +12,7 @@ export function MatchInfoPanel({
   discardTop,
 }: Props) {
   return (
-    <div className="absolute top-4 left-4 z-20">
+    <div className="absolute top-12 left-4 z-20">
       <div className="bg-black/70 backdrop-blur-md rounded-xl p-4 min-w-[220px] text-center">
         <div className="text-xs uppercase text-gray-400">Match Status</div>
 
