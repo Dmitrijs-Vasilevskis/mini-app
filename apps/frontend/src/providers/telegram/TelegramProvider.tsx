@@ -15,6 +15,10 @@ interface TelegramContextInterface {
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
   const { user, ready, playerId, telegramId, setUsername } = useTelegramUser();
 
+  if (!ready) {
+    return <div>Loading...</div>; // or null
+  }
+
   const contextValue: TelegramContextInterface = {
     user,
     ready,
