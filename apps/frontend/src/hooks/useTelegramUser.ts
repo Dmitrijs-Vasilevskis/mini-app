@@ -10,7 +10,7 @@ export interface TelegramUser {
 export interface UseTelegramUserInterface{
   user: TelegramUser | null;
   playerId: string;
-  telegramId: string | null;
+  telegramId: string;
   ready: boolean;
   setUsername: (username: string) => void;
 }
