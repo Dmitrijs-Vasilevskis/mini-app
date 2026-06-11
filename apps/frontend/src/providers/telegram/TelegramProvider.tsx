@@ -8,7 +8,7 @@ interface TelegramContextInterface {
   user: TelegramUser | null;
   ready: boolean;
   playerId: string;
-  telegramId: string | null;
+  telegramId: string;
   setUsername: (username: string) => void;
 }
 

@@ -36,7 +36,7 @@ export function useTelegramUser(): UseTelegramUserInterface {
   const initialized = useRef(false);
 
   const [playerId, setPlayerId] = useState("");
-  const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [telegramId, setTelegramId] = useState<string>("");
 
   const updateUsername = useCallback((username: string) => {
     localStorage.setItem(USERNAME_STORAGE_KEY, username);
