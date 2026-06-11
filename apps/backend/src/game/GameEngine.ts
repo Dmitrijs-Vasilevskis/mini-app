@@ -291,17 +291,17 @@ export class GameEngine {
         };
 
         // prevent stuck match if a round winner leaves
-        // setTimeout(() => {
-        //     if (this.state.players.size < 2) return;
+        setTimeout(() => {
+            if (this.state.players.size < 2) return;
 
-        //     const starterId = this.state.players.has(playerId)
-        //         ? playerId
-        //         : this.state.playerOrder[0];
+            const starterId = this.state.players.has(playerId)
+                ? playerId
+                : this.state.playerOrder[0];
 
-        //     if (!starterId) return;
+            if (!starterId) return;
 
-        //     this.startNextRound(starterId);
-        // }, 10000);
+            this.startNextRound(starterId);
+        }, 10000);
     }
 
     callUno(playerId: string) {

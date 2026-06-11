@@ -12,7 +12,8 @@ export class Card extends Schema {
 }
 
 export class Player extends Schema {
-  @type("string") id: string = "";
+  @type("string") id: string = ""; // sessionId
+  @type("string") connectionId: string = "";
   @type("string") name: string = "";
   @type("number") score: number = 0;
   @type("boolean") isConnected: boolean = true;
@@ -21,7 +22,8 @@ export class Player extends Schema {
   @type([Card]) hand = new ArraySchema<Card>();
   @type("boolean") isTurn: boolean = false;
   @type("boolean") saidUno: boolean = false;
-  @type("string") telegramId?: string; // optional
+  @type("string") telegramId?: string; // optional telegram webapp user identificator
+  @type("string") playerId?: string; // web page local storage uuid
 }
 
 export class GameState extends Schema {

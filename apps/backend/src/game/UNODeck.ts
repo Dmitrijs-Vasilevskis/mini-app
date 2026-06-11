@@ -62,7 +62,7 @@ export function createDeck(): Card[] {
 export function shuffle<T>(array: T[]): T[] {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    // Use temporary variable to avoid TypeScript destructuring issues
+    // temporary variable to avoid TypeScript destructuring issues
     const temp = array[i];
     array[i] = array[j]!;
     array[j] = temp!;

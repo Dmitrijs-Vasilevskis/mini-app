@@ -25,13 +25,10 @@ export class UNORoom extends Room {
 
     const roomCode = generateRoomCode();
 
-    console.log(">>> roomCode", roomCode);
-
     state.roomCode = roomCode;
     this.setMetadata({ roomCode });
 
     this.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color }) => {
-      console.log(">> playCard payload", payload)
       this.gameEngine.playCard(client.sessionId, payload.cardId, payload.chosenColor);
     });
 
@@ -81,80 +78,134 @@ export class UNORoom extends Room {
     this.broadcast("gameStarted");
   }
 
-  async onLeave(client: Client, code?: number) {
+  async onLeave(client: Client) {
     const state = this.state as GameState;
 
     const player = state.players.get(client.sessionId);
 
-    if (!player) return;
+    if (!player) {
+      return;
+    }
 
     player.isConnected = false;
     player.disconnectedAt = Date.now();
 
     try {
-      await this.allowReconnection(
-        client,
-        60
-      );
+      await this.allowReconnection(client, 60);
 
       player.isConnected = true;
       player.disconnectedAt = 0;
 
-      if (state.pausedPlayerId === client.sessionId) {
-        state.isPaused = false;
-        state.pausedPlayerId = '';
-
-        this.broadcast("gameResumed", {
-          playerId: client.sessionId
-        });
-      }
-
       this.broadcast("playerReconnected", {
-        playerId: client.sessionId
+        playerId: player.id,
       });
     } catch {
-      const wasPausedPlayer = state.pausedPlayerId === client.sessionId;
+      const wasPausedPlayer =
+        state.pausedPlayerId === player.id;
 
-      this.removePlayer(client.sessionId);
+      this.removePlayer(player.id);
 
       if (wasPausedPlayer) {
         state.isPaused = false;
-        state.pausedPlayerId = '';
+        state.pausedPlayerId = "";
 
         this.turnManager.nextTurn();
 
-        this.broadcast('gameResumed');
+        this.broadcast("gameResumed");
 
-        this.broadcast('turnChanged', {
-          playerId: state.currentTurn
+        this.broadcast("turnChanged", {
+          playerId: state.currentTurn,
         });
       }
     }
   }
 
-  onJoin(client: Client, options: { name: string; telegramId?: string }) {
+  onJoin(client: Client, options: { name: string; playerId: string; telegramId?: string }) {
     const state = this.state as GameState;
 
-    if (state.players.has(client.sessionId)) {
-      console.warn(`Player ${client.sessionId} already exists`);
+    const existingPlayer = this.findExistingPlayer(options.playerId, options.telegramId);
+
+    console.log(">> options", options);
+
+    console.log(">> existing", existingPlayer);
+
+    console.log(">> client.sessionId", client.sessionId);
+
+    if (existingPlayer) {
+      const oldSessionId = existingPlayer.id;
+      const newSessionId = client.sessionId;
+
+      state.players.delete(oldSessionId);
+
+      existingPlayer.id = newSessionId;
+      existingPlayer.connectionId = newSessionId;
+      existingPlayer.isConnected = true;
+      existingPlayer.disconnectedAt = 0;
+
+      state.players.set(newSessionId, existingPlayer);
+
+      if (state.hostId === oldSessionId) {
+        state.hostId = newSessionId;
+      }
+
+      if (state.currentTurn === oldSessionId) {
+        state.currentTurn = newSessionId;
+      }
+
+      if (state.pausedPlayerId === oldSessionId) {
+        state.pausedPlayerId = newSessionId;
+      }
+
+      if (state.unoPendingPlayerId === oldSessionId) {
+        state.unoPendingPlayerId = newSessionId;
+      }
+
+      if (state.roundWinnerId === oldSessionId) {
+        state.roundWinnerId = newSessionId;
+      }
+
+      if (state.matchWinnerId === oldSessionId) {
+        state.matchWinnerId = newSessionId;
+      }
+
+      const playerIndex =
+        state.playerOrder.indexOf(oldSessionId);
+
+      if (playerIndex !== -1) {
+        state.playerOrder[playerIndex] = newSessionId;
+      }
+
+      this.broadcast("playerReconnected", {
+        playerId: newSessionId,
+      });
+
       return;
     }
+
+    const newPlayer = new Player();
+
+    newPlayer.id = client.sessionId;
+    newPlayer.connectionId = client.sessionId;
+    newPlayer.telegramId = options.telegramId ?? "";
+    newPlayer.playerId = options.playerId ?? "";
+
+    newPlayer.name = options.name;
+    newPlayer.isTurn = false;
+    newPlayer.hand = new ArraySchema<Card>();
+
+    state.players.set(client.sessionId, newPlayer);
+    state.playerOrder.push(client.sessionId);
 
     if (!state.hostId) {
       state.hostId = client.sessionId;
     }
 
-    const newPlayer = new Player();
-    newPlayer.id = client.sessionId;
-    newPlayer.name = options.name;
-    newPlayer.hand = new ArraySchema<Card>();
-    newPlayer.isTurn = false;
-    if (options.telegramId) newPlayer.telegramId = options.telegramId;
-
-    state.players.set(client.sessionId, newPlayer);
-    state.playerOrder.push(client.sessionId);
-
-    this.broadcast('playerJoined', { id: client.sessionId, name: options.name });
+    this.broadcast('playerJoined',
+      {
+        id: client.sessionId,
+        name: options.name
+      }
+    );
   }
 
   private removePlayer(playerId: string) {
@@ -169,16 +220,16 @@ export class UNORoom extends Room {
     state.players.delete(playerId);
 
     if (state.currentTurn === playerId) {
-      state.currentTurn = '';
+      state.currentTurn = "";
     }
 
     if (state.hostId === playerId) {
       state.hostId = state.playerOrder[0] ?? "";
     }
 
-    this.broadcast('playerLeft', {
-      playerId
-    })
+    this.broadcast("playerLeft", {
+      playerId,
+    });
   }
 
   private initializeState() {
@@ -200,5 +251,21 @@ export class UNORoom extends Room {
     state.pausedPlayerId = '';
 
     state.unoPendingPlayerId = '';
+  }
+
+  private findExistingPlayer(playerId?: string, telegramId?: string): Player | undefined {
+    const state = this.state as GameState;
+
+    return Array.from(state.players.values()).find(p => {
+      if (telegramId) {
+        return p.telegramId === telegramId;
+      }
+
+      if (playerId) {
+        return p.playerId === playerId;
+      }
+
+      return false;
+    })
   }
 }
