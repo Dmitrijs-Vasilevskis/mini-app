@@ -7,7 +7,7 @@ export interface TelegramUser {
   last_name?: string;
 }
 
-export interface UseTelegramUserInterface{
+export interface UseTelegramUserInterface {
   user: TelegramUser | null;
   playerId: string;
   telegramId: string;
@@ -80,16 +80,17 @@ export function useTelegramUser(): UseTelegramUserInterface {
 
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
+
       tg.ready();
       tg.expand();
 
-      if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-      }
+      const tgUser = tg.initDataUnsafe?.user;
+      if (tgUser) {
 
-      const realUser = tg.initDataUnsafe?.user;
-      if (realUser) {
-        handleInit(realUser);
+        if (tg.requestFullscreen) {
+          tg.requestFullscreen();
+        }
+        handleInit(tgUser);
       } else {
         console.warn("No telegram user was found")
         handleInit(undefined)
