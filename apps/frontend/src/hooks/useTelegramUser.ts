@@ -64,11 +64,11 @@ export function useTelegramUser(): UseTelegramUserInterface {
 
       setUser({
         id: webId.slice(0, 8),
-        first_name: null,
-        username: null
+        first_name: '',
+        username: ''
       })
 
-      setTelegramId(null);
+      setTelegramId('');
       setPlayerId(webId);
     }
     setReady(true);

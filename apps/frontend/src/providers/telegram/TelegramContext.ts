@@ -2,10 +2,10 @@ import { createContext, useContext } from "react";
 import type { TelegramUser } from "../../hooks/useTelegramUser";
 
 interface TelegramContextInterface {
-    user: TelegramUser;
+    user: TelegramUser | null;
     ready: boolean;
     playerId: string;
-    telegramId: string;
+    telegramId: string | null;
     setUsername: (username: string) => void;
 }
 
