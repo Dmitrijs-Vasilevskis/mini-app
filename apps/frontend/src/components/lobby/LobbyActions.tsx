@@ -7,23 +7,23 @@ interface Props {
 }
 export function LobbyActions({ isReady, isHost, canStart }: Props) {
   return (
-    <div className="mt-auto w-full max-w-md">
-      <button
-        onClick={() => colyseusService.toggleReady()}
-        className=" w-full bg-green-600 py-3 rounded-xl font-semibold"
-      >
-        {isReady ? "Unready" : "Ready"}
-      </button>
-
+    <div className="w-full flex gap-12 pt-4">
       {isHost && (
         <button
           onClick={() => colyseusService.startGame()}
           disabled={!canStart}
-          className={`w-full mt-3 bg-yellow-500 text-black py-3 rounded-xl font-bold ${!canStart && "grayscale"}`}
+          className={`bg-yellow-500 w-full text-black px-5 py-3 rounded-lg font-bold ${!canStart && "grayscale"}`}
         >
           Start Game
         </button>
       )}
+
+      <button
+        onClick={() => colyseusService.toggleReady()}
+        className="bg-green-600 px-5 py-3 rounded-lg font-semibold w-full"
+      >
+        {isReady ? "Not Ready" : "Ready"}
+      </button>
     </div>
   );
 }

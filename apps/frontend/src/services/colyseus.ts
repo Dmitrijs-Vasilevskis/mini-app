@@ -13,8 +13,14 @@ export class ColyseusService {
     );
   }
 
-  async createRoom(username: string) {
-    this.room = await this.client.create("uno", { name: username });
+  async createRoom(name: string, playerId?: string, telegramId?: string) {
+    this.room = await this.client.create("uno",
+      {
+        name,
+        playerId,
+        telegramId
+      }
+    );
 
     console.log(
       "ROOM CREATED",
@@ -24,14 +30,18 @@ export class ColyseusService {
     return this.room;
   }
 
-  async joinRoomByCode(roomCode: string, username: string) {
-    this.room = await this.client.join(
-      "uno",
-      {
-        roomCode,
-        name: username
-      }
-    );
+  async joinRoomByCode(
+    roomCode: string,
+    name: string,
+    playerId: string,
+    telegramId: string | null
+  ) {
+    this.room = await this.client.join("uno", {
+      roomCode,
+      name,
+      playerId,
+      telegramId,
+    });
 
     console.log(
       "JOINED ROOM",

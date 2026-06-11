@@ -1,25 +1,27 @@
-import { useEffect } from "react";
-import { useTelegramUser } from "../../hooks/useTelegramUser";
+import {
+  useTelegramUser,
+  type TelegramUser,
+} from "../../hooks/useTelegramUser";
 import { TelegramContext } from "./TelegramContext";
 
 interface TelegramContextInterface {
-  user: ReturnType<typeof useTelegramUser>["user"];
-  ready: ReturnType<typeof useTelegramUser>["ready"];
+  user: TelegramUser;
+  ready: boolean;
+  playerId: string;
+  telegramId: string;
+  setUsername: (username: string) => void;
 }
 
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
-  const { user, ready } = useTelegramUser();
+  const { user, ready, playerId, telegramId, setUsername } = useTelegramUser();
 
   const contextValue: TelegramContextInterface = {
     user,
     ready,
+    playerId,
+    telegramId,
+    setUsername
   };
-
-  useEffect(() => {
-    console.log(">> TelegramProvider user:", user);
-    console.log(">> TelegramProvider ready:", ready);
-  }, [user, ready]);
-
 
   return (
     <TelegramContext.Provider value={contextValue}>

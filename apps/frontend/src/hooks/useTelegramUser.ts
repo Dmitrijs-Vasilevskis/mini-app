@@ -1,25 +1,76 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-interface User {
-  id: number;
+export interface TelegramUser {
+  id: string;
   username: string;
   first_name: string;
   last_name?: string;
 }
 
-export function useTelegramUser() {
-  const [user, setUser] = useState<User | null>(null);
+export interface UseTelegramUserInterface{
+  user: TelegramUser | null;
+  playerId: string;
+  telegramId: string | null;
+  ready: boolean;
+  setUsername: (username: string) => void;
+}
+
+const STORAGE_KEY = "uno_player_id";
+const USERNAME_STORAGE_KEY = "uno_player_name"
+
+function getOrCreateWebPlayerId(): string {
+  let id = localStorage.getItem(STORAGE_KEY);
+
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(STORAGE_KEY, id);
+  }
+
+  return id;
+}
+
+export function useTelegramUser(): UseTelegramUserInterface {
+  const [user, setUser] = useState<TelegramUser | null>(null);
   const [ready, setReady] = useState(false);
+
   const initialized = useRef(false);
 
-  const handleSetUser = useCallback((newUser: User) => {
-    setUser((prev) => {
-      if (prev) {
-        console.warn('⚠️ Telegram user already set, ignoring', newUser);
-        return prev;
-      }
-      return newUser;
-    });
+  const [playerId, setPlayerId] = useState("");
+  const [telegramId, setTelegramId] = useState<string | null>(null);
+
+  const updateUsername = useCallback((username: string) => {
+    localStorage.setItem(USERNAME_STORAGE_KEY, username);
+
+    setUser((prev) =>
+      prev
+        ? {
+          ...prev,
+          username,
+          first_name: username,
+        }
+        : prev
+    );
+  }, []);
+
+  const handleInit = useCallback((tgUser?: TelegramUser) => {
+    if (tgUser) {
+      const id = String(tgUser.id);
+
+      setUser(tgUser);
+      setTelegramId(id);
+      setPlayerId(id);
+    } else {
+      const webId = getOrCreateWebPlayerId();
+
+      setUser({
+        id: webId.slice(0, 8),
+        first_name: null,
+        username: null
+      })
+
+      setTelegramId(null);
+      setPlayerId(webId);
+    }
     setReady(true);
   }, []);
 
@@ -32,31 +83,28 @@ export function useTelegramUser() {
       tg.ready();
       tg.expand();
 
-      if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-      }
+      // if (tg.requestFullscreen) {
+      //   tg.requestFullscreen();
+      // }
 
       const realUser = tg.initDataUnsafe?.user;
       if (realUser) {
-        handleSetUser(realUser);
+        handleInit(realUser);
       } else {
-        handleSetUser({
-          id: Math.floor(Math.random() * 1000000),
-          username: 'Anonymous',
-          first_name: 'Telegram',
-          last_name: 'User',
-        });
+        console.warn("No telegram user was found")
+        handleInit(undefined)
       }
     } else {
-      console.log('⚠️ Running outside Telegram – using mock user');
-      handleSetUser({
-        id: Math.floor(Math.random() * 1000000),
-        username: 'LocalTester',
-        first_name: 'Local',
-        last_name: 'Tester',
-      });
+      console.log('⚠️ Running outside Telegram – using web identity');
+      handleInit(undefined)
     }
-  }, [handleSetUser]);
+  }, [handleInit]);
 
-  return { user, ready };
+  return {
+    user,
+    playerId,
+    telegramId,
+    ready,
+    setUsername: updateUsername
+  };
 }

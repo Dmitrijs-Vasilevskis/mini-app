@@ -1,15 +1,15 @@
 import { createContext, useContext } from "react";
-import type { useTelegramUser } from "../../hooks/useTelegramUser";
+import type { TelegramUser } from "../../hooks/useTelegramUser";
 
 interface TelegramContextInterface {
-    user: ReturnType<typeof useTelegramUser>["user"];
-    ready: ReturnType<typeof useTelegramUser>["ready"];
-  }
+    user: TelegramUser;
+    ready: boolean;
+    playerId: string;
+    telegramId: string;
+    setUsername: (username: string) => void;
+}
 
-export const TelegramContext = createContext<TelegramContextInterface>({
-    user: null,
-    ready: false,
-});
+export const TelegramContext = createContext<TelegramContextInterface>(null);
 
 export const useTelegramContext = () => {
     const context = useContext(TelegramContext);
