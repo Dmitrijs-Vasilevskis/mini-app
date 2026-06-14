@@ -1,20 +1,20 @@
 interface Props {
-  roomId: string;
+  roomCode: string;
   username: string;
   joining: boolean;
   isTelegramUser: boolean;
-  setRoomId: (value: string) => void;
+  setRoomCode: (value: string) => void;
   setUsername: (value: string) => void;
   onCreate: () => void;
   onJoin: () => void;
 }
 
 export function JoinRoomScreen({
-  roomId,
+  roomCode,
   username,
   joining,
   isTelegramUser,
-  setRoomId,
+  setRoomCode,
   setUsername,
   onCreate,
   onJoin,
@@ -84,8 +84,8 @@ export function JoinRoomScreen({
 
             <div className="flex gap-2">
               <input
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value)}
+                value={roomCode}
+                onChange={(e) => setRoomCode(e.target.value)}
                 placeholder="Room code"
                 className="
                   flex-1
