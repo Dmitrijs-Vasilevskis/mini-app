@@ -28,4 +28,8 @@ export function RegisterGameLifecycleEvents(room: GameRoom) {
     room.onMessage(GameEvents.ROUND_ENDED, (results: RoundResults) => {
         store.setRoundResults(results);
     });
+
+    room.onMessage(GameEvents.PLAYER_LEFT, (data: { playerId: string }) => {
+        console.log(">> player left", data.playerId);
+    })
 }

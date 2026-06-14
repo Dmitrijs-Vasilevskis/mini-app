@@ -10,6 +10,25 @@ import type {
     PlayerDTO,
 } from '../types/game';
 
+const initialState = {
+    connected: false,
+    roomId: null,
+    roomCode: null,
+    status: null as unknown as RoomStatus,
+    hostId: '',
+    currentTurn: '',
+    activeColor: 'red' as Color,
+    discardTop: null,
+    players: [],
+    localPlayer: null,
+    winner: null,
+    isPaused: false,
+    pausedPlayerId: null,
+    reconnectRemaining: null,
+    unoWindowPlayerId: null,
+    roundResults: null,
+};
+
 export const useGameStore =
     create<GameStore>((set) => ({
         connected: false,
@@ -85,5 +104,8 @@ export const useGameStore =
         },
         setRoundResults(roundResults: RoundResults | null) {
             set({ roundResults });
+        },
+        reset(){
+            set({...initialState});
         },
     }));

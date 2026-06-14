@@ -57,16 +57,15 @@ export class ColyseusService {
     return this.room;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   send(type: string, payload?: any) {
     this.room?.send(type, payload);
   }
 
-  leave() {
-    if (this.room) {
-      this.room.leave();
-      this.room = null;
-    }
+  async leave() {
+    if (!this.room) return;
+
+    this.room.leave();
+    this.room = null;
   }
 
   playCard(cardId: string, chosenColor?: string) {

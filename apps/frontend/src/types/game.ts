@@ -94,4 +94,5 @@ export interface GameStore {
     setPaused: (paused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) => void;
     setUnoWindowPlayerId: (playerId: string | null) => void;
     setRoundResults: (results: RoundResults | null) => void;
+    reset:() => void;
 }
