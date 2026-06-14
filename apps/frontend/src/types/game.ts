@@ -62,6 +62,8 @@ export interface RoundResults {
     }[];
 }
 
+export type GameDirection  = 1 | -1;
+
 export interface GameStore {
     connected: boolean;
     roomId: string | null;
@@ -69,6 +71,7 @@ export interface GameStore {
     status: RoomStatus;
     hostId: string;
     currentTurn: string;
+    direction: GameDirection;
     activeColor: Color;
     discardTop: CardDTO | null;
     players: PlayerDTO[];
@@ -83,6 +86,7 @@ export interface GameStore {
     setRoomId: (roomId: string) => void;
     setRoomCode: (roomCode: string) => void;
     setCurrentTurn: (playerId: string) => void;
+    setDirection: (direction: number) => void;
     setPlayers: (players: PlayerDTO[]) => void;
     setLocalPlayer: (player: LocalPlayerDTO) => void;
     setDiscardTop: (card: CardDTO) => void;
@@ -94,5 +98,5 @@ export interface GameStore {
     setPaused: (paused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) => void;
     setUnoWindowPlayerId: (playerId: string | null) => void;
     setRoundResults: (results: RoundResults | null) => void;
-    reset:() => void;
+    reset: () => void;
 }

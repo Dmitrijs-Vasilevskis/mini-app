@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { RoomStatus, type Color } from "@uno/shared";
-import type { RoundResults } from '../types/game';
+import type { GameDirection, RoundResults } from '../types/game';
 
 import type {
     CardDTO,
@@ -17,6 +17,7 @@ const initialState = {
     status: null as unknown as RoomStatus,
     hostId: '',
     currentTurn: '',
+    direction: 1 as GameDirection,
     activeColor: 'red' as Color,
     discardTop: null,
     players: [],
@@ -37,6 +38,7 @@ export const useGameStore =
         status: null as unknown as RoomStatus,
         hostId: '',
         currentTurn: '',
+        direction: 1,
         activeColor: 'red',
         discardTop: null,
         players: [],
@@ -55,6 +57,9 @@ export const useGameStore =
         },
         setCurrentTurn: (currentTurn: string) => {
             set({ currentTurn })
+        },
+        setDirection: (direction: GameDirection) => {
+            set({ direction });
         },
         setPlayers: (players: PlayerDTO[]) => {
             set({ players })
@@ -105,7 +110,7 @@ export const useGameStore =
         setRoundResults(roundResults: RoundResults | null) {
             set({ roundResults });
         },
-        reset(){
-            set({...initialState});
+        reset() {
+            set({ ...initialState });
         },
     }));

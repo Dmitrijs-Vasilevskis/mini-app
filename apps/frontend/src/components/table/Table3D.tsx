@@ -4,6 +4,7 @@ import { DrawPile } from "./DrawPile";
 import { DiscardPile } from "./DiscardPile";
 import { AvatarPlayer } from "../player/AvatarPlayer";
 import { useGameStore } from "../../store/gameStore";
+import { DirectionIndicator } from "./DirectionIndicator";
 
 const SEAT_POSITIONS = [
   {
@@ -24,6 +25,7 @@ export function Table3D() {
   const localPlayer = useGameStore((s) => s.localPlayer);
   const players = useGameStore((s) => s.players);
   const currentTurn = useGameStore((s) => s.currentTurn);
+  const direction = useGameStore((s) => s.direction);
 
   if (!localPlayer) {
     return null;
@@ -62,6 +64,8 @@ export function Table3D() {
 
       <DrawPile position={[-1, 0.3, 0]} />
       <DiscardPile position={[1, 0.31, 0]} />
+      
+      <DirectionIndicator direction={direction} />
 
       <AvatarPlayer
         position={[0, 0.5, 5]}

@@ -17,6 +17,13 @@ export function RegisterRoomEvents(
     );
 
     $(room.state).listen(
+        "direction",
+        (direction: number) => {
+            store.setDirection(direction);
+        }
+    );
+
+    $(room.state).listen(
         "activeColor",
         (color: Color) => {
             store.setActiveColor(color);
