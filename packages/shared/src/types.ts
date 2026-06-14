@@ -45,6 +45,10 @@ export class GameState extends Schema {
   @type("string") unoPendingPlayerId: string = "";
 }
 
+export interface UnoRoomOptions {
+  state: GameState;
+}
+
 export enum RoomStatus {
   LOBBY = "lobby",
   PLAYING = "playing",
