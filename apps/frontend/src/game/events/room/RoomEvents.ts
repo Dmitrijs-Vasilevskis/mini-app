@@ -1,6 +1,6 @@
 import type { RoomStatus } from '@uno/shared';
 import { useGameStore } from '../../../store/gameStore';
-import type { Color } from '../../../types/game';
+import type { Color, GameDirection } from '../../../types/game';
 import type { GameRoom, StateCallbacks } from '../types';
 
 export function RegisterRoomEvents(
@@ -18,7 +18,7 @@ export function RegisterRoomEvents(
 
     $(room.state).listen(
         "direction",
-        (direction: number) => {
+        (direction: GameDirection) => {
             store.setDirection(direction);
         }
     );

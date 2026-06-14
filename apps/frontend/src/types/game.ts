@@ -86,7 +86,7 @@ export interface GameStore {
     setRoomId: (roomId: string) => void;
     setRoomCode: (roomCode: string) => void;
     setCurrentTurn: (playerId: string) => void;
-    setDirection: (direction: number) => void;
+    setDirection: (direction: GameDirection) => void;
     setPlayers: (players: PlayerDTO[]) => void;
     setLocalPlayer: (player: LocalPlayerDTO) => void;
     setDiscardTop: (card: CardDTO) => void;
