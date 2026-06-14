@@ -8,7 +8,7 @@ import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
 
 interface GameContextInterface {
-  user: TelegramUser;
+  user: TelegramUser | null;
   telegramId: string;
   playerId: string;
   joining: boolean;
