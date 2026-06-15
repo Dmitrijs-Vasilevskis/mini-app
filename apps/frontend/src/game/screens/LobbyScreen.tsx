@@ -42,7 +42,7 @@ export function LobbyScreen() {
             />
           </div>
 
-          <div className="w-px bg-white/10" />
+          <div className="sm:w-px sm:h-auto w-full h-px bg-white/10" />
 
           <div className="flex-1 flex flex-col justify-center gap-4 w-full sm:max-w-[50%]">
             <div className="w-full max-w-md flex flex-col gap-3 overflow-y-auto no-scrollbar mb-4 max-h-[80%] h-full">
