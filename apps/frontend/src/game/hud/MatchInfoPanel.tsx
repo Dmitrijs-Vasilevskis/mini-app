@@ -1,38 +1,53 @@
 import type { CardDTO, Color } from "../../types/game";
+import { getCardLabel } from "../Helpers";
 
 type Props = {
   currentTurnPlayer: string;
   activeColor: Color;
   discardTop: CardDTO | null;
+  isMyTurn: boolean;
 };
 
 export function MatchInfoPanel({
   currentTurnPlayer,
   activeColor,
   discardTop,
+  isMyTurn,
 }: Props) {
   return (
-    <div className="absolute top-12 left-4 z-20">
-      <div className="bg-black/70 backdrop-blur-md rounded-xl p-4 min-w-[220px] text-center">
-        <div className="text-xs uppercase text-gray-400">Match Status</div>
+    <div className="flex flex-col items-center gap-2 text-center absolute top-6 left-1/2 -translate-x-1/2 z-40">
+      <div className="text-lg font-bold text-white">
+        <div className="text-lg font-bold">
+          {isMyTurn ? "YOUR TURN" : `${currentTurnPlayer}'s Turn`}
+        </div>
+      </div>
 
-        <div className="mt-2">
-          <div className="font-semibold">{currentTurnPlayer}'s Turn</div>
+      <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-3 w-3 rounded-full ${
+              activeColor === "red"
+                ? "bg-red-500"
+                : activeColor === "green"
+                  ? "bg-green-500"
+                  : activeColor === "blue"
+                    ? "bg-blue-500"
+                    : "bg-yellow-400"
+            }`}
+          />
+
+          <span className="font-medium capitalize">{activeColor}</span>
         </div>
 
-        <div className="mt-3 flex justify-center gap-4 text-sm">
-          <div>
-            <div className="text-gray-400">Color</div>
-            <div>{activeColor}</div>
-          </div>
+        {discardTop && (
+          <>
+            <div className="h-4 w-px bg-gray-600" />
 
-          <div>
-            <div className="text-gray-400">Top Card</div>
-            <div>
-              {discardTop?.color} {discardTop?.value}
+            <div className="font-semibold">
+              {getCardLabel(discardTop.value)}
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
