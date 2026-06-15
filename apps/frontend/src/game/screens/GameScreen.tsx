@@ -71,13 +71,10 @@ export function GameScreen() {
     >
       {/* 2D UI Overlay */}
       <GameHUD
-        roomId={roomCode}
-        players={players}
         currentTurnPlayer={currentTurnPlayer}
         discardTop={discardTop}
         activeColor={activeColor}
         isMyTurn={isMyTurn}
-        localPlayer={localPlayer}
       />
 
       {winner && (

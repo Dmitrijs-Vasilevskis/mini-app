@@ -1,20 +1,11 @@
-import type {
-  CardDTO,
-  Color,
-  LocalPlayerDTO,
-  PlayerDTO,
-} from "../../types/game";
+import type { CardDTO, Color, PlayerDTO } from "../../types/game";
 import { MatchInfoPanel } from "./MatchInfoPanel";
-import { PlayerInfoPanel } from "./PlayerInfoPanel";
 
 type Props = {
-  roomId: string;
-  players: PlayerDTO[];
   currentTurnPlayer: PlayerDTO | null;
   discardTop: CardDTO | null;
   activeColor: Color;
   isMyTurn: boolean;
-  localPlayer: LocalPlayerDTO;
 };
 
 export function GameHUD({
@@ -22,7 +13,6 @@ export function GameHUD({
   discardTop,
   activeColor,
   isMyTurn,
-  localPlayer,
 }: Props) {
   return (
     <>
@@ -30,9 +20,8 @@ export function GameHUD({
         currentTurnPlayer={currentTurnPlayer?.name ?? ""}
         activeColor={activeColor}
         discardTop={discardTop}
+        isMyTurn={isMyTurn}
       />
-
-      <PlayerInfoPanel cardsCount={localPlayer.handCount} isMyTurn={isMyTurn} />
     </>
   );
 }
