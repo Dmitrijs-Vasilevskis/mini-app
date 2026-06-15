@@ -26,8 +26,8 @@ export function LobbyScreen() {
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-4 p-4 bg-gradient-to-b from-[#ac61a3] to-[#2a57c0] text-white">
       <div className="w-full max-w-5xl min-h-80 rounded-3xl bg-black/20 backdrop-blur-md border border-white/10 p-6 flex flex-col relative">
-        <div className="flex flex-row flex-grow gap-6">
-          <div className="flex flex-col w-full max-w-[50%] justify-center">
+        <div className="flex sm:flex-row flex-col flex-grow gap-6">
+          <div className="flex flex-col w-full sm:max-w-[50%] justify-center">
             <LobbyHeader
               roomCode={roomCode}
               onClick={copyRoomCode}
@@ -44,7 +44,7 @@ export function LobbyScreen() {
 
           <div className="w-px bg-white/10" />
 
-          <div className="flex-1 flex flex-col justify-center gap-4 w-full max-w-[50%]">
+          <div className="flex-1 flex flex-col justify-center gap-4 w-full sm:max-w-[50%]">
             <div className="w-full max-w-md flex flex-col gap-3 overflow-y-auto no-scrollbar mb-4 max-h-[80%] h-full">
               {players.map((player) => (
                 <div
