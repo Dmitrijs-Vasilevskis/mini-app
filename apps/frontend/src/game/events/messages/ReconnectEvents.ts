@@ -1,9 +1,14 @@
+import { useEffectStore } from "../../../store/effectsStore";
 import type { GameRoom } from "../types";
 
 export function RegisterReconnectEvents(room: GameRoom) {
-    room.onMessage("playerReconnected", ({ playerId }) => {
-        // todo: add effect ti highlihgt reconnected player
+    const effects = useEffectStore.getState();
 
-        console.log(">> player reconnected", playerId);
+    room.onMessage("playerReconnected", ({ playerName }) => {
+        effects.addEffect({
+            text: `${playerName} went back!`,
+            color: "#facc15",
+            emphasis: "special"
+        });
     });
 }
