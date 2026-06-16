@@ -10,8 +10,8 @@ interface DirectionIndicatorProps {
 export function DirectionIndicator({ direction }: DirectionIndicatorProps) {
   const groupRef = useRef<THREE.Group>(null);
 
-  const count = 5;
-  const radius = 3.3;
+  const count = 3;
+  const radius = 3.8;
 
   useFrame((_, delta) => {
     if (!groupRef.current) {
@@ -37,8 +37,10 @@ export function DirectionIndicator({ direction }: DirectionIndicatorProps) {
         return (
           <DirectionArrow
             key={i}
-            position={[x, 0.35, z]}
+            position={[x, 0.25, z]}
             rotation={[0, rotationY, 0]}
+            radius={radius}
+            direction={direction}
           />
         );
       })}
