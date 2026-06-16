@@ -64,7 +64,7 @@ export function Table3D() {
 
       <DrawPile position={[-1, 0.3, 0]} />
       <DiscardPile position={[1, 0.31, 0]} />
-      
+
       <DirectionIndicator direction={direction} />
 
       <AvatarPlayer
@@ -88,6 +88,7 @@ export function Table3D() {
             rotation={seat.rotation as [number, number, number]}
             cardCount={player.handCount}
             showCardsCount={true}
+            isConnected={player.isConnected}
           />
         );
       })}

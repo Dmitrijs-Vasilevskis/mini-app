@@ -104,7 +104,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
       player.disconnectedAt = 0;
 
       this.broadcast("playerReconnected", {
-        playerId: player.id,
+        playerName: player.name,
       });
     } catch {
       const wasPausedPlayer =
@@ -175,7 +175,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
       }
 
       this.broadcast("playerReconnected", {
-        playerId: newSessionId,
+        playerName: existingPlayer.name,
       });
 
       return;

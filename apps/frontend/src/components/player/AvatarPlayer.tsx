@@ -3,12 +3,14 @@ import type { ThreeElements } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
+import { LostConnectionIcon } from "../uno/connection/LostConnectionIcon";
 
 type Props = ThreeElements["group"] & {
   name: string;
   active?: boolean;
   cardCount?: number;
   showCardsCount?: boolean;
+  isConnected?: boolean;
 };
 
 export function AvatarPlayer({
@@ -16,6 +18,7 @@ export function AvatarPlayer({
   active,
   cardCount = 0,
   showCardsCount = false,
+  isConnected = true,
   ...props
 }: Props) {
   const groupRef = useRef<Group>(null);
@@ -86,6 +89,21 @@ export function AvatarPlayer({
 
           <meshStandardMaterial color="#ffffff" />
         </mesh>
+
+        {!isConnected && (
+          <group position={[0, 2.35, 0]}>
+            <LostConnectionIcon color="#ef4444" position={[0, 0.22, 0]} />
+            <Text
+              position={[0, 0, 0]}
+              fontSize={0.12}
+              color="#ef4444"
+              anchorX="center"
+              fontWeight="bold"
+            >
+              DISCONNECTED
+            </Text>
+          </group>
+        )}
 
         {/* NAME */}
         <Text
