@@ -16,14 +16,22 @@ export function DirectionArrow({
   const alphaTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
+    
     canvas.width = 256;
     canvas.height = 1;
+
     const ctx = canvas.getContext("2d");
+
+    if (!ctx) return null;
+
     const gradient = ctx.createLinearGradient(0, 0, 256, 0);
+
     gradient.addColorStop(0, "#000000");
     gradient.addColorStop(0.5, "#ffffff");
+
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 256, 1);
+
     return new THREE.CanvasTexture(canvas);
   }, []);
 
