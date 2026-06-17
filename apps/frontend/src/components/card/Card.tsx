@@ -9,7 +9,7 @@ import type { JSX } from "react";
 
 interface Props {
   card: CardDTO;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const CARD_COLORS = {
@@ -20,13 +20,9 @@ const CARD_COLORS = {
   wild: "#212121",
 };
 
-export function Card({ card, onClick }: Props) {
+export function Card({ card }: Props) {
   return (
     <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
       className="uno-card"
       role="article"
       style={{

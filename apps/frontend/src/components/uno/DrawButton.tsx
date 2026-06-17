@@ -5,7 +5,7 @@ type Props = {
 
 export function DrawButton({ isMyTurn, onDraw }: Props) {
   return (
-    <div className="absolute bottom-24 right-6 z-30">
+      <div className="absolute sm:bottom-36 sm:right-6 sm:translate-x-0 bottom-4 right-1/2 translate-x-1/2 z-30">
       <button
         onClick={onDraw}
         disabled={!isMyTurn}

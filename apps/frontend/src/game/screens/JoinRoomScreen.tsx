@@ -59,7 +59,7 @@ export function JoinRoomScreen({
               onClick={onCreate}
               className="h-14 rounded-xl bg-green-600 hover:bg-green-500 font-semibold transition disabled:opacity-50"
             >
-              {joining ? "Loading..." : "➕ Create Room"}
+              <span>{joining ? "Loading..." : "➕ Create Room"}</span>
             </button>
 
             <div className="flex items-center gap-3">
@@ -68,20 +68,21 @@ export function JoinRoomScreen({
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-row w-full">
               <input
+                id="roomCodeInput"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
                 placeholder="Room code"
-                className="flex-1 h-12 rounded-xl px-4 text-black outline-none"
+                className="flex-1 h-12 rounded-xl px-4 text-black outline-none min-w-[60%]"
               />
 
               <button
                 disabled={joining}
                 onClick={onJoin}
-                className="px-5 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold transition disabled:opacity-50"
+                className="rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold transition disabled:opacity-50"
               >
-                Join
+                <span className="px-5 py-4">Join</span>
               </button>
             </div>
 

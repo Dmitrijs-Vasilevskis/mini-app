@@ -17,9 +17,9 @@ export function LobbyHeader({ roomCode, onClick }: Props) {
       <div className="flex justify-center">
         <button
           onClick={onClick}
-          className="transition active:scale-95 bg-blue-600 px-5 py-3 rounded-lg text-sm font-semibold"
+          className="transition active:scale-95 bg-blue-600 rounded-lg flex items-center"
         >
-          Copy Code
+          <span className="px-5 py-3 text-sm font-semibold">Copy Code</span>
         </button>
       </div>
     </div>

@@ -12,8 +12,11 @@ import { UnoButton } from "../../components/uno/UnoButton";
 import { ChallengeUnoButton } from "../../components/uno/ChallengeUnoButton";
 import { VictoryOverlay } from "../../components/uno/VictoryOverlay";
 import { RoundEndOverlay } from "../../components/uno/RoundEndOverlay";
+import { LandscapeHandCards } from "../../components/uno/LandscapeHandCards";
+import { useGameContext } from "../../providers/game/GameProvider";
 
 export function GameScreen() {
+  const { isLandscape } = useGameContext();
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [wildCard, setWildCard] = useState<CardDTO | null>(null);
 
@@ -99,13 +102,22 @@ export function GameScreen() {
       <FloatingActionText />
 
       {/* Hand Cards */}
-      <HandCards
-        cards={localPlayer.hand}
-        onWildCard={onWilCard}
-        isPlayable={isPlayable}
-        selectedCardId={selectedCardId}
-        setSelectedCardId={setSelectedCardId}
-      />
+      {isLandscape ? (
+        <HandCards
+          cards={localPlayer.hand}
+          onWildCard={onWilCard}
+          isPlayable={isPlayable}
+          selectedCardId={selectedCardId}
+          setSelectedCardId={setSelectedCardId}
+        />
+      ) : (
+        <LandscapeHandCards
+          cards={localPlayer.hand}
+          isPlayable={isPlayable}
+          setSelectedCardId={setSelectedCardId}
+          onWildCard={onWilCard}
+        />
+      )}
 
       <UnoButton />
 
