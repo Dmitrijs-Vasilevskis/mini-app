@@ -53,7 +53,7 @@ export function HandCards({
     setSelectedCardId(null);
   };
 
-  const center = (cards.length - 1) / 2;
+  const center = (cards.length - 1) / 1.8;
   const spacing = Math.max(18, 68 - cards.length * 1.8);
   const cardScale = Math.max(0.72, 1 - cards.length * 0.018);
   const curveStrength = Math.min(38, 16 + cards.length * 0.9);
@@ -63,8 +63,6 @@ export function HandCards({
     <div className="absolute bottom-[max(3rem,env(safe-area-inset-bottom))] left-0 right-0 z-20 pointer-events-none overflow-visible">
       <AnimatePresence mode="popLayout">
         {cards.map((card, index) => {
-          // const playable = isPlayable(card);
-
           const selected = selectedCardId === card.id;
           const offset = index - center;
           const normalized = center === 0 ? 0 : offset / center;
@@ -120,8 +118,13 @@ export function HandCards({
               style={{
                 zIndex: selected ? 999 : index,
               }}
+
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePlayCard(card);
+              }}
             >
-              <Card card={card} onClick={() => handlePlayCard(card)} />
+              <Card card={card} />
             </motion.div>
           );
         })}

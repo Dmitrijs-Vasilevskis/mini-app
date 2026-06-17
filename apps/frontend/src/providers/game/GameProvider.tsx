@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   useTelegramUser,
   type TelegramUser,
@@ -13,6 +13,7 @@ interface GameContextInterface {
   playerId: string;
   joining: boolean;
   roomCode: string;
+  isLandscape: boolean;
   setRoomCode: (values: string) => void;
   setUsername: (username: string) => void;
   createRoom: () => Promise<void>;
@@ -27,6 +28,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const [roomCode, setRoomCode] = useState<string>("");
   const [joining, setJoining] = useState<boolean>(false);
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
+
   const displayName = user?.username || user?.first_name || "Player";
 
   const createRoom = async () => {
@@ -99,6 +102,22 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(orientation: landscape)");
+
+    setIsLandscape(mediaQuery.matches);
+
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      setIsLandscape(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleOrientationChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleOrientationChange);
+    };
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -107,6 +126,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         playerId,
         joining,
         roomCode,
+        isLandscape,
         setRoomCode,
         setUsername,
         createRoom,
