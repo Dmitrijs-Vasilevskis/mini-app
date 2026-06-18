@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface TelegramUser {
   id: string;
@@ -23,67 +23,67 @@ export interface UseTelegramUserInterface {
   error: boolean;
 }
 
-const STORAGE_KEY = "uno_player_id";
-const USERNAME_STORAGE_KEY = "uno_player_name"
+// const STORAGE_KEY = "uno_player_id";
+// const USERNAME_STORAGE_KEY = "uno_player_name"
 
-function getOrCreateWebPlayerId(): string {
-  let id = localStorage.getItem(STORAGE_KEY);
+// function getOrCreateWebPlayerId(): string {
+//   let id = localStorage.getItem(STORAGE_KEY);
 
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(STORAGE_KEY, id);
-  }
+//   if (!id) {
+//     id = crypto.randomUUID();
+//     localStorage.setItem(STORAGE_KEY, id);
+//   }
 
-  return id;
-}
+//   return id;
+// }
 
 export function useTelegramUser(): UseTelegramUserInterface {
   const [initData, setInitData] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [ready, setReady] = useState(false);
 
-  const [user, setUser] = useState<TelegramUser | null>(null);
+  // const [user, setUser] = useState<TelegramUser | null>(null);
 
-  const [playerId, setPlayerId] = useState<string>("");
-  const [telegramId, setTelegramId] = useState<string>("");
+  // const [playerId, setPlayerId] = useState<string>("");
+  // const [telegramId, setTelegramId] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const initialized = useRef<boolean>(false);
 
-  const updateUsername = useCallback((username: string) => {
-    localStorage.setItem(USERNAME_STORAGE_KEY, username);
+  // const updateUsername = useCallback((username: string) => {
+  //   localStorage.setItem(USERNAME_STORAGE_KEY, username);
 
-    setUser((prev) =>
-      prev
-        ? {
-          ...prev,
-          username,
-          first_name: username,
-        }
-        : prev
-    );
-  }, []);
+  //   setUser((prev) =>
+  //     prev
+  //       ? {
+  //         ...prev,
+  //         username,
+  //         first_name: username,
+  //       }
+  //       : prev
+  //   );
+  // }, []);
 
-  const handleInit = useCallback((tgUser?: TelegramUser) => {
-    if (tgUser) {
-      const id = String(tgUser.id);
+  // const handleInit = useCallback((tgUser?: TelegramUser) => {
+  //   if (tgUser) {
+  //     const id = String(tgUser.id);
 
-      setUser(tgUser);
-      setTelegramId(id);
-      setPlayerId(id);
-    } else {
-      const webId = getOrCreateWebPlayerId();
+  //     setUser(tgUser);
+  //     setTelegramId(id);
+  //     setPlayerId(id);
+  //   } else {
+  //     const webId = getOrCreateWebPlayerId();
 
-      setUser({
-        id: webId.slice(0, 8),
-        first_name: '',
-        username: ''
-      })
+  //     setUser({
+  //       id: webId.slice(0, 8),
+  //       first_name: '',
+  //       username: ''
+  //     })
 
-      setTelegramId('');
-      setPlayerId(webId);
-    }
-    setReady(true);
-  }, []);
+  //     setTelegramId('');
+  //     setPlayerId(webId);
+  //   }
+  //   setReady(true);
+  // }, []);
 
   useEffect(() => {
     if (initialized.current) return;
@@ -106,8 +106,9 @@ export function useTelegramUser(): UseTelegramUserInterface {
       setReady(true);
       // handleInit(tgUser);
     } else {
-      console.warn("No telegram user was found")
-      handleInit(undefined)
+      console.warn("No telegram user was found");
+      setError(true);
+      // handleInit(undefined)
     }
     // }
     // else {
