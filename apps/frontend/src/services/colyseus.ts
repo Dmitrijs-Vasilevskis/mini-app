@@ -13,13 +13,9 @@ export class ColyseusService {
     );
   }
 
-  async createRoom(name: string, playerId?: string, telegramId?: string) {
+  async createRoom(initData: string) {
     this.room = await this.client.create("uno",
-      {
-        name,
-        playerId,
-        telegramId
-      }
+      { initData }
     );
 
     console.log(
@@ -32,15 +28,11 @@ export class ColyseusService {
 
   async joinRoomByCode(
     roomCode: string,
-    name: string,
-    playerId: string,
-    telegramId: string | null
+    initData: string
   ) {
     this.room = await this.client.join("uno", {
       roomCode,
-      name,
-      playerId,
-      telegramId,
+      initData
     });
 
     console.log(

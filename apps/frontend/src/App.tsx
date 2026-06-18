@@ -7,10 +7,9 @@ import { useGameContext } from "./providers/game/GameProvider";
 
 function App() {
   const {
-    user,
     joining,
     roomCode,
-    telegramId,
+    username,
     setRoomCode,
     setUsername,
     createRoom,
@@ -28,9 +27,9 @@ function App() {
       return (
         <JoinRoomScreen
           roomCode={roomCode}
-          username={user?.username ?? ""}
+          username={username}
           joining={joining}
-          isTelegramUser={!!telegramId}
+          isTelegramUser={true}
           setRoomCode={setRoomCode}
           setUsername={setUsername}
           onCreate={createRoom}
