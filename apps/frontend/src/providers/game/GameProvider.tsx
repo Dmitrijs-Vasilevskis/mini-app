@@ -8,12 +8,10 @@ import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
 
 interface GameContextInterface {
-  user: TelegramUser | null;
-  telegramId: string;
-  playerId: string;
   joining: boolean;
   roomCode: string;
   isLandscape: boolean;
+  username: string;
   setRoomCode: (values: string) => void;
   setUsername: (username: string) => void;
   createRoom: () => Promise<void>;
@@ -24,30 +22,25 @@ interface GameContextInterface {
 export const GameContext = createContext<GameContextInterface | null>(null);
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  const { user, playerId, telegramId, setUsername } = useTelegramUser();
+  // const { user, playerId, telegramId, setUsername } = useTelegramUser();
+  const { initData, username, setUsername } = useTelegramUser();
 
   const [roomCode, setRoomCode] = useState<string>("");
   const [joining, setJoining] = useState<boolean>(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
-  const displayName = user?.username || user?.first_name || "Player";
-
   const createRoom = async () => {
     if (joining) return;
 
-    if (!playerId) {
-      console.error("Player identity not ready");
-      return;
-    }
+    // if (!playerId) {
+    //   console.error("Player identity not ready");
+    //   return;
+    // }
 
     setJoining(true);
 
     try {
-      const room = await colyseusService.createRoom(
-        displayName,
-        playerId,
-        telegramId
-      );
+      const room = await colyseusService.createRoom(initData);
 
       room.onStateChange.once(() => {
         GameEvents.initialize(room);
@@ -62,11 +55,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const joinRoom = async () => {
     if (joining) return;
 
-    if (!playerId) {
-      console.error("Player identity not ready");
-      return;
-    }
-
     if (!roomCode.trim()) {
       console.error("Room Code is required");
       return;
@@ -75,12 +63,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setJoining(true);
 
     try {
-      const room = await colyseusService.joinRoomByCode(
-        roomCode,
-        displayName,
-        playerId,
-        telegramId
-      );
+      const room = await colyseusService.joinRoomByCode(roomCode, initData);
 
       room.onStateChange.once(() => {
         GameEvents.initialize(room);
@@ -121,12 +104,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   return (
     <GameContext.Provider
       value={{
-        user,
-        telegramId,
-        playerId,
         joining,
         roomCode,
         isLandscape,
+        username,
         setRoomCode,
         setUsername,
         createRoom,

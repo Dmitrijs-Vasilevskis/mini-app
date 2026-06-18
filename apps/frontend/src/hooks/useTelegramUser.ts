@@ -7,12 +7,20 @@ export interface TelegramUser {
   last_name?: string;
 }
 
+// export interface UseTelegramUserInterface {
+//   user: TelegramUser | null;
+//   playerId: string;
+//   telegramId: string;
+//   ready: boolean;
+//   setUsername: (username: string) => void;
+// }
+
 export interface UseTelegramUserInterface {
-  user: TelegramUser | null;
-  playerId: string;
-  telegramId: string;
-  ready: boolean;
+  initData: string; // The vital string token we send to Colyseus
+  username: string;
   setUsername: (username: string) => void;
+  ready: boolean;
+  error: boolean;
 }
 
 const STORAGE_KEY = "uno_player_id";
@@ -30,13 +38,16 @@ function getOrCreateWebPlayerId(): string {
 }
 
 export function useTelegramUser(): UseTelegramUserInterface {
-  const [user, setUser] = useState<TelegramUser | null>(null);
+  const [initData, setInitData] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [ready, setReady] = useState(false);
 
-  const initialized = useRef(false);
+  const [user, setUser] = useState<TelegramUser | null>(null);
 
-  const [playerId, setPlayerId] = useState("");
+  const [playerId, setPlayerId] = useState<string>("");
   const [telegramId, setTelegramId] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
+  const initialized = useRef<boolean>(false);
 
   const updateUsername = useCallback((username: string) => {
     localStorage.setItem(USERNAME_STORAGE_KEY, username);
@@ -79,33 +90,39 @@ export function useTelegramUser(): UseTelegramUserInterface {
     initialized.current = true;
 
     const tg = (window as any).Telegram?.WebApp;
-    if (tg) {
-
+    if (tg && tg.initData) {
       tg.ready();
       tg.expand();
 
-      const tgUser = tg.initDataUnsafe?.user;
-      if (tgUser) {
+      // const tgUser = tg.initDataUnsafe?.user;
+      // if (tgUser) {
 
-        if (tg.requestFullscreen) {
-          tg.requestFullscreen();
-        }
-        handleInit(tgUser);
-      } else {
-        console.warn("No telegram user was found")
-        handleInit(undefined)
+      if (tg.requestFullscreen) {
+        tg.requestFullscreen();
       }
+
+      setInitData(tg.initData);
+      setUsername(tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || "Player");
+      setReady(true);
+      // handleInit(tgUser);
     } else {
-      console.log('⚠️ Running outside Telegram – using web identity');
+      console.warn("No telegram user was found")
       handleInit(undefined)
     }
-  }, [handleInit]);
+    // }
+    // else {
+    //   console.log('⚠️ Running outside Telegram – using web identity');
+    //   handleInit(undefined)
+    // }
+  }, []);
 
-  return {
-    user,
-    playerId,
-    telegramId,
-    ready,
-    setUsername: updateUsername
-  };
+  // return {
+  //   user,
+  //   playerId,
+  //   telegramId,
+  //   ready,
+  //   setUsername: updateUsername
+  // };
+
+  return { initData, username, setUsername, ready, error };
 }

@@ -5,6 +5,7 @@ import { generateRoomCode } from '../utils/roomCode';
 import { DeckManager } from '../game/DeckManager';
 import { TurnManager } from '../game/TurnManager';
 import { GameEngine } from '../game/GameEngine';
+import { TelegramAuthUser, validateTelegramInitData } from '../auth/telegram';
 
 export class UNORoom extends Room<UnoRoomOptions> {
   private deckManager!: DeckManager;
@@ -56,6 +57,31 @@ export class UNORoom extends Room<UnoRoomOptions> {
       }
       player.isReady = !player.isReady;
     });
+  }
+
+  async onAuth(client: Client, options: { initData: string },) {
+    console.log(">>>onAuth initData:", options.initData);
+
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+    if (!botToken) {
+      console.error("Environment variable TELEGRAM_BOT_TOKEN is missing");
+
+      return false;
+    }
+
+    if (!options.initData) {
+      return false;
+    }
+
+    const tgUser = validateTelegramInitData(options.initData, botToken);
+
+    if (!tgUser) {
+      console.error(`[AUTH FAILED]: Client ${client.sessionId} - Invalid authentification raw data`);
+      return false;
+    }
+
+    return tgUser;
   }
 
   private startGame(playerId?: string) {
@@ -127,8 +153,11 @@ export class UNORoom extends Room<UnoRoomOptions> {
     }
   }
 
-  onJoin(client: Client, options: { name: string; playerId: string; telegramId?: string }) {
-    const existingPlayer = this.findExistingPlayer(options.playerId, options.telegramId);
+  onJoin(client: Client, options: { roomCode: string }) {
+    const user = client.auth as TelegramAuthUser;
+    const telegramId = String(user.id);
+    const displayName = user.username || user.first_name || "Player";
+    const existingPlayer = this.findExistingPlayer(telegramId);
 
     if (existingPlayer) {
       const oldSessionId = existingPlayer.id;
@@ -185,10 +214,10 @@ export class UNORoom extends Room<UnoRoomOptions> {
 
     newPlayer.id = client.sessionId;
     newPlayer.connectionId = client.sessionId;
-    newPlayer.telegramId = options.telegramId ?? "";
-    newPlayer.playerId = options.playerId ?? "";
+    newPlayer.telegramId = telegramId;
+    newPlayer.playerId = telegramId;
 
-    newPlayer.name = options.name;
+    newPlayer.name = displayName;
     newPlayer.isTurn = false;
     newPlayer.hand = new ArraySchema<Card>();
 
@@ -202,7 +231,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
     this.broadcast('playerJoined',
       {
         id: client.sessionId,
-        name: options.name
+        name: displayName
       }
     );
   }
@@ -252,17 +281,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
     this.state.unoPendingPlayerId = '';
   }
 
-  private findExistingPlayer(playerId?: string, telegramId?: string): Player | undefined {
-    return Array.from(this.state.players.values()).find(p => {
-      if (telegramId) {
-        return p.telegramId === telegramId;
-      }
-
-      if (playerId) {
-        return p.playerId === playerId;
-      }
-
-      return false;
-    })
+  private findExistingPlayer(telegramId: string): Player | undefined {
+    return Array.from(this.state.players.values()).find(p => p.telegramId === telegramId);
   }
 }
