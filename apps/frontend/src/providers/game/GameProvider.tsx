@@ -1,8 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  useTelegramUser,
-  type TelegramUser,
-} from "../../hooks/useTelegramUser";
+import { useTelegramUser } from "../../hooks/useTelegramUser";
 import { colyseusService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
