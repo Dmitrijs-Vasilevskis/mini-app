@@ -4,7 +4,7 @@ import type { WebAppUser } from "../types/TelegramWebApp";
 export interface UseTelegramUserInterface {
   initData: string;
   username: string;
-  user: WebAppUser;
+  user: WebAppUser | null;
   setUsername: (username: string) => void;
   ready: boolean;
   error: boolean;
