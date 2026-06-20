@@ -2,7 +2,7 @@ import type { LocalPlayerDTO, PlayerDTO } from "../../types/game";
 
 interface Props {
   players: PlayerDTO[];
-  localPlayer: LocalPlayerDTO;
+  localPlayer: LocalPlayerDTO | null;
   hostId: string;
 }
 
