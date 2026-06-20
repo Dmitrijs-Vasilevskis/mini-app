@@ -10,6 +10,7 @@ export interface UseTelegramUserInterface {
   error: boolean;
 }
 
+
 export function useTelegramUser(): UseTelegramUserInterface {
   const [initData, setInitData] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -27,10 +28,6 @@ export function useTelegramUser(): UseTelegramUserInterface {
     if (tg) {
       tg.ready();
       tg.expand();
-
-      if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-      }
 
       const realUser = tg.initDataUnsafe?.user as WebAppUser;
       const realInitData = tg.initData;
