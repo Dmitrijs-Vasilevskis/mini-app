@@ -21,7 +21,7 @@ export function JoinLobby({roomCode, joining, onJoin, setRoomCode}: Props) {
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
               placeholder="ENTER ROOM CODE"
               maxLength={6}
-              className="flex-1 h-12 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder-white/20 font-mono text-center tracking-widest uppercase focus:border-blue-500/50 outline-none transition"
+              className="h-12 w-full rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder-white/20 font-mono text-center tracking-widest uppercase focus:border-blue-500/50 outline-none transition"
             />
             <button
               disabled={joining || !roomCode.trim()}
