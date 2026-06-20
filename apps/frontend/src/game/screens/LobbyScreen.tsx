@@ -47,7 +47,7 @@ export function LobbyScreen() {
       />
 
       <LobbyActions
-        isReady={localPlayer?.isReady}
+        isReady={localPlayer?.isReady ?? false}
         isHost={isHost}
         canStart={canStart}
         onLeave={leaveRoom}
