@@ -173,7 +173,7 @@ export function LandscapeHandCards({
                 }}
               >
                 {isCentered && isPlayable(card) && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-green-500 text-xs px-2 py-0.5 rounded-full font-bold animate-bounce uppercase tracking-wider shadow-lg z-50">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-xs px-5 py-2 rounded-xl font-bold animate-bounce uppercase tracking-wider shadow-lg z-50">
                     Play
                   </div>
                 )}

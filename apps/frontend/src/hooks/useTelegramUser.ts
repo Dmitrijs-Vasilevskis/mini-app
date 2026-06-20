@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import type { WebAppInitData } from "../types/TelegramWebApp";
-
+import type { WebAppUser } from "../types/TelegramWebApp";
 
 export interface UseTelegramUserInterface {
   initData: string;
   username: string;
+  user: WebAppUser | null;
   setUsername: (username: string) => void;
   ready: boolean;
   error: boolean;
@@ -13,6 +13,7 @@ export interface UseTelegramUserInterface {
 export function useTelegramUser(): UseTelegramUserInterface {
   const [initData, setInitData] = useState<string>("");
   const [username, setUsername] = useState<string>("");
+  const [user, setUser] = useState<WebAppUser | null>(null);
   const [ready, setReady] = useState(false);
 
   const [error, setError] = useState<boolean>(false);
@@ -23,7 +24,7 @@ export function useTelegramUser(): UseTelegramUserInterface {
     initialized.current = true;
 
     const tg = (window as any).Telegram?.WebApp;
-    if (tg && tg.initData) {
+    if (tg) {
       tg.ready();
       tg.expand();
 
@@ -31,12 +32,12 @@ export function useTelegramUser(): UseTelegramUserInterface {
         tg.requestFullscreen();
       }
 
-      console.error(">> tg.initDataUnsafe", tg.initDataUnsafe);
+      const realUser = tg.initDataUnsafe?.user as WebAppUser;
+      const realInitData = tg.initData;
 
-      const initDataUnsafe = tg.initDataUnsafe as WebAppInitData;
-
-      setInitData(tg.initData);
-      setUsername(initDataUnsafe.user?.username || initDataUnsafe.user?.first_name || "Player");
+      setInitData(realInitData);
+      setUser(realUser || null);
+      setUsername(realUser.username || realUser.first_name || "Player");
       setReady(true);
     } else {
       console.warn("No telegram user was found");
@@ -44,5 +45,5 @@ export function useTelegramUser(): UseTelegramUserInterface {
     }
   }, []);
 
-  return { initData, username, setUsername, ready, error };
+  return { initData, username, user, setUsername, ready, error };
 }

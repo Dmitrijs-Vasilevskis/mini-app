@@ -9,9 +9,8 @@ function App() {
   const {
     joining,
     roomCode,
-    username,
+    user,
     setRoomCode,
-    setUsername,
     createRoom,
     joinRoom,
   } = useGameContext();
@@ -27,11 +26,9 @@ function App() {
       return (
         <JoinRoomScreen
           roomCode={roomCode}
-          username={username}
+          user={user}
           joining={joining}
-          isTelegramUser={true}
           setRoomCode={setRoomCode}
-          setUsername={setUsername}
           onCreate={createRoom}
           onJoin={joinRoom}
         />
