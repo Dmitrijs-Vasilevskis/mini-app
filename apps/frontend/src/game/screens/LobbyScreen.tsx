@@ -21,10 +21,10 @@ export function LobbyScreen() {
   const copyInviteLink = async () => {
     if (!roomCode) return;
 
-    // const inviteLink = `https://t.me/uno_mini_bot/play?startapp=${roomCode}`;
+    const inviteLink = `https://t.me/mercuria_test_bot/play?startapp=${roomCode}`;
 
     try {
-      await navigator.clipboard.writeText(roomCode);
+      await navigator.clipboard.writeText(inviteLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
