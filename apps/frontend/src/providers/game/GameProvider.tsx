@@ -3,13 +3,15 @@ import { useTelegramUser } from "../../hooks/useTelegramUser";
 import { colyseusService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
+import type { WebAppUser } from "../../types/TelegramWebApp";
 
 interface GameContextInterface {
   joining: boolean;
   roomCode: string;
   isLandscape: boolean;
   username: string;
-  setRoomCode: (values: string) => void;
+  user: WebAppUser;
+  setRoomCode: React.Dispatch<React.SetStateAction<string>>;
   setUsername: (username: string) => void;
   createRoom: () => Promise<void>;
   joinRoom: () => Promise<void>;
@@ -20,7 +22,7 @@ export const GameContext = createContext<GameContextInterface | null>(null);
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   // const { user, playerId, telegramId, setUsername } = useTelegramUser();
-  const { initData, username, setUsername } = useTelegramUser();
+  const { initData, username, user, setUsername } = useTelegramUser();
 
   const [roomCode, setRoomCode] = useState<string>("");
   const [joining, setJoining] = useState<boolean>(false);
@@ -105,6 +107,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         roomCode,
         isLandscape,
         username,
+        user,
         setRoomCode,
         setUsername,
         createRoom,

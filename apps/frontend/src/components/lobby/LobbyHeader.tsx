@@ -1,27 +1,31 @@
 interface Props {
   roomCode: string | null;
-  onClick: () => void;
-  onLeave: () => void;
+  copyInviteLink: () => void;
+  copied: boolean;
 }
 
-export function LobbyHeader({ roomCode, onClick }: Props) {
+export function LobbyHeader({ roomCode, copyInviteLink, copied }: Props) {
   return (
-    <div className="w-full max-w-md flex flex-row mb-4 justify-center gap-4">
-      <div className="text-center">
-        <div className="text-sm opacity-70">Room Code</div>
-        <div className=" text-4xl font-black tracking-widest">
-          {roomCode ?? ""}
-        </div>
+    <div className="w-full bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-lg flex items-center justify-between mt-2">
+      <div className="flex flex-col">
+        <span className="text-xs text-white/40 font-bold tracking-wider uppercase">
+          Lobby Code
+        </span>
+        <span className="text-3xl font-black font-mono tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-400">
+          {roomCode || "------"}
+        </span>
       </div>
 
-      <div className="flex justify-center">
-        <button
-          onClick={onClick}
-          className="transition active:scale-95 bg-blue-600 rounded-lg flex items-center"
-        >
-          <span className="px-5 py-3 text-sm font-semibold">Copy Code</span>
-        </button>
-      </div>
+      <button
+        onClick={copyInviteLink}
+        className={`h-11 px-5 rounded-xl font-bold text-xs tracking-wide transition-all active:scale-[0.95] flex items-center gap-2 shadow-md ${
+          copied
+            ? "bg-emerald-600 text-white"
+            : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/40"
+        }`}
+      >
+        <span>{copied ? "✨ CODE COPIED!" : "🔗 SHARE CODE"}</span>
+      </button>
     </div>
   );
 }
