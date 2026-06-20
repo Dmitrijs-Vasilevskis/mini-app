@@ -10,7 +10,7 @@ interface GameContextInterface {
   roomCode: string;
   isLandscape: boolean;
   username: string;
-  user: WebAppUser;
+  user: WebAppUser | null;
   setRoomCode: React.Dispatch<React.SetStateAction<string>>;
   setUsername: (username: string) => void;
   createRoom: () => Promise<void>;
