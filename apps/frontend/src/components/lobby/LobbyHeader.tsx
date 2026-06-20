@@ -24,7 +24,7 @@ export function LobbyHeader({ roomCode, copyInviteLink, copied }: Props) {
             : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/40"
         }`}
       >
-        <span>{copied ? "✨ LINK COPIED!" : "🔗 SHARE LINK"}</span>
+        <span>{copied ? "✨ CODE COPIED!" : "🔗 SHARE CODE"}</span>
       </button>
     </div>
   );
