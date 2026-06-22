@@ -21,7 +21,6 @@ interface GameContextInterface {
 export const GameContext = createContext<GameContextInterface | null>(null);
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  // const { user, playerId, telegramId, setUsername } = useTelegramUser();
   const { initData, username, user, setUsername } = useTelegramUser();
 
   const [roomCode, setRoomCode] = useState<string>("");
@@ -30,11 +29,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const createRoom = async () => {
     if (joining) return;
-
-    // if (!playerId) {
-    //   console.error("Player identity not ready");
-    //   return;
-    // }
 
     setJoining(true);
 

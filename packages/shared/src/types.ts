@@ -15,6 +15,7 @@ export class Player extends Schema {
   @type("string") id: string = ""; // sessionId
   @type("string") connectionId: string = "";
   @type("string") name: string = "";
+  @type("string") photoUrl: string = "";
   @type("number") score: number = 0;
   @type("boolean") isConnected: boolean = true;
   @type("number") disconnectedAt: number = 0;

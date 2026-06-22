@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { LocalPlayerDTO, PlayerDTO } from "../../types/game";
+import { getProxiedAvatarUrl } from "../../utils/avatar";
 
 interface Props {
   players: PlayerDTO[];
@@ -7,6 +9,8 @@ interface Props {
 }
 
 export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
   return (
     <div className="flex-1 flex flex-col min-h-0 my-4 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between mb-2 px-1">
@@ -24,6 +28,8 @@ export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
             ? player.name.charAt(0).toUpperCase()
             : "P";
           const isPlayerHost = player.id === hostId;
+          const proxiedAvatarUrl = getProxiedAvatarUrl(player.photoUrl);
+          const hasImageError = imageErrors[player.id];
 
           return (
             <div
@@ -35,8 +41,22 @@ export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
               }`}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-sm text-white/90 border border-white/10 flex-shrink-0">
-                  {initial}
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-sm text-white/90 border border-white/10 flex-shrink-0">
+                  {proxiedAvatarUrl && !hasImageError ? (
+                    <img
+                      src={proxiedAvatarUrl}
+                      alt={player.name}
+                      className="w-full h-full object-cover"
+                      onError={() =>
+                        setImageErrors((prev) => ({
+                          ...prev,
+                          [player.id]: true,
+                        }))
+                      }
+                    />
+                  ) : (
+                    <span>{initial}</span>
+                  )}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5">

@@ -32,6 +32,7 @@ export interface CardDTO {
 export interface PlayerDTO {
     id: string;
     name: string;
+    photoUrl: string;
     score: number;
     isTurn: boolean;
     handCount: number;

@@ -157,6 +157,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
     const user = client.auth as TelegramAuthUser;
     const telegramId = String(user.id);
     const displayName = user.username || user.first_name || "Player";
+    const photoUrl = user.photo_url || "";
     const existingPlayer = this.findExistingPlayer(telegramId);
 
     if (existingPlayer) {
@@ -218,6 +219,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
     newPlayer.playerId = telegramId;
 
     newPlayer.name = displayName;
+    newPlayer.photoUrl = photoUrl;
     newPlayer.isTurn = false;
     newPlayer.hand = new ArraySchema<Card>();
 
