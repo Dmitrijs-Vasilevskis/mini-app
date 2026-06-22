@@ -1,9 +1,10 @@
-import { Text } from "@react-three/drei";
+import { Text, useTexture } from "@react-three/drei";
 import type { ThreeElements } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 import { LostConnectionIcon } from "../uno/connection/LostConnectionIcon";
+import { getProxiedAvatarUrl } from "../../utils/avatar";
 
 type Props = ThreeElements["group"] & {
   name: string;
@@ -11,6 +12,7 @@ type Props = ThreeElements["group"] & {
   cardCount?: number;
   showCardsCount?: boolean;
   isConnected?: boolean;
+  photoUrl?: string;
 };
 
 export function AvatarPlayer({
@@ -19,15 +21,28 @@ export function AvatarPlayer({
   cardCount = 0,
   showCardsCount = false,
   isConnected = true,
+  photoUrl,
   ...props
 }: Props) {
   const groupRef = useRef<Group>(null);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const textRef = useRef<any>(null);
+
+  const [isValidImage, setIsValidImage] = useState(false);
 
   const fanColor =
     cardCount <= 2 ? "#ef4444" : cardCount <= 5 ? "#f59e0b" : "#3b82f6";
+
+  useEffect(() => {
+    if (!photoUrl) {
+      setIsValidImage(false);
+      return;
+    }
+
+    const img = new Image();
+    img.src = photoUrl;
+    img.onload = () => setIsValidImage(true);
+    img.onerror = () => setIsValidImage(false);
+  }, [photoUrl]);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) {
@@ -77,17 +92,34 @@ export function AvatarPlayer({
         </mesh>
 
         {/* HEAD */}
-        <mesh position={[0, 1.5, 0]}>
+        <mesh position={[0, 1.5, 0]} scale={1.25}>
           <sphereGeometry args={[0.32, 32, 32]} />
-
-          <meshStandardMaterial color="#f5d0a9" />
+          <meshStandardMaterial color="#f5d0a9" roughness={0.5} />
         </mesh>
 
-        {/* FACE */}
-        <mesh position={[0, 1.5, 0.29]}>
-          <circleGeometry args={[0.18, 32]} />
+        <mesh position={[0, 1.55, 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.31, 0.31, 0.3, 32]} />
+          <meshStandardMaterial
+            color="#f5d0a9"
+            metalness={0.6}
+            roughness={0.2}
+          />
+        </mesh>
 
-          <meshStandardMaterial color="#ffffff" />
+        <mesh position={[0, 1.55, 0.401]} scale={1.4}>
+          <circleGeometry args={[0.22, 32]} />
+
+          {photoUrl ? (
+            <Suspense
+              fallback={
+                <meshStandardMaterial color="#ffffff" roughness={0.4} />
+              }
+            >
+              <ProxyAvatarFace avatarUrl={photoUrl} />
+            </Suspense>
+          ) : (
+            <meshStandardMaterial color="#ffffff" roughness={0.4} />
+          )}
         </mesh>
 
         {!isConnected && (
@@ -156,4 +188,11 @@ function CardFan({ count, fanColor }: { count: number; fanColor: string }) {
       })}
     </>
   );
+}
+
+function ProxyAvatarFace({ avatarUrl }: { avatarUrl: string }) {
+  const proxiedUrl = getProxiedAvatarUrl(avatarUrl);
+  const texture = useTexture(proxiedUrl);
+
+  return <meshBasicMaterial map={texture} transparent={true} />;
 }

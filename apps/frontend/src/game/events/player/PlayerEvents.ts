@@ -22,7 +22,8 @@ export function RegisterPlayerEvents(
                 isReady: player.isReady,
                 isConnected: player.isConnected,
                 saidUno: player.saidUno,
-                score: player.score
+                score: player.score,
+                photoUrl: player.photoUrl
             },
         ]);
 
@@ -55,7 +56,8 @@ export function RegisterPlayerEvents(
                 isConnected: player.isConnected,
                 isReady: player.isReady,
                 saidUno: player.saidUno,
-                score: player.score
+                score: player.score,
+                photoUrl: player.photoUrl,
             });
         }
     });

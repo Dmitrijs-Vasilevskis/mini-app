@@ -37,7 +37,7 @@ export function Table3D() {
     <Canvas
       camera={{
         position: [0, 8, 8],
-        fov: 50,
+        fov: 40,
       }}
     >
       <ambientLight intensity={0.4} />
@@ -73,6 +73,7 @@ export function Table3D() {
         active={currentTurn === localPlayer.id}
         name={localPlayer?.name || "You"}
         cardCount={localPlayer.handCount}
+        photoUrl={localPlayer.photoUrl}
       />
 
       {otherPlayers.map((player, index) => {
@@ -83,6 +84,7 @@ export function Table3D() {
         return (
           <AvatarPlayer
             name={player.name}
+            photoUrl={player.photoUrl}
             active={currentTurn === player.id}
             position={seat.position as [number, number, number]}
             rotation={seat.rotation as [number, number, number]}
