@@ -109,7 +109,7 @@ export function AvatarPlayer({
         <mesh position={[0, 1.55, 0.401]} scale={1.4}>
           <circleGeometry args={[0.22, 32]} />
 
-          {photoUrl ? (
+          {photoUrl && isValidImage ? (
             <Suspense
               fallback={
                 <meshStandardMaterial color="#ffffff" roughness={0.4} />
@@ -192,7 +192,7 @@ function CardFan({ count, fanColor }: { count: number; fanColor: string }) {
 
 function ProxyAvatarFace({ avatarUrl }: { avatarUrl: string }) {
   const proxiedUrl = getProxiedAvatarUrl(avatarUrl);
-  const texture = useTexture(proxiedUrl);
+  const texture = useTexture(proxiedUrl ?? "");
 
   return <meshBasicMaterial map={texture} transparent={true} />;
 }
