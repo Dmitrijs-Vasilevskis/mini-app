@@ -8,6 +8,7 @@ import { RegisterReconnectEvents } from './events/messages/ReconnectEvents';
 import { RegisterUnoEvents } from './events/messages/UnoEvents';
 import { RegisterDiscardPileEvents } from './events/gameplay/DiscardPileEvents';
 import type { GameRoom } from './events/types';
+import { RegisterEmoteEvents } from './events/messages/EmotesEvents';
 
 export class GameEvents {
     static initialize(room: GameRoom) {
@@ -19,6 +20,7 @@ export class GameEvents {
         RegisterPauseEvents(room);
         RegisterReconnectEvents(room);
         RegisterUnoEvents(room);
-        RegisterDiscardPileEvents(room, $)
+        RegisterDiscardPileEvents(room, $);
+        RegisterEmoteEvents(room);
     }
 }
