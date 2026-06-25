@@ -130,7 +130,7 @@ export function LandscapeHandCards({
             const xPosition = distance * CENTER_OFFSET;
 
             const scale = isCentered
-              ? 1.25
+              ? 1.15
               : Math.max(0.75, 1 - Math.abs(distance) * 0.08);
             const rotate = isCentered ? 0 : distance * 12;
             const yOffset = isCentered ? -24 : Math.abs(distance) * 12;
@@ -172,12 +172,6 @@ export function LandscapeHandCards({
                   handlePlayCard(card, index);
                 }}
               >
-                {isCentered && isPlayable(card) && (
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-xs px-5 py-2 rounded-xl font-bold animate-bounce uppercase tracking-wider shadow-lg z-50">
-                    Play
-                  </div>
-                )}
-
                 <div className={!isCentered ? "pointer-events-none" : ""}>
                   <Card card={card} />
                 </div>
