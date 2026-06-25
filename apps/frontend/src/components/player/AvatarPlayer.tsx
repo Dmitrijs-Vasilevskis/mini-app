@@ -5,9 +5,12 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 import { LostConnectionIcon } from "../uno/connection/LostConnectionIcon";
 import { getProxiedAvatarUrl } from "../../utils/avatar";
+import { useEmoteStore } from "../../store/emoteStore";
+import { FloatingEmote3D } from "../uno/FloatingEmote3D";
 
 type Props = ThreeElements["group"] & {
   name: string;
+  playerId: string;
   active?: boolean;
   cardCount?: number;
   showCardsCount?: boolean;
@@ -17,6 +20,7 @@ type Props = ThreeElements["group"] & {
 
 export function AvatarPlayer({
   name,
+  playerId,
   active,
   cardCount = 0,
   showCardsCount = false,
@@ -26,6 +30,8 @@ export function AvatarPlayer({
 }: Props) {
   const groupRef = useRef<Group>(null);
   const textRef = useRef<any>(null);
+
+  const playerEmote = useEmoteStore((s) => s.activeEmotes[playerId]);
 
   const [isValidImage, setIsValidImage] = useState(false);
 
@@ -121,6 +127,13 @@ export function AvatarPlayer({
             <meshStandardMaterial color="#ffffff" roughness={0.4} />
           )}
         </mesh>
+
+        {playerEmote && (
+          <FloatingEmote3D
+            emote={playerEmote.emoteId}
+            timestamp={playerEmote.timestamp}
+          />
+        )}
 
         {!isConnected && (
           <group position={[0, 2.35, 0]}>

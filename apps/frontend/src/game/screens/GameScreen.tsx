@@ -14,6 +14,7 @@ import { VictoryOverlay } from "../../components/uno/VictoryOverlay";
 import { RoundEndOverlay } from "../../components/uno/RoundEndOverlay";
 import { LandscapeHandCards } from "../../components/uno/LandscapeHandCards";
 import { useGameContext } from "../../providers/game/GameProvider";
+import { EmoteWheel } from "../../components/table/EmoteWheel";
 
 export function GameScreen() {
   const { isLandscape } = useGameContext();
@@ -100,6 +101,8 @@ export function GameScreen() {
       </div>
       {/* Floating Ation Highlighting */}
       <FloatingActionText />
+
+      <EmoteWheel />
 
       {/* Hand Cards */}
       {isLandscape ? (

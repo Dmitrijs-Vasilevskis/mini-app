@@ -72,6 +72,7 @@ export function Table3D() {
         rotation={[0, Math.PI, 0]}
         active={currentTurn === localPlayer.id}
         name={localPlayer?.name || "You"}
+        playerId={localPlayer.id}
         cardCount={localPlayer.handCount}
         photoUrl={localPlayer.photoUrl}
       />
@@ -84,6 +85,7 @@ export function Table3D() {
         return (
           <AvatarPlayer
             name={player.name}
+            playerId={player.id}
             photoUrl={player.photoUrl}
             active={currentTurn === player.id}
             position={seat.position as [number, number, number]}
