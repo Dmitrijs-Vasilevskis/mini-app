@@ -57,6 +57,13 @@ export class UNORoom extends Room<UnoRoomOptions> {
       }
       player.isReady = !player.isReady;
     });
+
+    this.onMessage('sendEmote', (client, payload: { emoteId: string }) => {
+      this.broadcast('onEmoteReceived', {
+        senderId: client.sessionId,
+        emoteId: payload.emoteId
+      });
+    });
   }
 
   async onAuth(client: Client, options: { initData: string },) {

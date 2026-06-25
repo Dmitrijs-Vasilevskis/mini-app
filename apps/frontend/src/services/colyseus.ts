@@ -87,6 +87,10 @@ export class ColyseusService {
   challengeUno() {
     this.room?.send('challengeUno');
   }
+
+  sendEmote(emoteId: string) {
+    this.room?.send('sendEmote', { emoteId });
+  }
 }
 
 export const colyseusService = new ColyseusService();
