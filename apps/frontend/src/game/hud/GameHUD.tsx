@@ -1,5 +1,6 @@
 import type { CardDTO, Color, PlayerDTO } from "../../types/game";
 import { MatchInfoPanel } from "./MatchInfoPanel";
+import { PauseOverlay } from "./PauseOverlay";
 
 type Props = {
   currentTurnPlayer: PlayerDTO | null;
@@ -22,6 +23,8 @@ export function GameHUD({
         discardTop={discardTop}
         isMyTurn={isMyTurn}
       />
+
+      <PauseOverlay />
     </>
   );
 }
