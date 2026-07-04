@@ -1,3 +1,4 @@
+import { useEffectStore } from "../../../store/effectsStore";
 import { useGameStore } from "../../../store/gameStore";
 import type { PlayerDTO } from "../../../types/game";
 import type { GameRoom, PlayerSchema, StateCallbacks } from "../types";
@@ -10,7 +11,7 @@ export function PlayerListeners(
     const updatePlayer = (updates: Partial<PlayerDTO>) => {
         const players = useGameStore.getState().players;
         const store = useGameStore.getState();
-        
+
         store.setPlayers(
             players.map((p) =>
                 p.id === player.id
@@ -36,6 +37,8 @@ export function PlayerListeners(
         }
     };
 
+    let wasConnected = player.isConnected;
+
     $(player).listen(
         "isTurn",
         (isTurn: boolean) => {
@@ -60,9 +63,24 @@ export function PlayerListeners(
     $(player).listen(
         "isConnected",
         (isConnected: boolean) => {
+            const reconnected = !wasConnected && isConnected;
+            wasConnected = isConnected;
+
             updatePlayer({ isConnected });
+
+            if (reconnected) {
+                useEffectStore.getState().addEffect({
+                    text: `${player.name} went back!`,
+                    color: "#facc15",
+                    emphasis: "special",
+                });
+            }
         }
     );
+
+    $(player).listen("handCount", (count: number) => {
+        updatePlayer({ handCount: count });
+    });
 
     $(player).listen(
         "saidUno",

@@ -17,7 +17,7 @@ export function RegisterPlayerEvents(
             {
                 id: player.id,
                 name: player.name,
-                handCount: player.hand.length,
+                handCount: player.handCount,
                 isTurn: player.isTurn,
                 isReady: player.isReady,
                 isConnected: player.isConnected,
@@ -33,13 +33,13 @@ export function RegisterPlayerEvents(
             $
         );
 
-        HandListeners(
-            room,
-            player,
-            $
-        );
-
         if (player.id === room.sessionId) {
+
+            HandListeners(
+                room,
+                player,
+                $
+            );
 
             const initialHand = player.hand.map((card: CardDTO) => ({
                 id: card.id,
@@ -51,7 +51,7 @@ export function RegisterPlayerEvents(
                 id: player.id,
                 name: player.name,
                 hand: initialHand,
-                handCount: initialHand.length,
+                handCount: player.handCount,
                 isTurn: player.isTurn,
                 isConnected: player.isConnected,
                 isReady: player.isReady,

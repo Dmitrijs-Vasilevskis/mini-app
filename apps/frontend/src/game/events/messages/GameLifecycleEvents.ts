@@ -7,8 +7,12 @@ export function RegisterGameLifecycleEvents(room: GameRoom) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
 
-    room.onMessage(GameEvents.GAME_END, (data: { winnerId: string, winnerName: string }) => {
-        store.setWinner({ id: data.winnerId, name: data.winnerName });
+    room.onMessage(GameEvents.GAME_END, (data: {
+        matchWinnerId: string;
+        winnerName: string;
+        winnerScore?: number;
+    }) => {
+        store.setWinner({ id: data.matchWinnerId, name: data.winnerName });
 
         effects.addEffect({
             text: `${data.winnerName} WINS!`,
@@ -29,7 +33,13 @@ export function RegisterGameLifecycleEvents(room: GameRoom) {
         store.setRoundResults(results);
     });
 
-    room.onMessage(GameEvents.PLAYER_LEFT, (data: { playerId: string }) => {
-        console.log(">> player left", data.playerId);
-    })
+    room.onMessage(GameEvents.ERROR, (data: { message: string }) => {
+        store.setRoomError(data.message);
+
+        effects.addEffect({
+            text: data.message,
+            color: "#ef4444",
+            emphasis: "special",
+        });
+    });
 }
