@@ -9,7 +9,7 @@ export function RegisterDiscardPileEvents(
 
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
-    $(room.state).listen("topDiscardCard", ((card: CardSchema) => {
+    $(room.state).listen("topDiscardCard", ((card: CardSchema | null) => {
 
         if(!card) return;
 
