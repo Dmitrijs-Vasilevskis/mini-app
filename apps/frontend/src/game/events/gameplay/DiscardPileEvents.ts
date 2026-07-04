@@ -11,6 +11,8 @@ export function RegisterDiscardPileEvents(
     const effects = useEffectStore.getState();
     $(room.state).listen("topDiscardCard", ((card: CardSchema) => {
 
+        if(!card) return;
+
         store.setDiscardTop({
             id: card.id,
             color: card.color,
