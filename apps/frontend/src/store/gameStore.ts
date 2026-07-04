@@ -28,6 +28,7 @@ const initialState = {
     reconnectRemaining: null,
     unoWindowPlayerId: null,
     roundResults: null,
+    roomError: null,
 };
 
 export const useGameStore =
@@ -49,6 +50,7 @@ export const useGameStore =
         reconnectRemaining: null,
         unoWindowPlayerId: null,
         roundResults: null,
+        roomError: null,
         setConnected: (value: boolean) => {
             set({ connected: value })
         },
@@ -84,6 +86,7 @@ export const useGameStore =
                 pausedPlayerId: null,
                 reconnectRemaining: null,
                 unoWindowPlayerId: null,
+                roomError: null,
             });
         },
         setRoomCode: (roomCode: string) => {
@@ -109,6 +112,9 @@ export const useGameStore =
         },
         setRoundResults(roundResults: RoundResults | null) {
             set({ roundResults });
+        },
+        setRoomError(message: string | null) {
+            set({ roomError: message });
         },
         reset() {
             set({ ...initialState });
