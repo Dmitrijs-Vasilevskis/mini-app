@@ -9,6 +9,7 @@ interface Props {
   roomCode: string;
   user: WebAppUser | null;
   joining: boolean;
+  joinError: string | null;
   setRoomCode: React.Dispatch<React.SetStateAction<string>>;
   onCreate: () => void;
   onJoin: () => void;
@@ -18,6 +19,7 @@ export function JoinRoomScreen({
   roomCode,
   user,
   joining,
+  joinError,
   setRoomCode,
   onCreate,
   onJoin,
@@ -44,6 +46,12 @@ export function JoinRoomScreen({
             Real-time Telegram Card Battles
           </p>
         </div>
+
+        {joinError && (
+          <div className="w-full rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-center text-sm text-red-300">
+            {joinError}
+          </div>
+        )}
 
         <CreateLobby joining={joining} onCreate={onCreate} />
 
