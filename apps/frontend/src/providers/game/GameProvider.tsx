@@ -3,11 +3,13 @@ import { useTelegramUser } from "../../hooks/useTelegramUser";
 import { colyseusService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
+import { getErrorMessage } from "../../utils/errors";
 import type { WebAppUser } from "../../types/TelegramWebApp";
 
 interface GameContextInterface {
   joining: boolean;
   roomCode: string;
+  joinError: string | null;
   isLandscape: boolean;
   username: string;
   user: WebAppUser | null;
@@ -21,14 +23,47 @@ interface GameContextInterface {
 export const GameContext = createContext<GameContextInterface | null>(null);
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  const { initData, username, user, setUsername } = useTelegramUser();
+  const { initData, username, user, setUsername, ready } = useTelegramUser();
 
   const [roomCode, setRoomCode] = useState<string>("");
   const [joining, setJoining] = useState<boolean>(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!ready || !initData) return;
+
+    const attemptRecovery = async () => {
+      setJoining(true);
+      try {
+        const activeRoom = await colyseusService.trySessionRecovery();
+        if (activeRoom) {
+          activeRoom.onStateChange.once(() => {
+            GameEvents.initialize(activeRoom);
+          });
+        }
+      } catch (error) {
+        console.error("[AUTO RECOVERY FAILED]:", error);
+      } finally {
+        setJoining(false);
+      }
+    };
+
+    attemptRecovery();
+  }, [ready, initData]);
 
   const createRoom = async () => {
     if (joining) return;
+
+    setJoinError(null);
+    useGameStore.getState().setRoomError(null);
+
+    if (!ready || !initData) {
+      setJoinError(
+        "Telegram authentication is not available. Open the app from Telegram and try again."
+      );
+      return;
+    }
 
     setJoining(true);
 
@@ -40,6 +75,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       console.error(err);
+      setJoinError(getErrorMessage(err));
     } finally {
       setJoining(false);
     }
@@ -49,7 +85,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     if (joining) return;
 
     if (!roomCode.trim()) {
-      console.error("Room Code is required");
+      setJoinError("Room code is required.");
+      return;
+    }
+
+    setJoinError(null);
+    useGameStore.getState().setRoomError(null);
+
+    if (!ready || !initData) {
+      setJoinError(
+        "Telegram authentication is not available. Open the app from Telegram and try again."
+      );
       return;
     }
 
@@ -63,6 +109,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       console.error(err);
+      setJoinError(getErrorMessage(err));
     } finally {
       setJoining(false);
     }
@@ -70,9 +117,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const leaveRoom = async () => {
     try {
+      GameEvents.destroy();
       await colyseusService.leave();
 
       useGameStore.getState().reset();
+      setJoinError(null);
     } catch (error) {
       console.error("Failed to leave room", error);
     }
@@ -91,6 +140,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mediaQuery.removeEventListener("change", handleOrientationChange);
+      GameEvents.destroy();
     };
   }, []);
 
@@ -99,6 +149,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       value={{
         joining,
         roomCode,
+        joinError,
         isLandscape,
         username,
         user,
