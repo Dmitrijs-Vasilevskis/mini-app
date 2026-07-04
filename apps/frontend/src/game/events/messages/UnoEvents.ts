@@ -14,12 +14,9 @@ export function RegisterUnoEvents(
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
 
-    let prevPendingId = room.state.unoPendingPlayerId || "";
-
     $(room.state).listen("unoPendingPlayerId", (currPendingPlayerId: string) => {
         if (!currPendingPlayerId) {
             store.setUnoWindowPlayerId(null);
-            prevPendingId = "";
             return;
         }
 
