@@ -17,6 +17,7 @@ export function LobbyScreen() {
   const isHost = localPlayer?.id === hostId;
 
   const canStart = players.length >= 1 && players.every((p) => p.isReady);
+  const roomError = useGameStore((s) => s.roomError);
 
   const copyInviteLink = async () => {
     if (!roomCode) return;
@@ -34,6 +35,12 @@ export function LobbyScreen() {
 
   return (
     <div className="h-screen w-full flex flex-col justify-between bg-gradient-to-b from-[#1c0a26] via-[#2a1b40] to-[#0f081d] text-white p-4 select-none overflow-hidden">
+      {roomError && (
+        <div className="mb-2 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-center text-sm text-red-300">
+          {roomError}
+        </div>
+      )}
+
       <LobbyHeader
         roomCode={roomCode}
         copied={copied}
