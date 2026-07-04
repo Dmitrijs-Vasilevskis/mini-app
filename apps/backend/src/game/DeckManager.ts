@@ -15,69 +15,53 @@ const NUMBER_VALUES: Value[] = [
 ];
 
 export class DeckManager {
-    constructor(private state: GameState) { }
+    private internalDeck: Card[] = [];
+    private internalDiscardPile: Card[] = [];
 
-    // init deck
+    constructor(
+        private state: GameState,
+
+    ) { }
+
     initialize() {
-        this.state.deck.clear();
-        this.state.discardPile.clear();
+        this.internalDeck = createDeck();
+        this.internalDiscardPile = [];
+        this.state.topDiscardCard = null;
 
-        let deckCards = createDeck();
-        const firstCardIndex = deckCards.findIndex(card => NUMBER_VALUES.includes(card.value));
-        const [firstCardData] = deckCards.splice(firstCardIndex, 1);
+        const firstCardIndex = this.internalDeck.findIndex(card => NUMBER_VALUES.includes(card.value));
+        const [firstCard] = this.internalDeck.splice(firstCardIndex, 1);
 
-        // Convert plain objects to Card instances
-        for (const c of deckCards) {
-            const card = new Card();
-            card.id = c.id;
-            card.color = c.color;
-            card.value = c.value;
-            this.state.deck.push(card);
-        }
-
-        const firstCard = new Card();
-        firstCard.id = firstCardData.id;
-        firstCard.color = firstCardData.color;
-        firstCard.value = firstCardData.value;
-
-        this.state.discardPile.push(firstCard);
+        this.internalDiscardPile.push(firstCard);
+        this.state.topDiscardCard = firstCard;
         this.state.activeColor = firstCard.color!;
     }
 
-    // reshuffle deck
     reshuffleDiscard() {
-        if (this.state.discardPile.length <= 1) {
-            return;
-        }
-        // Remove the top card from discard pile
-        const top = this.state.discardPile.pop()!;
-        // Convert remaining discard pile to plain objects for shuffling
-        const cardsToShuffle = this.state.discardPile.map(c => ({
-            id: c.id,
-            color: c.color,
-            value: c.value
-        })) as { id: string; color: Color | null; value: Value }[];
-        const shuffledDeck = shuffle(cardsToShuffle);
+        if (this.internalDiscardPile.length <= 1) return;
 
-        for (const cardData of shuffledDeck) {
-            const card = new Card();
-            card.id = cardData.id;
-            card.color = cardData.color;
-            card.value = cardData.value;
-            this.state.deck.push(card);
-        }
+        const top = this.internalDiscardPile.pop()!;
 
-        this.state.discardPile.push(top);
+        this.internalDeck = shuffle(this.internalDiscardPile);
+        this.internalDiscardPile = [top];
     }
 
-    // draw card
-    draw(): Card | null {
-        if (this.state.deck.length === 0) {
+    draw(onCardAllocated?: (card: Card) => void): Card | null {
+        if (this.internalDeck.length === 0) {
             this.reshuffleDiscard();
         }
 
-        const card = this.state.deck.pop();
+        const card = this.internalDeck.pop();
+        if (!card) return null;
 
-        return card || null;
+        if (onCardAllocated) {
+            onCardAllocated(card);
+        }
+
+        return card;
+    }
+
+    discard(card: Card) {
+        this.internalDiscardPile.push(card);
+        this.state.topDiscardCard = card;
     }
 }

@@ -9,7 +9,10 @@ export function RegisterDiscardPileEvents(
 
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
-    $(room.state).discardPile.onAdd((card: CardSchema) => {
+    $(room.state).listen("topDiscardCard", ((card: CardSchema | null) => {
+
+        if(!card) return;
+
         store.setDiscardTop({
             id: card.id,
             color: card.color,
@@ -64,5 +67,5 @@ export function RegisterDiscardPileEvents(
                     emphasis: "normal"
                 })
         }
-    });
+    }));
 }

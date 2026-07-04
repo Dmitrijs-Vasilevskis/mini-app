@@ -3,7 +3,7 @@ import { Card, Color } from "@uno/shared";
 export class CardValidator {
     static canPlay(
         card: Card,
-        topCard: Card,
+        topCard: Card | null,
         activeColor: Color
     ): boolean {
         // wild cards, can be played in any time
@@ -15,7 +15,7 @@ export class CardValidator {
             return true;
         }
 
-        if (card.value === topCard.value) {
+        if (card.value === topCard?.value) {
             return true;
         }
 

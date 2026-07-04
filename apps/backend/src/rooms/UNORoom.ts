@@ -1,11 +1,13 @@
 import { Room, Client, CloseCode } from '@colyseus/core';
 import { GameState, Card, Player, Color, RoomStatus, UnoRoomOptions } from '@uno/shared';
-import { ArraySchema } from '@colyseus/schema';
-import { generateRoomCode } from '../utils/roomCode';
+import { ArraySchema, StateView } from '@colyseus/schema';
+import { generateUniqueRoomCode } from '../utils/roomCode';
+import { assertRoomCapacity, hasRoomCode, registerRoom, unregisterRoom } from '../utils/roomRegistry';
 import { DeckManager } from '../game/DeckManager';
 import { TurnManager } from '../game/TurnManager';
 import { GameEngine } from '../game/GameEngine';
 import { TelegramAuthUser, validateTelegramInitData } from '../auth/telegram';
+import { ALLOWED_EMOTE_IDS, MAX_CLIENTS, ROOM_CODE_MAX_GENERATION_ATTEMPTS } from '../game/constants';
 
 export class UNORoom extends Room<UnoRoomOptions> {
   private deckManager!: DeckManager;
@@ -13,6 +15,9 @@ export class UNORoom extends Room<UnoRoomOptions> {
   private gameEngine!: GameEngine;
 
   onCreate(options: any) {
+    assertRoomCapacity();
+
+    this.maxClients = MAX_CLIENTS;
     this.state = new GameState();
 
     this.initializeState();
@@ -25,7 +30,13 @@ export class UNORoom extends Room<UnoRoomOptions> {
       this.turnManager
     );
 
-    const roomCode = generateRoomCode();
+    const roomCode = generateUniqueRoomCode(
+      (code) => !hasRoomCode(code),
+      6,
+      ROOM_CODE_MAX_GENERATION_ATTEMPTS,
+    );
+
+    registerRoom(roomCode);
 
     this.state.roomCode = roomCode;
     this.setMetadata({ roomCode });
@@ -59,6 +70,10 @@ export class UNORoom extends Room<UnoRoomOptions> {
     });
 
     this.onMessage('sendEmote', (client, payload: { emoteId: string }) => {
+      if (!payload?.emoteId || !ALLOWED_EMOTE_IDS.has(payload.emoteId)) {
+        return;
+      }
+
       this.broadcast('onEmoteReceived', {
         senderId: client.sessionId,
         emoteId: payload.emoteId
@@ -66,9 +81,12 @@ export class UNORoom extends Room<UnoRoomOptions> {
     });
   }
 
-  async onAuth(client: Client, options: { initData: string },) {
-    console.log(">>>onAuth initData:", options.initData);
+  onDispose() {
+    unregisterRoom(this.state.roomCode);
+    this.gameEngine.dispose();
+  }
 
+  async onAuth(client: Client, options: { initData: string },) {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
     if (!botToken) {
@@ -114,9 +132,7 @@ export class UNORoom extends Room<UnoRoomOptions> {
   async onLeave(client: Client, code?: number) {
     const player = this.state.players.get(client.sessionId);
 
-    if (!player) {
-      return;
-    }
+    if (!player) return;
 
     console.log("[PLAYER LEFT]", client.sessionId, "closeCode:", code);
 
@@ -130,32 +146,22 @@ export class UNORoom extends Room<UnoRoomOptions> {
     player.isConnected = false;
     player.disconnectedAt = Date.now();
 
+    this.gameEngine.handlePlayerDisconnect(client.sessionId, 30000);
+
     try {
-      await this.allowReconnection(client, 60);
+      await this.allowReconnection(client, 30);
 
       player.isConnected = true;
       player.disconnectedAt = 0;
 
-      this.broadcast("playerReconnected", {
-        playerName: player.name,
-      });
+      this.gameEngine.handlePlayerReconnect(client.sessionId);
     } catch {
-      const wasPausedPlayer =
-        this.state.pausedPlayerId === player.id;
+      const wasPausedPlayer = this.state.pausedPlayerId === player.id;
 
       this.removePlayer(player.id);
 
       if (wasPausedPlayer) {
-        this.state.isPaused = false;
-        this.state.pausedPlayerId = "";
-
-        this.turnManager.nextTurn();
-
-        this.broadcast("gameResumed");
-
-        this.broadcast("turnChanged", {
-          playerId: this.state.currentTurn,
-        });
+        this.gameEngine.handleTimeoutForfeit();
       }
     }
   }
@@ -165,7 +171,14 @@ export class UNORoom extends Room<UnoRoomOptions> {
     const telegramId = String(user.id);
     const displayName = user.username || user.first_name || "Player";
     const photoUrl = user.photo_url || "";
+
+    client.view = new StateView();
+
     const existingPlayer = this.findExistingPlayer(telegramId);
+
+    if (!existingPlayer && this.state.status !== RoomStatus.LOBBY) {
+      throw new Error('Game already in progress');
+    }
 
     if (existingPlayer) {
       const oldSessionId = existingPlayer.id;
@@ -180,41 +193,24 @@ export class UNORoom extends Room<UnoRoomOptions> {
 
       this.state.players.set(newSessionId, existingPlayer);
 
-      if (this.state.hostId === oldSessionId) {
-        this.state.hostId = newSessionId;
-      }
+      if (this.state.hostId === oldSessionId) this.state.hostId = newSessionId;
+      if (this.state.currentTurn === oldSessionId) this.state.currentTurn = newSessionId;
+      if (this.state.pausedPlayerId === oldSessionId) this.state.pausedPlayerId = newSessionId;
+      if (this.state.unoPendingPlayerId === oldSessionId) this.state.unoPendingPlayerId = newSessionId;
+      if (this.state.roundWinnerId === oldSessionId) this.state.roundWinnerId = newSessionId;
+      if (this.state.matchWinnerId === oldSessionId) this.state.matchWinnerId = newSessionId;
 
-      if (this.state.currentTurn === oldSessionId) {
-        this.state.currentTurn = newSessionId;
-      }
-
-      if (this.state.pausedPlayerId === oldSessionId) {
-        this.state.pausedPlayerId = newSessionId;
-      }
-
-      if (this.state.unoPendingPlayerId === oldSessionId) {
-        this.state.unoPendingPlayerId = newSessionId;
-      }
-
-      if (this.state.roundWinnerId === oldSessionId) {
-        this.state.roundWinnerId = newSessionId;
-      }
-
-      if (this.state.matchWinnerId === oldSessionId) {
-        this.state.matchWinnerId = newSessionId;
-      }
-
-      const playerIndex =
-        this.state.playerOrder.indexOf(oldSessionId);
+      const playerIndex = this.state.playerOrder.indexOf(oldSessionId);
 
       if (playerIndex !== -1) {
         this.state.playerOrder[playerIndex] = newSessionId;
       }
 
-      this.broadcast("playerReconnected", {
-        playerName: existingPlayer.name,
-      });
+      for (const card of existingPlayer.hand) {
+        client.view.add(card);
+      }
 
+      client.view.add(existingPlayer);
       return;
     }
 
@@ -224,7 +220,6 @@ export class UNORoom extends Room<UnoRoomOptions> {
     newPlayer.connectionId = client.sessionId;
     newPlayer.telegramId = telegramId;
     newPlayer.playerId = telegramId;
-
     newPlayer.name = displayName;
     newPlayer.photoUrl = photoUrl;
     newPlayer.isTurn = false;
@@ -233,16 +228,11 @@ export class UNORoom extends Room<UnoRoomOptions> {
     this.state.players.set(client.sessionId, newPlayer);
     this.state.playerOrder.push(client.sessionId);
 
+    client.view.add(newPlayer);
+
     if (!this.state.hostId) {
       this.state.hostId = client.sessionId;
     }
-
-    this.broadcast('playerJoined',
-      {
-        id: client.sessionId,
-        name: displayName
-      }
-    );
   }
 
   private removePlayer(playerId: string) {
@@ -262,31 +252,20 @@ export class UNORoom extends Room<UnoRoomOptions> {
       this.state.hostId = this.state.playerOrder[0] ?? "";
     }
 
-    this.broadcast("playerLeft", {
-      playerId,
-    });
-
     if (this.state.players.size === 0) {
       this.disconnect();
     }
   }
 
   private initializeState() {
-    this.state.deck.clear();
-    this.state.discardPile.clear();
-
     this.state.status = RoomStatus.LOBBY;
-
     this.state.currentTurn = '';
     this.state.direction = 1;
-
     this.state.roundWinnerId = '';
     this.state.matchWinnerId = '';
     this.state.gameEnded = false;
-
     this.state.isPaused = false;
     this.state.pausedPlayerId = '';
-
     this.state.unoPendingPlayerId = '';
   }
 

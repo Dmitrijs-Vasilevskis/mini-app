@@ -1,28 +1,22 @@
 import { useState } from "react";
-import type { WebAppUser } from "../../types/TelegramWebApp";
 import { BottomNavigation } from "../../components/navigation/BottomNavigation";
 import { ProfileInformationPanel } from "../../components/user/ProfileInformationPanel";
 import { JoinLobby } from "../../components/lobby/JoinLobby";
 import { CreateLobby } from "../../components/lobby/CreateLobby";
+import { useGameContext } from "../../providers/game/GameProvider";
 
-interface Props {
-  roomCode: string;
-  user: WebAppUser | null;
-  joining: boolean;
-  setRoomCode: React.Dispatch<React.SetStateAction<string>>;
-  onCreate: () => void;
-  onJoin: () => void;
-}
-
-export function JoinRoomScreen({
-  roomCode,
-  user,
-  joining,
-  setRoomCode,
-  onCreate,
-  onJoin,
-}: Props) {
+export function JoinRoomScreen() {
   const [imageError, setImageError] = useState(false);
+
+  const {
+    joining,
+    roomCode,
+    user,
+    joinError,
+    setRoomCode,
+    createRoom,
+    joinRoom,
+  } = useGameContext();
 
   const displayName = user?.username || user?.first_name || "Player";
 
@@ -45,7 +39,13 @@ export function JoinRoomScreen({
           </p>
         </div>
 
-        <CreateLobby joining={joining} onCreate={onCreate} />
+        {joinError && (
+          <div className="w-full rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-center text-sm text-red-300">
+            {joinError}
+          </div>
+        )}
+
+        <CreateLobby joining={joining} onCreate={createRoom} />
 
         <div className="flex items-center gap-3 w-full opacity-30">
           <div className="flex-1 h-px bg-white" />
@@ -56,7 +56,7 @@ export function JoinRoomScreen({
         <JoinLobby
           roomCode={roomCode}
           joining={joining}
-          onJoin={onJoin}
+          onJoin={joinRoom}
           setRoomCode={setRoomCode}
         />
       </div>

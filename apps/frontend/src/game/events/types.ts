@@ -14,16 +14,8 @@ export type CardSchema = Card;
 export type StateCallbacks = ReturnType<typeof getStateCallbacks>
 
 export const GameEvents = {
-    PLAYER_JOINED: "playerJoined",
-    PLAYER_LEFT: "playerLeft",
-
-    CARD_DRAWN: "cardDrawn",
-    TURN_CHANGED: "turnChanged",
-
-    UNO_AVAILABLE: "unoAvailable",
     UNO_CALLED: "unoCalled",
     UNO_PENALTY: "unoPenalty",
-    UNO_WINDOW_CLOSE: "unoWindowClosed",
 
     ROUND_ENDED: "roundEnded",
     ROUND_STARTED: "roundStarted",
@@ -31,5 +23,7 @@ export const GameEvents = {
     GAME_END: "gameEnd",
     GAME_START: "gameStarted",
     GAME_PAUSED: "gamePaused",
-    GAME_RESUMED: "gameResumed"
+    GAME_RESUMED: "gameResumed",
+    
+    ERROR: "error",
 } as const;

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { TELEGRAM_AUTH_MAX_AGE_SECONDS } from "../game/constants";
 
 export interface TelegramAuthUser {
     id: number;
@@ -31,6 +32,14 @@ export function validateTelegramInitData(rawInitData: string, botToken: string):
         const calculatedHash = crypto.createHmac("sha256", secretKey).update(dataCheckString).digest("hex");
 
         if (calculatedHash !== hash) return null;
+
+        const authDate = Number(params.get("auth_date"));
+
+        if (!authDate || Number.isNaN(authDate)) return null;
+
+        const ageSeconds = Math.floor(Date.now() / 1000) - authDate;
+
+        if (ageSeconds < 0 || ageSeconds > TELEGRAM_AUTH_MAX_AGE_SECONDS) return null;
 
         const userStr = params.get("user");
 

@@ -1,18 +1,43 @@
 import { Room } from "@colyseus/core";
-import { Color, GameState, RoomStatus } from "@uno/shared";
+import { Card, Color, GameState, Player, RoomStatus } from "@uno/shared";
 import { DeckManager } from './DeckManager';
 import { TurnManager } from './TurnManager';
 import { CardValidator } from "./validators/CardValidator";
 import { ScodeCalculator } from "./ScoreCalculator";
-import { MATCH_WINNING_SCORE } from "./constants";
+import { MATCH_WINNING_SCORE, ROUND_INTERMISSION_MS } from "./constants";
 
 export class GameEngine {
+    private roundStartTimer: ReturnType<typeof setTimeout> | null = null;
+    private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
+
     constructor(
         private room: Room,
         private state: GameState,
         private deckManager: DeckManager,
         private turnManager: TurnManager,
     ) { }
+
+    dispose() {
+        this.clearRoundStartTimer();
+    }
+
+    private clearRoundStartTimer() {
+        if (this.roundStartTimer) {
+            clearTimeout(this.roundStartTimer);
+            this.roundStartTimer = null;
+        }
+    }
+
+    private clearPauseInterval() {
+        if (this.pauseIntervalTimer) {
+            clearInterval(this.pauseIntervalTimer);
+            this.pauseIntervalTimer = null;
+        }
+    }
+
+    private isGameplayBlocked(): boolean {
+        return this.state.gameEnded || Boolean(this.state.roundWinnerId);
+    }
 
     startGame() {
         for (const player of this.state.players.values()) {
@@ -25,36 +50,42 @@ export class GameEngine {
         this.setupRound(firstPlayer);
     }
 
+    private syncHandCount(player: Player) {
+        player.handCount = player.hand.length;
+    }
+
     private setupRound(startingPlayerId: string) {
         this.deckManager.initialize();
 
         this.state.isPaused = false;
         this.state.pausedPlayerId = "";
-
         this.state.roundWinnerId = "";
         this.state.unoPendingPlayerId = "";
-
         this.state.gameEnded = false;
-
         this.state.direction = 1;
         this.state.currentTurn = "";
 
-        for (const playerId of this.state.players.values()) {
-            playerId.hand.clear();
-
-            playerId.isTurn = false;
-            playerId.saidUno = false;
+        for (const player of this.state.players.values()) {
+            player.hand.clear();
+            const client = this.room.clients.find(c => c.sessionId === player.id);
 
             for (let i = 0; i < 7; i++) {
-                const card = this.deckManager.draw();
-                if (card) {
-                    playerId.hand.push(card);
-                }
+
+                const card = this.deckManager.draw((allocatedCard: Card) => {
+                    player.hand.push(allocatedCard);
+
+                    if (client?.view) {
+                        client.view.add(allocatedCard);
+                    }
+                });
             }
+
+            player.isTurn = false;
+            player.saidUno = false;
+            this.syncHandCount(player);
         }
 
         this.turnManager.assignTurn(startingPlayerId);
-
         this.state.status = RoomStatus.PLAYING;
     }
 
@@ -69,45 +100,34 @@ export class GameEngine {
     }
 
     drawCard(playerId: string) {
-        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused) return;
+        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused || this.isGameplayBlocked()) return;
 
         this.resolveUnoWindow();
 
         const player = this.state.players.get(playerId);
 
-        if (!player || !player.isTurn) {
-            return;
-        }
+        if (!player || !player.isTurn) return;
 
-        const card = this.deckManager.draw();
+        const client = this.room.clients.find(c => c.sessionId === playerId);
+
+        const card = this.deckManager.draw((allocatedCard) => {
+            player.hand.push(allocatedCard);
+
+            if (client?.view) {
+                client.view.add(allocatedCard);
+            }
+        });
 
         if (card) {
-            player.hand.push(card);
-
-            this.room.broadcast(
-                'cardDrawn',
-                {
-                    playerId,
-                    count: player.hand.length
-                }
-            );
+            this.syncHandCount(player);
         }
 
         const result = this.turnManager.nextTurn();
 
-        if (result?.type === 'advanced') {
-            this.room.broadcast('turnChanged',
-                {
-                    playerId: result.playerId
-                }
-            );
-        }
-
         if (result?.type === 'paused') {
-            this.room.broadcast('gamePaused', {
-                playerId: result.playerId,
-                remainingMs: result.remainingMs
-            })
+            this.state.isPaused = true;
+            this.state.pausedPlayerId = result.playerId;
+            this.state.pausedReconnectRemainingMs = result.remainingMs;
         }
     }
 
@@ -115,18 +135,23 @@ export class GameEngine {
         const player = this.state.players.get(playerId);
         if (!player) return;
 
+        const client = this.room.clients.find(c => c.sessionId === playerId);
+
         for (let i = 0; i < count; i++) {
-            const card = this.deckManager.draw();
-            if (card) {
-                player.hand.push(card);
-            }
+            this.deckManager.draw((allocatedCard) => {
+                player.hand.push(allocatedCard);
+
+                if (client?.view) {
+                    client.view.add(allocatedCard);
+                }
+            });
         }
 
-        this.room.broadcast('playerDrewPenalty', { playerId, count });
+        this.syncHandCount(player);
     }
 
     playCard(playerId: string, cardId: string, chosenColor?: Color) {
-        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused) return;
+        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused || this.isGameplayBlocked()) return;
 
         this.resolveUnoWindow()
 
@@ -138,39 +163,30 @@ export class GameEngine {
         }
 
         const cardIndex = player.hand.findIndex(c => c.id === cardId);
-
         if (cardIndex === -1) return;
 
         const card = player.hand[cardIndex];
-        const topCard = this.state.discardPile[this.state.discardPile.length - 1];
 
-        if (!CardValidator.canPlay(card, topCard, this.state.activeColor)) return;
+        if (!CardValidator.canPlay(card, this.state.topDiscardCard, this.state.activeColor)) return;
 
         if (card.value === 'wild' || card.value === 'wildDrawFour') {
-            if (!chosenColor) {
-                return;
-            }
+            if (!chosenColor) return;
+
             this.state.activeColor = chosenColor;
         } else {
             this.state.activeColor = card.color!;
         }
 
         player.hand.splice(cardIndex, 1);
+        this.syncHandCount(player);
 
         if (player.hand.length === 1) {
             player.saidUno = false;
 
             this.state.unoPendingPlayerId = player.id;
-
-            this.room.broadcast(
-                'unoAvailable',
-                {
-                    playerId: player.id
-                }
-            );
         }
 
-        this.state.discardPile.push(card);
+        this.deckManager.discard(card);
 
         if (card.value === 'skip') {
             turnsToAdvance = 2;
@@ -209,7 +225,6 @@ export class GameEngine {
         // check for win condition before next turn
         if (player.hand.length === 0) {
             this.handleRoundWin(playerId);
-
             return;
         }
 
@@ -218,25 +233,10 @@ export class GameEngine {
             result = this.turnManager.nextTurn();
         }
 
-        if (result?.type === "advanced") {
-            this.room.broadcast(
-                "turnChanged",
-                {
-                    playerId: result.playerId
-                }
-            );
-        }
-
         if (result?.type === "paused") {
-            this.room.broadcast(
-                "gamePaused",
-                {
-                    playerId:
-                        result.playerId,
-                    remainingMs:
-                        result.remainingMs
-                }
-            );
+            this.state.isPaused = true;
+            this.state.pausedPlayerId = result.playerId;
+            this.state.pausedReconnectRemainingMs = result.remainingMs;
         }
     }
 
@@ -263,8 +263,6 @@ export class GameEngine {
             score: player.score
         })).sort((a, b) => b.score - a.score);
 
-        this.room.broadcast("unoWindowClosed");
-
         this.room.broadcast("roundEnded",
             {
                 roundWinnerId: playerId,
@@ -276,8 +274,10 @@ export class GameEngine {
         );
 
         if (winner.score >= MATCH_WINNING_SCORE) {
+            this.clearRoundStartTimer();
             this.state.matchWinnerId = playerId;
             this.state.gameEnded = true;
+            this.state.status = RoomStatus.FINISHED;
 
             this.room.broadcast("gameEnd",
                 {
@@ -290,8 +290,12 @@ export class GameEngine {
             return;
         };
 
+        this.clearRoundStartTimer();
+
         // prevent stuck match if a round winner leaves
-        setTimeout(() => {
+        this.roundStartTimer = setTimeout(() => {
+            this.roundStartTimer = null;
+
             if (this.state.players.size < 2) return;
 
             const starterId = this.state.players.has(playerId)
@@ -301,7 +305,7 @@ export class GameEngine {
             if (!starterId) return;
 
             this.startNextRound(starterId);
-        }, 10000);
+        }, ROUND_INTERMISSION_MS);
     }
 
     callUno(playerId: string) {
@@ -325,19 +329,12 @@ export class GameEngine {
 
     challengeUno(challengerId: string) {
         const offenderId = this.state.unoPendingPlayerId;
-
         if (!offenderId) return;
 
         const offender = this.state.players.get(offenderId);
-
-        if (!offender) return;
-
-        if (offender.id === challengerId) return;
-
-        if (offender.saidUno) return;
+        if (!offender || offender.id === challengerId || offender.saidUno) return;
 
         this.addCardsToPlayer(offender.id, 2);
-
         this.state.unoPendingPlayerId = "";
 
         this.room.broadcast(
@@ -346,10 +343,6 @@ export class GameEngine {
                 offenderId: offender.id,
                 challengerId
             }
-        );
-
-        this.room.broadcast(
-            "unoWindowClosed"
         );
     }
 
@@ -363,19 +356,55 @@ export class GameEngine {
         if (!player) {
             this.state.unoPendingPlayerId = "";
 
-            this.room.broadcast(
-                "unoWindowClosed"
-            );
-
             return;
         }
 
         player.saidUno = true;
 
         this.state.unoPendingPlayerId = "";
+    }
 
-        this.room.broadcast(
-            "unoWindowClosed"
-        );
+    handlePlayerDisconnect(playerId: string, durationMs: number) {
+        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused) return;
+
+        this.state.isPaused = true;
+        this.state.pausedPlayerId = playerId;
+        this.state.pausedReconnectRemainingMs = durationMs;
+
+        this.clearPauseInterval();
+
+        this.pauseIntervalTimer = setInterval(() => {
+            if (this.state.pausedReconnectRemainingMs <= 1000) {
+                this.clearPauseInterval();
+                this.state.pausedReconnectRemainingMs = 0;
+                return;
+            }
+
+            this.state.pausedReconnectRemainingMs -= 1000;
+        }, 1000);
+    }
+
+    handlePlayerReconnect(playerId: string) {
+        if (this.state.isPaused && this.state.pausedPlayerId === playerId) {
+            this.clearPauseInterval();
+
+            this.state.isPaused = false;
+            this.state.pausedPlayerId = "";
+            this.state.pausedReconnectRemainingMs = 0;
+
+            // this.room.broadcast("gameResumed");
+        }
+    }
+
+    handleTimeoutForfeit() {
+        this.clearPauseInterval();
+
+        this.state.isPaused = false;
+        this.state.pausedPlayerId = "";
+        this.state.pausedReconnectRemainingMs = 0;
+
+        this.turnManager.nextTurn();
+
+        // this.room.broadcast("gameResumed");
     }
 }

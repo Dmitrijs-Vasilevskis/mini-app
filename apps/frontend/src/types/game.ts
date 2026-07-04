@@ -83,6 +83,7 @@ export interface GameStore {
     pausedPlayerId: string | null;
     reconnectRemaining: number | null;
     unoWindowPlayerId: string | null;
+    roomError: string | null;
     setConnected: (value: boolean) => void;
     setRoomId: (roomId: string) => void;
     setRoomCode: (roomCode: string) => void;
@@ -99,5 +100,6 @@ export interface GameStore {
     setPaused: (paused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) => void;
     setUnoWindowPlayerId: (playerId: string | null) => void;
     setRoundResults: (results: RoundResults | null) => void;
+    setRoomError: (message: string | null) => void;
     reset: () => void;
 }
