@@ -35,7 +35,7 @@ export function DrawButton({ isMyTurn, onDraw }: Props) {
       >
         <div className="flex items-center gap-3">
           <div className="flex flex-col items-start leading-none">
-            <span className="text-lg">Draw Card</span>
+            <span className="text-lg">Draw</span>
           </div>
         </div>
 

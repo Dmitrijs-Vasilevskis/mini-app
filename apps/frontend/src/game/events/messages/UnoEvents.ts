@@ -1,6 +1,6 @@
 import { useEffectStore } from "../../../store/effectsStore";
 import { useGameStore } from "../../../store/gameStore";
-import { GameEvents, type GameRoom, type StateCallbacks } from "../types";
+import { GameEvents, type GameRoom } from "../types";
 
 interface UnoPenalty {
     offenderId: string;
@@ -8,28 +8,10 @@ interface UnoPenalty {
 }
 
 export function RegisterUnoEvents(
-    room: GameRoom,
-    $: StateCallbacks,
+    room: GameRoom
 ) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
-
-    $(room.state).listen("unoPendingPlayerId", (currPendingPlayerId: string) => {
-        if (!currPendingPlayerId) {
-            store.setUnoWindowPlayerId(null);
-            return;
-        }
-
-        store.setUnoWindowPlayerId(currPendingPlayerId);
-
-        const player = useGameStore.getState().players.find(p => p.id === currPendingPlayerId);
-
-        effects.addEffect({
-            text: `${player?.name ?? "Player"} UNO?`,
-            color: "#f59e0b",
-            emphasis: "special"
-        });
-    });
 
     room.onMessage(GameEvents.UNO_CALLED, ({ playerId }: { playerId: string }) => {
         const player = useGameStore.getState().players.find(p => p.id === playerId);

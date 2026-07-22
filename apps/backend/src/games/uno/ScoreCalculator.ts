@@ -1,4 +1,4 @@
-import { Card, Player } from "@uno/shared";
+import { Card, Player, UnoPlayerData } from "@uno/shared";
 
 export class ScodeCalculator {
     static getCardPoints(card: Card): number {
@@ -20,12 +20,14 @@ export class ScodeCalculator {
     static CalculateRoundPoints(players: Iterable<Player>, winnderId: string): number {
         let total = 0;
 
-        for(const player of players) {
+        for (const player of players) {
+            const unoData = player.gameData as UnoPlayerData;
+            
             if (player.id === winnderId) {
                 continue;
             }
 
-            for (const card of player.hand) {
+            for (const card of unoData.hand) {
                 total += this.getCardPoints(card);
             }
         }

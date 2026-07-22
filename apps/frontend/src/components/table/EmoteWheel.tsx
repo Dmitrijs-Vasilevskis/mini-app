@@ -2,23 +2,7 @@ import { useState } from "react";
 import { useGameContext } from "../../providers/game/GameProvider";
 import { colyseusService } from "../../services/colyseus";
 import { AnimatePresence, motion } from "framer-motion";
-
-interface Emote {
-  id: string;
-  char: string;
-}
-
-const ALL_EMOTES: Emote[] = [
-  { id: "laugh", char: "😂" },
-  { id: "angry", char: "😡" },
-  { id: "wow", char: "😮" },
-  { id: "cry", char: "😢" },
-  { id: "flex", char: "💪" },
-  { id: "gg", char: "🤝" },
-  { id: "heart", char: "❤️" },
-  { id: "fire", char: "🔥" },
-  { id: "mindblown", char: "🤯" },
-];
+import { EMOTES, type Emote } from "@uno/shared";
 
 const ITEMS_PER_PAGE = 3;
 const RADIUS = 75;
@@ -53,8 +37,8 @@ export function EmoteWheel() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
-  const totalPages = Math.ceil(ALL_EMOTES.length / ITEMS_PER_PAGE);
-  const visibleEmotes = ALL_EMOTES.slice(
+  const totalPages = Math.ceil(EMOTES.length / ITEMS_PER_PAGE);
+  const visibleEmotes = EMOTES.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   );

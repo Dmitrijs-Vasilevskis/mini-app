@@ -1,4 +1,4 @@
-import { GameState, Card, Color, Value } from "@uno/shared";
+import { GameState, Card, Value, UnoGameState } from "@uno/shared";
 import { createDeck, shuffle } from "./UNODeck";
 
 const NUMBER_VALUES: Value[] = [
@@ -20,20 +20,25 @@ export class DeckManager {
 
     constructor(
         private state: GameState,
-
     ) { }
+
+    private getUnoState(): UnoGameState {
+        return this.state.gameState as UnoGameState;
+    }
 
     initialize() {
         this.internalDeck = createDeck();
+        const unoState = this.getUnoState();
+
         this.internalDiscardPile = [];
-        this.state.topDiscardCard = null;
+        unoState.topDiscardCard = null;
 
         const firstCardIndex = this.internalDeck.findIndex(card => NUMBER_VALUES.includes(card.value));
         const [firstCard] = this.internalDeck.splice(firstCardIndex, 1);
 
         this.internalDiscardPile.push(firstCard);
-        this.state.topDiscardCard = firstCard;
-        this.state.activeColor = firstCard.color!;
+        unoState.topDiscardCard = firstCard;
+        unoState.activeColor = firstCard.color!;
     }
 
     reshuffleDiscard() {
@@ -61,7 +66,8 @@ export class DeckManager {
     }
 
     discard(card: Card) {
+        const unoState = this.getUnoState();
         this.internalDiscardPile.push(card);
-        this.state.topDiscardCard = card;
+        unoState.topDiscardCard = card;
     }
 }

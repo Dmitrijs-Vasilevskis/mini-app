@@ -5,7 +5,6 @@ import { RegisterRoomEvents } from './events/room/RoomEvents';
 import { RegisterGameLifecycleEvents } from './events/messages/GameLifecycleEvents';
 import { RegisterPauseEvents } from './events/messages/PauseEvents';
 import { RegisterUnoEvents } from './events/messages/UnoEvents';
-import { RegisterDiscardPileEvents } from './events/gameplay/DiscardPileEvents';
 import type { GameRoom } from './events/types';
 import { RegisterEmoteEvents } from './events/messages/EmotesEvents';
 
@@ -22,8 +21,7 @@ export class GameEvents {
         RegisterRoomEvents(this.currentRoom, $);
         RegisterGameLifecycleEvents(this.currentRoom);
         RegisterPauseEvents(this.currentRoom, $);
-        RegisterUnoEvents(this.currentRoom, $);
-        RegisterDiscardPileEvents(this.currentRoom, $);
+        RegisterUnoEvents(this.currentRoom);
         RegisterEmoteEvents(this.currentRoom);
     }
 
