@@ -14,23 +14,6 @@ export function RegisterUnoEvents(
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();
 
-    $(room.state).listen("unoPendingPlayerId", (currPendingPlayerId: string) => {
-        if (!currPendingPlayerId) {
-            store.setUnoWindowPlayerId(null);
-            return;
-        }
-
-        store.setUnoWindowPlayerId(currPendingPlayerId);
-
-        const player = useGameStore.getState().players.find(p => p.id === currPendingPlayerId);
-
-        effects.addEffect({
-            text: `${player?.name ?? "Player"} UNO?`,
-            color: "#f59e0b",
-            emphasis: "special"
-        });
-    });
-
     room.onMessage(GameEvents.UNO_CALLED, ({ playerId }: { playerId: string }) => {
         const player = useGameStore.getState().players.find(p => p.id === playerId);
 

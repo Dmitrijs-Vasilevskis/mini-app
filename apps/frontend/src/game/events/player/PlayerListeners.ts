@@ -8,9 +8,10 @@ export function PlayerListeners(
     player: PlayerSchema,
     $: StateCallbacks
 ) {
+    const store = useGameStore.getState();
+
     const updatePlayer = (updates: Partial<PlayerDTO>) => {
         const players = useGameStore.getState().players;
-        const store = useGameStore.getState();
 
         store.setPlayers(
             players.map((p) =>
@@ -73,29 +74,6 @@ export function PlayerListeners(
                     text: `${player.name} went back!`,
                     color: "#facc15",
                     emphasis: "special",
-                });
-            }
-        }
-    );
-
-    $(player).listen("handCount", (count: number) => {
-        updatePlayer({ handCount: count });
-    });
-
-    $(player).listen(
-        "saidUno",
-        (saidUno: boolean) => {
-            updatePlayer({ saidUno });
-
-            if (player.id === room.sessionId) {
-                const store = useGameStore.getState();
-                const curr = store.localPlayer;
-
-                if (!curr) return;
-
-                store.setLocalPlayer({
-                    ...curr,
-                    saidUno
                 });
             }
         }
