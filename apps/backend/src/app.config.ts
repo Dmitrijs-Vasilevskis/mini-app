@@ -1,6 +1,5 @@
 import { defineServer, defineRoom, monitor, } from "colyseus";
 import { WebSocketTransport } from '@colyseus/ws-transport';
-import { UNORoom } from "./rooms/UNORoom";
 import cors from 'cors';
 import express from 'express';
 import { rateLimit } from "./middleware/rateLimit";
@@ -10,6 +9,7 @@ import {
     HTTP_RATE_LIMIT_HEALTH_MAX,
     MAX_WS_PAYLOAD_BYTES,
 } from "./game/constants";
+import { GameLobbyRoom } from "./rooms/GameLobbyRoom";
 
 const allowedOrigins = [
     'http://localhost:3000',
@@ -27,7 +27,7 @@ export const server = defineServer({
         maxPayload: MAX_WS_PAYLOAD_BYTES,
     }),
     rooms: {
-        uno: defineRoom(UNORoom).filterBy(['roomCode'])
+        uno: defineRoom(GameLobbyRoom).filterBy(['roomCode'])
     },
     express: (app) => {
         app.set('trust proxy', 1);

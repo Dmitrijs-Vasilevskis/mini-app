@@ -1,4 +1,4 @@
-import { GameState } from "@uno/shared";
+import { GameState, UnoGameState } from "@uno/shared";
 
 export type TurnResult =
     | {
@@ -15,6 +15,10 @@ export type TurnResult =
 export class TurnManager {
     constructor(private state: GameState) { }
 
+    private getUnoState(): UnoGameState {
+        return this.state.gameState as UnoGameState;
+    }
+
     getNextPlayerId(currentId: string): string | null {
         const players = this.state.playerOrder;
 
@@ -28,7 +32,9 @@ export class TurnManager {
             return players[0];
         }
 
-        let next = idx + this.state.direction;
+        const unoState = this.getUnoState();
+
+        let next = idx + unoState.direction;
 
         if (next < 0) {
             next = players.length - 1;

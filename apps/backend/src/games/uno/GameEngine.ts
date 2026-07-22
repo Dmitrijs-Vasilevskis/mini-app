@@ -1,12 +1,12 @@
 import { Room } from "@colyseus/core";
-import { Card, Color, GameState, Player, RoomStatus } from "@uno/shared";
+import { Card, Color, GameState, Player, RoomStatus, UnoGameState, UnoPlayerData } from "@uno/shared";
 import { DeckManager } from './DeckManager';
 import { TurnManager } from './TurnManager';
 import { CardValidator } from "./validators/CardValidator";
 import { ScodeCalculator } from "./ScoreCalculator";
 import { MATCH_WINNING_SCORE, ROUND_INTERMISSION_MS } from "./constants";
 
-export class GameEngine {
+export class UnoGameEngine {
     private roundStartTimer: ReturnType<typeof setTimeout> | null = null;
     private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -26,6 +26,14 @@ export class GameEngine {
             clearTimeout(this.roundStartTimer);
             this.roundStartTimer = null;
         }
+    }
+
+    private getUnoPlayerData(player: Player): UnoPlayerData {
+        return player.gameData as UnoPlayerData;
+    }
+
+    private getUnoState(): UnoGameState {
+        return this.state.gameState as UnoGameState;
     }
 
     private clearPauseInterval() {
@@ -51,28 +59,36 @@ export class GameEngine {
     }
 
     private syncHandCount(player: Player) {
-        player.handCount = player.hand.length;
+        const unoData = this.getUnoPlayerData(player);
+        if (unoData) {
+            unoData.handCount = unoData.hand.length;
+        }
     }
 
     private setupRound(startingPlayerId: string) {
         this.deckManager.initialize();
 
+        const unoState = this.getUnoState();
+
         this.state.isPaused = false;
         this.state.pausedPlayerId = "";
         this.state.roundWinnerId = "";
-        this.state.unoPendingPlayerId = "";
         this.state.gameEnded = false;
-        this.state.direction = 1;
         this.state.currentTurn = "";
 
+        unoState.direction = 1;
+        unoState.unoPendingPlayerId = "";
+
         for (const player of this.state.players.values()) {
-            player.hand.clear();
+            const unoData = player.gameData as UnoPlayerData;
+            unoData.hand.clear();
+
             const client = this.room.clients.find(c => c.sessionId === player.id);
 
             for (let i = 0; i < 7; i++) {
 
                 const card = this.deckManager.draw((allocatedCard: Card) => {
-                    player.hand.push(allocatedCard);
+                    unoData.hand.push(allocatedCard);
 
                     if (client?.view) {
                         client.view.add(allocatedCard);
@@ -81,7 +97,7 @@ export class GameEngine {
             }
 
             player.isTurn = false;
-            player.saidUno = false;
+            unoData.saidUno = false;
             this.syncHandCount(player);
         }
 
@@ -108,10 +124,11 @@ export class GameEngine {
 
         if (!player || !player.isTurn) return;
 
+        const unoData = this.getUnoPlayerData(player);
         const client = this.room.clients.find(c => c.sessionId === playerId);
 
         const card = this.deckManager.draw((allocatedCard) => {
-            player.hand.push(allocatedCard);
+            unoData.hand.push(allocatedCard);
 
             if (client?.view) {
                 client.view.add(allocatedCard);
@@ -135,11 +152,12 @@ export class GameEngine {
         const player = this.state.players.get(playerId);
         if (!player) return;
 
+        const unoData = this.getUnoPlayerData(player);
         const client = this.room.clients.find(c => c.sessionId === playerId);
 
         for (let i = 0; i < count; i++) {
             this.deckManager.draw((allocatedCard) => {
-                player.hand.push(allocatedCard);
+                unoData.hand.push(allocatedCard);
 
                 if (client?.view) {
                     client.view.add(allocatedCard);
@@ -162,28 +180,31 @@ export class GameEngine {
             return;
         }
 
-        const cardIndex = player.hand.findIndex(c => c.id === cardId);
+        const unoData = this.getUnoPlayerData(player);
+        const unoState = this.getUnoState();
+
+        const cardIndex = unoData.hand.findIndex(c => c.id === cardId);
         if (cardIndex === -1) return;
 
-        const card = player.hand[cardIndex];
+        const card = unoData.hand[cardIndex];
 
-        if (!CardValidator.canPlay(card, this.state.topDiscardCard, this.state.activeColor)) return;
+        if (!CardValidator.canPlay(card, unoState.topDiscardCard, unoState.activeColor)) return;
 
         if (card.value === 'wild' || card.value === 'wildDrawFour') {
             if (!chosenColor) return;
 
-            this.state.activeColor = chosenColor;
+            unoState.activeColor = chosenColor;
         } else {
-            this.state.activeColor = card.color!;
+            unoState.activeColor = card.color!;
         }
 
-        player.hand.splice(cardIndex, 1);
+        unoData.hand.splice(cardIndex, 1);
         this.syncHandCount(player);
 
-        if (player.hand.length === 1) {
-            player.saidUno = false;
+        if (unoData.hand.length === 1) {
+            unoData.saidUno = false;
 
-            this.state.unoPendingPlayerId = player.id;
+            unoState.unoPendingPlayerId = player.id;
         }
 
         this.deckManager.discard(card);
@@ -194,7 +215,7 @@ export class GameEngine {
             if (this.state.players.size === 2) {
                 turnsToAdvance = 2;
             } else {
-                this.state.direction = this.state.direction === 1
+                unoState.direction = unoState.direction === 1
                     ? -1
                     : 1;
             }
@@ -223,7 +244,7 @@ export class GameEngine {
         }
 
         // check for win condition before next turn
-        if (player.hand.length === 0) {
+        if (unoData.hand.length === 0) {
             this.handleRoundWin(playerId);
             return;
         }
@@ -247,6 +268,7 @@ export class GameEngine {
             return;
         }
 
+        const unoState = this.getUnoState();
         const points = ScodeCalculator.CalculateRoundPoints(
             this.state.players.values(),
             playerId
@@ -254,7 +276,7 @@ export class GameEngine {
 
         winner.score += points;
 
-        this.state.unoPendingPlayerId = "";
+        unoState.unoPendingPlayerId = "";
         this.state.roundWinnerId = playerId;
 
         const standings = Array.from(this.state.players.values()).map(player => ({
@@ -313,12 +335,16 @@ export class GameEngine {
 
         if (!player) return;
 
-        if (this.state.unoPendingPlayerId !== playerId) {
+        const unoState = this.getUnoState();
+
+        if (unoState.unoPendingPlayerId !== playerId) {
             return;
         }
 
-        player.saidUno = true;
-        this.state.unoPendingPlayerId = "";
+        const unoData = this.getUnoPlayerData(player);
+
+        unoData.saidUno = true;
+        unoState.unoPendingPlayerId = "";
 
         this.room.broadcast('unoCalled',
             {
@@ -328,14 +354,21 @@ export class GameEngine {
     }
 
     challengeUno(challengerId: string) {
-        const offenderId = this.state.unoPendingPlayerId;
+        const unoState = this.getUnoState();
+
+        const offenderId = unoState.unoPendingPlayerId;
         if (!offenderId) return;
 
         const offender = this.state.players.get(offenderId);
-        if (!offender || offender.id === challengerId || offender.saidUno) return;
+
+        if (!offender || offender.id === challengerId) return;
+
+        const offenderUnoData = this.getUnoPlayerData(offender);
+
+        if (offenderUnoData.saidUno) return;
 
         this.addCardsToPlayer(offender.id, 2);
-        this.state.unoPendingPlayerId = "";
+        unoState.unoPendingPlayerId = "";
 
         this.room.broadcast(
             "unoPenalty",
@@ -347,21 +380,24 @@ export class GameEngine {
     }
 
     private resolveUnoWindow() {
-        const pendingPlayerId = this.state.unoPendingPlayerId;
+        const unoState = this.getUnoState();
+
+        const pendingPlayerId = unoState.unoPendingPlayerId;
 
         if (!pendingPlayerId) return;
 
         const player = this.state.players.get(pendingPlayerId);
 
         if (!player) {
-            this.state.unoPendingPlayerId = "";
+            unoState.unoPendingPlayerId = "";
 
             return;
         }
 
-        player.saidUno = true;
+        const unoData = this.getUnoPlayerData(player);
+        unoData.saidUno = true;
 
-        this.state.unoPendingPlayerId = "";
+        unoState.unoPendingPlayerId = "";
     }
 
     handlePlayerDisconnect(playerId: string, durationMs: number) {
