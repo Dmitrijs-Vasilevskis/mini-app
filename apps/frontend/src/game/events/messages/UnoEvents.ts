@@ -1,6 +1,6 @@
 import { useEffectStore } from "../../../store/effectsStore";
 import { useGameStore } from "../../../store/gameStore";
-import { GameEvents, type GameRoom, type StateCallbacks } from "../types";
+import { GameEvents, type GameRoom } from "../types";
 
 interface UnoPenalty {
     offenderId: string;
@@ -8,8 +8,7 @@ interface UnoPenalty {
 }
 
 export function RegisterUnoEvents(
-    room: GameRoom,
-    $: StateCallbacks,
+    room: GameRoom
 ) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();

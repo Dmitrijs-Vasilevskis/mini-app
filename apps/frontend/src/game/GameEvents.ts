@@ -21,7 +21,7 @@ export class GameEvents {
         RegisterRoomEvents(this.currentRoom, $);
         RegisterGameLifecycleEvents(this.currentRoom);
         RegisterPauseEvents(this.currentRoom, $);
-        RegisterUnoEvents(this.currentRoom, $);
+        RegisterUnoEvents(this.currentRoom);
         RegisterEmoteEvents(this.currentRoom);
     }
 
