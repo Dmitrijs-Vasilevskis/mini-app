@@ -78,7 +78,6 @@ export class UnoGameState extends BaseGameState {
 export class BjGameState extends BaseGameState {
   @type(BlackjackDealer) bjDdealer = new BlackjackDealer();
   @type("int8") cardsRemaining: number = 0;
-  @type("boolean") needsReshuffle: boolean = true;
 }
 
 export class GameState extends Schema {
