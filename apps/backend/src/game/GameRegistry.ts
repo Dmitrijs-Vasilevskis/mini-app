@@ -1,6 +1,7 @@
 import { BaseGameState, BasePlayerData, BjGameState, BjPlayerData, Color, GameState, GameType, UnoGameState, UnoPlayerData } from "@uno/shared";
 import { Room } from "@colyseus/core";
 import { UnoGameEngine } from "../games/uno/GameEngine";
+import { BlackjackGameEngine } from "../games/blackjack/GameEngine";
 
 export interface GameDefinition {
     createGameState: () => BaseGameState;
@@ -59,13 +60,25 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
         }
     },
     blackjack: {
-        createGameState: () => new BjGameState,
-        createPlayerData: () => new BjPlayerData,
+        createGameState: () => new BjGameState(),
+        createPlayerData: () => new BjPlayerData(),
         createEngine: (room, state) => {
+            const { DeckManager } = require("../games/blackjack/DeckManager");
+            const { TurnManager } = require("../games/blackjack/TurnManager");
 
+            const deckManager = new DeckManager(state);
+            const turnManager = new TurnManager(state);
+
+            return new BlackjackGameEngine(room, state, deckManager, turnManager);
         },
         setupMessages: (room, engine) => {
+            room.onMessage('stand', (client) => {
+                engine.handlePlayerStand(client.sessionId);
+            });
 
+            room.onMessage('hit', (client) => {
+                engine.handlePlayerHit(client.sessionId);
+            });
         },
         syncView: (client, player) => {
             const bjData = player.gameData as BjPlayerData;

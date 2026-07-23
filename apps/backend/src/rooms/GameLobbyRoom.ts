@@ -48,6 +48,7 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
             this.state.players.forEach((player) => {
                 player.gameData = config.createPlayerData();
+                player.isReady = false;
             });
 
             console.log(`[LOBBY] Host changed game type to: ${payload.gameType}`);
