@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-interface ActiveEmote {
+export interface ActiveEmote {
     emoteId: string;
     timestamp: number;
 }
 
-interface EmoteStore {
+export interface EmoteStore {
     activeEmotes: Record<string, ActiveEmote>;
     triggerEmote: (playerId: string, emoteId: string) => void;
     clearEmote: (playerId: string, timestamp: number) => void;
