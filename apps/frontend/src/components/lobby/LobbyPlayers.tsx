@@ -1,10 +1,10 @@
 import { useState } from "react";
-import type { LocalPlayerDTO, PlayerDTO } from "../../types/game";
 import { getProxiedAvatarUrl } from "../../utils/avatar";
+import type { BaseLocalPlayerDTO, BasePlayerDTO } from "../../store/types";
 
 interface Props {
-  players: PlayerDTO[];
-  localPlayer: LocalPlayerDTO | null;
+  players: BasePlayerDTO[];
+  localPlayer: BaseLocalPlayerDTO | null;
   hostId: string;
 }
 
