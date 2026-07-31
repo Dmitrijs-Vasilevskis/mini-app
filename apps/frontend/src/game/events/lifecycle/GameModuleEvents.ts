@@ -1,10 +1,11 @@
 import { RoomStatus, type GameType } from "@uno/shared";
 import { UnoEventModule, type GameEventModule } from "../games/uno/UnoEventModule";
 import type { GameRoom, StateCallbacks } from "../types";
+import { BjEventModule } from "../games/bj/BjEventModule";
 
 export const GAME_EVENT_MODULES: Record<GameType, GameEventModule> = {
     uno: UnoEventModule,
-    blackjack: null,
+    blackjack: BjEventModule
 };
 
 export function RegisterGameModuleEvents(
