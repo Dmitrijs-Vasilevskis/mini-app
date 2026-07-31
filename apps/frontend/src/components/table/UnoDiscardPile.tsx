@@ -12,7 +12,7 @@ const CARD_COLORS = {
 
 type Props = ThreeElements["group"];
 
-export function DiscardPile(props: Props) {
+export function UnoDiscardPile(props: Props) {
   const discardTop = useGameStore((s) => s.discardTop);
   const activeColor = useGameStore((s) => s.activeColor);
 

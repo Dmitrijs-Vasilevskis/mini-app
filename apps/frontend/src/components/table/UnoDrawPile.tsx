@@ -5,7 +5,7 @@ type Props = ThreeElements["group"] & {
     count?: number;
 };
 
-export function DrawPile({
+export function UnoDrawPile({
     count = 0,
     ...props
 }: Props) {
