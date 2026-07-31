@@ -1,0 +1,26 @@
+import type { UnoGameState } from "@uno/shared";
+import type { GameRoom, StateCallbacks } from "../../types";
+import { UnoPlayerGameDataEvents } from "./UnoPlayerGameDataEvents";
+import { UnoGameStateEvents } from "./UnoGameStateEvents";
+import { UnoEvents } from "./UnoEvents";
+
+export interface GameEventModule {
+    initialize(
+        room: GameRoom,
+        $: StateCallbacks
+    ): Array<() => void>;
+}
+
+export const UnoEventModule: GameEventModule = {
+    initialize(room, $) {
+        const unlisteners = [];
+
+        unlisteners.push(
+            ...UnoGameStateEvents($, room.state.gameState as UnoGameState),
+            ...UnoPlayerGameDataEvents($, room),
+            ...UnoEvents(room),
+        );
+
+        return unlisteners;
+    }
+}

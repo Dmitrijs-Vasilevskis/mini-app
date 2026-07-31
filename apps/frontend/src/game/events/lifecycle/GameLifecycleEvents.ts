@@ -3,6 +3,7 @@ import { useGameStore } from "../../../store/gameStore";
 import type { RoundResults } from "../../../types/game";
 import { GameEvents, type GameRoom } from "../types";
 
+
 export function RegisterGameLifecycleEvents(room: GameRoom) {
     const store = useGameStore.getState();
     const effects = useEffectStore.getState();

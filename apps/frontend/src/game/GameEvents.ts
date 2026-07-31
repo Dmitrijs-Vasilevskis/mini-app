@@ -1,12 +1,12 @@
 
 import { getStateCallbacks } from '@colyseus/sdk';
-import { RegisterPlayerEvents } from './events/player/PlayerEvents';
-import { RegisterRoomEvents } from './events/room/RoomEvents';
-import { RegisterGameLifecycleEvents } from './events/messages/GameLifecycleEvents';
-import { RegisterPauseEvents } from './events/messages/PauseEvents';
-import { RegisterUnoEvents } from './events/messages/UnoEvents';
+import { RegisterBasePlayerEvents } from './events/base/player/BasePlayerEvents';
+import { RegisterRoomEvents } from './events/base/room/RoomEvents';
 import type { GameRoom } from './events/types';
-import { RegisterEmoteEvents } from './events/messages/EmotesEvents';
+import { RegisterPauseEvents } from './events/base/messages/PauseEvents';
+import { RegisterEmoteEvents } from './events/base/messages/EmotesEvents';
+import { RegisterGameLifecycleEvents } from './events/lifecycle/GameLifecycleEvents';
+import { RegisterGameModuleEvents } from './events/lifecycle/GameModuleEvents';
 
 export class GameEvents {
     private static currentRoom: GameRoom | null = null;
@@ -17,12 +17,12 @@ export class GameEvents {
         this.currentRoom = room;
         const $ = getStateCallbacks(this.currentRoom);
 
-        RegisterPlayerEvents(this.currentRoom, $);
+        RegisterBasePlayerEvents(this.currentRoom, $);
         RegisterRoomEvents(this.currentRoom, $);
         RegisterGameLifecycleEvents(this.currentRoom);
         RegisterPauseEvents(this.currentRoom, $);
-        RegisterUnoEvents(this.currentRoom);
         RegisterEmoteEvents(this.currentRoom);
+        RegisterGameModuleEvents(this.currentRoom, $);
     }
 
     static destroy() {

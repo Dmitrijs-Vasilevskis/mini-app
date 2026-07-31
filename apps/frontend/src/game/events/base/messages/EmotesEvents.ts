@@ -1,5 +1,6 @@
-import { useEmoteStore } from "../../../store/emoteStore";
-import type { GameRoom } from "../types";
+import { useEmoteStore } from "../../../../store/emoteStore";
+import type { GameRoom } from "../../types";
+
 
 export function RegisterEmoteEvents(room: GameRoom) {
     const emotes = useEmoteStore.getState();

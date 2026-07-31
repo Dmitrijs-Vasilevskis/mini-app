@@ -1,5 +1,6 @@
-import { useGameStore } from "../../../store/gameStore";
-import { GameEvents, type GameRoom, type StateCallbacks } from "../types";
+import { useGameStore } from "../../../../store/gameStore";
+import { GameEvents, type GameRoom, type StateCallbacks } from "../../types";
+
 
 export function RegisterPauseEvents(
     room: GameRoom,
