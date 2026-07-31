@@ -24,6 +24,6 @@ export const GameEvents = {
     GAME_START: "gameStarted",
     GAME_PAUSED: "gamePaused",
     GAME_RESUMED: "gameResumed",
-    
+
     ERROR: "error",
 } as const;

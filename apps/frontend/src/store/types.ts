@@ -62,7 +62,7 @@ export interface BasePlayerDTO<TGameData = unknown> {
     gameData: TGameData;
 }
 
-export interface BaseLocalPlayerDTO extends BasePlayerDTO { }
+export type BaseLocalPlayerDTO<TGameData = unknown> = BasePlayerDTO<TGameData>; 
 
 export interface GameWinner {
     id: string;
