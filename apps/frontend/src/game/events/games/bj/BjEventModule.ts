@@ -1,8 +1,8 @@
 import type { GameEventModule } from "../uno/UnoEventModule";
 
 export const BjEventModule: GameEventModule = {
-    initialize(room, $) {
-        const unlisteners = [];
+    initialize(_room, _$) {
+        const unlisteners: Array<() => void> = [];
 
 
         return unlisteners;

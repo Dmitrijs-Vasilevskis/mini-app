@@ -13,7 +13,7 @@ export interface GameEventModule {
 
 export const UnoEventModule: GameEventModule = {
     initialize(room, $) {
-        const unlisteners = [];
+        const unlisteners: Array<() => void> = [];
 
         unlisteners.push(
             ...UnoGameStateEvents($, room.state.gameState as UnoGameState),
