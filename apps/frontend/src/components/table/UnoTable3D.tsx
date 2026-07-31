@@ -1,10 +1,11 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { DrawPile } from "./DrawPile";
-import { DiscardPile } from "./DiscardPile";
+import { UnoDrawPile } from "./UnoDrawPile";
+import { UnoDiscardPile } from "./UnoDiscardPile";
 import { AvatarPlayer } from "../player/AvatarPlayer";
 import { useGameStore } from "../../store/gameStore";
 import { DirectionIndicator } from "./DirectionIndicator";
+import { useUnoLocalPlayer, useUnoPlayers } from "../../games/uno/hooks";
 
 const SEAT_POSITIONS = [
   {
@@ -21,9 +22,9 @@ const SEAT_POSITIONS = [
   },
 ];
 
-export function Table3D() {
-  const localPlayer = useGameStore((s) => s.localPlayer);
-  const players = useGameStore((s) => s.players);
+export function UnoTable3D() {
+  const localPlayer = useUnoLocalPlayer();
+  const players = useUnoPlayers();
   const currentTurn = useGameStore((s) => s.currentTurn);
   const direction = useGameStore((s) => s.direction);
 
@@ -62,8 +63,8 @@ export function Table3D() {
 
       {/* Center Piles */}
 
-      <DrawPile position={[-1, 0.3, 0]} />
-      <DiscardPile position={[1, 0.31, 0]} />
+      <UnoDrawPile position={[-1, 0.3, 0]} />
+      <UnoDiscardPile position={[1, 0.31, 0]} />
 
       <DirectionIndicator direction={direction} />
 
@@ -73,7 +74,7 @@ export function Table3D() {
         active={currentTurn === localPlayer.id}
         name={localPlayer?.name || "You"}
         playerId={localPlayer.id}
-        cardCount={localPlayer.handCount}
+        cardCount={localPlayer.gameData.handCount}
         photoUrl={localPlayer.photoUrl}
       />
 
@@ -90,7 +91,7 @@ export function Table3D() {
             active={currentTurn === player.id}
             position={seat.position as [number, number, number]}
             rotation={seat.rotation as [number, number, number]}
-            cardCount={player.handCount}
+            cardCount={player.gameData.handCount}
             showCardsCount={true}
             isConnected={player.isConnected}
           />

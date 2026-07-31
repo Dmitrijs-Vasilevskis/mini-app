@@ -1,12 +1,14 @@
+import { useUnoLocalPlayer } from "../../games/uno/hooks";
 import { colyseusService } from "../../services/colyseus";
-import { useGameStore } from "../../store/gameStore";
 import { ReactionButton } from "./ReactionButton";
 
 export function UnoButton() {
-  const localPlayer = useGameStore((s) => s.localPlayer);
+  const localPlayer = useUnoLocalPlayer();
 
   const visible =
-    !!localPlayer && localPlayer.handCount === 1 && !localPlayer.saidUno;
+    !!localPlayer &&
+    localPlayer.gameData.handCount === 1 &&
+    !localPlayer.gameData.saidUno;
 
   return (
     <ReactionButton

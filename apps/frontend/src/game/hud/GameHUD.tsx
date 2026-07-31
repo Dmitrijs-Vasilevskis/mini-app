@@ -1,9 +1,10 @@
-import type { CardDTO, Color, PlayerDTO } from "../../types/game";
+import type { BasePlayerDTO } from "../../store/types";
+import type { CardDTO, Color } from "../../types/game";
 import { MatchInfoPanel } from "./MatchInfoPanel";
 import { PauseOverlay } from "./PauseOverlay";
 
 type Props = {
-  currentTurnPlayer: PlayerDTO | null;
+  currentTurnPlayer: BasePlayerDTO | null;
   discardTop: CardDTO | null;
   activeColor: Color;
   isMyTurn: boolean;

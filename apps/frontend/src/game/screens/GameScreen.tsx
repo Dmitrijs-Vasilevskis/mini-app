@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useGameStore } from "../../store/gameStore";
 import { GameHUD } from "../hud/GameHUD";
-import { Table3D } from "../../components/table/Table3D";
+import { UnoTable3D } from "../../components/table/UnoTable3D";
 import { FloatingActionText } from "../../components/uno/FloatingActionText";
 import { HandCards } from "../../components/uno/HandCards";
 import { DrawButton } from "../../components/uno/DrawButton";
-import { WildColorPicker } from "../../components/uno/WildColorPicker";
+import { UnoWildColorPicker } from "../../components/uno/UnoWildColorPicker";
 import type { CardDTO, Color } from "../../types/game";
 import { colyseusService } from "../../services/colyseus";
 import { UnoButton } from "../../components/uno/UnoButton";
@@ -15,18 +15,19 @@ import { RoundEndOverlay } from "../../components/uno/RoundEndOverlay";
 import { LandscapeHandCards } from "../../components/uno/LandscapeHandCards";
 import { useGameContext } from "../../providers/game/GameProvider";
 import { EmoteWheel } from "../../components/table/EmoteWheel";
+import { useUnoLocalPlayer, useUnoPlayers } from "../../games/uno/hooks";
 
 export function GameScreen() {
   const { isLandscape } = useGameContext();
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [wildCard, setWildCard] = useState<CardDTO | null>(null);
 
-  const localPlayer = useGameStore((s) => s.localPlayer);
-  const players = useGameStore((s) => s.players);
+  const localPlayer = useUnoLocalPlayer();
+  const players = useUnoPlayers();
   const roundResults = useGameStore((s) => s.roundResults);
-  const discardTop = useGameStore((s) => s.discardTop);
   const currentTurn = useGameStore((s) => s.currentTurn);
   const activeColor = useGameStore((s) => s.activeColor);
+  const discardTop = useGameStore((s) => s.discardTop);
   const winner = useGameStore((s) => s.winner);
   const roomCode = useGameStore((s) => s.roomCode);
 
@@ -97,7 +98,7 @@ export function GameScreen() {
 
       {/* 3D Scene */}
       <div className="absolute inset-0">
-        <Table3D />
+        <UnoTable3D />
       </div>
       {/* Floating Ation Highlighting */}
       <FloatingActionText />
@@ -107,7 +108,7 @@ export function GameScreen() {
       {/* Hand Cards */}
       {isLandscape ? (
         <HandCards
-          cards={localPlayer.hand}
+          cards={localPlayer.gameData.hand}
           onWildCard={onWilCard}
           isPlayable={isPlayable}
           selectedCardId={selectedCardId}
@@ -115,7 +116,7 @@ export function GameScreen() {
         />
       ) : (
         <LandscapeHandCards
-          cards={localPlayer.hand}
+          cards={localPlayer.gameData.hand}
           isPlayable={isPlayable}
           setSelectedCardId={setSelectedCardId}
           onWildCard={onWilCard}
@@ -131,7 +132,7 @@ export function GameScreen() {
         onDraw={() => colyseusService.drawCard()}
       />
 
-      {wildCard && <WildColorPicker onSelect={onWildCardColorSelect} />}
+      {wildCard && <UnoWildColorPicker onSelect={onWildCardColorSelect} />}
     </div>
   );
 }

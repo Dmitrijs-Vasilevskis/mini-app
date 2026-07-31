@@ -1,122 +1,32 @@
 import { create } from "zustand";
-import { RoomStatus, type Color } from "@uno/shared";
-import type { GameDirection, RoundResults } from '../types/game';
+import type { GameStore } from "./types";
+import { createRoomSlice, initialRoomState } from "./slices/roomSlice";
+import { initialUnoState, unoSlice } from "./slices/unoSlice";
+import { bjSlice, initialBjState } from "./slices/bjSlice";
 
-import type {
-    CardDTO,
-    GameStore,
-    GameWinner,
-    LocalPlayerDTO,
-    PlayerDTO,
-} from '../types/game';
+export const useGameStore = create<GameStore>()((set, get, api) => ({
+    ...createRoomSlice(set, get, api),
+    ...unoSlice(set, get, api),
+    ...bjSlice(set, get, api),
+    reset() {
+        set({
+            ...initialRoomState,
+            ...initialUnoState,
+            ...initialBjState
+        })
+    },
+    resetGame() {
+        const gameType = get().gameType;
 
-const initialState = {
-    connected: false,
-    roomId: null,
-    roomCode: null,
-    status: null as unknown as RoomStatus,
-    hostId: '',
-    currentTurn: '',
-    direction: 1 as GameDirection,
-    activeColor: 'red' as Color,
-    discardTop: null,
-    players: [],
-    localPlayer: null,
-    winner: null,
-    isPaused: false,
-    pausedPlayerId: null,
-    reconnectRemaining: null,
-    unoWindowPlayerId: null,
-    roundResults: null,
-    roomError: null,
-};
+        set({
+            winner: null,
+            roundResults: null,
+            isPaused: false,
+            pausedPlayerId: null,
+            reconnectRemaining: null,
 
-export const useGameStore =
-    create<GameStore>((set) => ({
-        connected: false,
-        roomId: null,
-        roomCode: null,
-        status: null as unknown as RoomStatus,
-        hostId: '',
-        currentTurn: '',
-        direction: 1,
-        activeColor: 'red',
-        discardTop: null,
-        players: [],
-        localPlayer: null,
-        winner: null,
-        isPaused: false,
-        pausedPlayerId: null,
-        reconnectRemaining: null,
-        unoWindowPlayerId: null,
-        roundResults: null,
-        roomError: null,
-        setConnected: (value: boolean) => {
-            set({ connected: value })
-        },
-        setRoomId: (roomId: string) => {
-            set({ roomId })
-        },
-        setCurrentTurn: (currentTurn: string) => {
-            set({ currentTurn })
-        },
-        setDirection: (direction: GameDirection) => {
-            set({ direction });
-        },
-        setPlayers: (players: PlayerDTO[]) => {
-            set({ players })
-        },
-        setLocalPlayer: (localPlayer: LocalPlayerDTO) => {
-            set({ localPlayer })
-        },
-        setDiscardTop: (discardTop: CardDTO) => {
-            set({ discardTop })
-        },
-        setActiveColor: (activeColor: Color) => {
-            set({ activeColor })
-        },
-        setWinner: (winner: GameWinner) => {
-            set({ winner });
-        },
-        resetGame: () => {
-            set({
-                winner: null,
-                roundResults: null,
-                isPaused: false,
-                pausedPlayerId: null,
-                reconnectRemaining: null,
-                unoWindowPlayerId: null,
-                roomError: null,
-            });
-        },
-        setRoomCode: (roomCode: string) => {
-            set({ roomCode });
-        },
-        setStatus: (status: RoomStatus) => {
-            set({ status });
-        },
-        setHostId: (hostId: string) => {
-            set({ hostId });
-        },
-        setPaused(isPaused: boolean, pausedPlayerId?: string, reconnectRemaining?: number) {
-            set({
-                isPaused,
-                pausedPlayerId: pausedPlayerId ?? null,
-                reconnectRemaining: reconnectRemaining ?? null,
-            });
-        },
-        setUnoWindowPlayerId(playerId: string | null) {
-            set({
-                unoWindowPlayerId: playerId
-            });
-        },
-        setRoundResults(roundResults: RoundResults | null) {
-            set({ roundResults });
-        },
-        setRoomError(message: string | null) {
-            set({ roomError: message });
-        },
-        reset() {
-            set({ ...initialState });
-        },
-    }));
+            ...(gameType === "uno" ? initialUnoState : {}),
+            ...(gameType === "blackjack" ? initialBjState : {}),
+        })
+    },
+}));
