@@ -2,14 +2,18 @@ import type { Color } from "@uno/shared";
 import type { CardDTO, GameDirection } from "../../types/game";
 import type { BasePlayerDTO, StoreSlice } from "../types";
 
-export interface UnoPlayerDTO extends BasePlayerDTO {
+export interface UnoPlayerDataDTO {
     handCount: number;
     saidUno: boolean;
 }
 
-export interface UnoLocalPlayerDTO extends UnoPlayerDTO {
+export type UnoPlayerDTO = BasePlayerDTO<UnoPlayerDataDTO>;
+
+export interface UnoLocalPlayerDataDTO extends UnoPlayerDataDTO {
     hand: CardDTO[];
 }
+
+export type UnoLocalPlayerDTO = BasePlayerDTO<UnoLocalPlayerDataDTO>;
 
 export type UnoSlice = UnoState & UnoActions;
 
