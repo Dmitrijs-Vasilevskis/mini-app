@@ -76,7 +76,7 @@ export class UnoGameState extends BaseGameState {
 }
 
 export class BjGameState extends BaseGameState {
-  @type(BlackjackDealer) bjDdealer = new BlackjackDealer();
+  @type(BlackjackDealer) bjDealer = new BlackjackDealer();
   @type("int8") cardsRemaining: number = 0;
 }
 

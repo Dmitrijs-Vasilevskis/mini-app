@@ -49,7 +49,7 @@ export class BlackjackGameEngine {
         this.state.playerOrder.clear();
         shiftedOrder.forEach(id => this.state.playerOrder.push(id));
 
-        bjState.bjDdealer.hand.clear();
+        bjState.bjDealer.hand.clear();
 
         // initial player states
         this.state.playerOrder.forEach((playerId) => {
@@ -107,7 +107,7 @@ export class BlackjackGameEngine {
         for (let i = 0; i < 2; i++) {
             const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
                 allocatedCard.isFaceDown = (i === 1);
-                bjState.bjDdealer.hand.push(allocatedCard);
+                bjState.bjDealer.hand.push(allocatedCard);
 
                 if (i === 0) {
                     this.room.clients.forEach(client => client.view?.add(allocatedCard));
@@ -119,9 +119,9 @@ export class BlackjackGameEngine {
             }
         }
 
-        const hand = evaluateHand(bjState.bjDdealer.hand);
+        const hand = evaluateHand(bjState.bjDealer.hand);
 
-        bjState.bjDdealer.handValue = hand.value;
+        bjState.bjDealer.handValue = hand.value;
     }
 
     handlePlayerHit(playerId: string) {
@@ -193,7 +193,7 @@ export class BlackjackGameEngine {
     private executeDealerTurn() {
         const bjState = this.getBjState();
         // reveal dealer hidden card
-        bjState.bjDdealer.hand.forEach((card: BjCard) => {
+        bjState.bjDealer.hand.forEach((card: BjCard) => {
             if (card.isFaceDown === true) {
                 card.isFaceDown = false;
 
@@ -203,11 +203,11 @@ export class BlackjackGameEngine {
             }
         });
 
-        let dealerScore = evaluateHand(bjState.bjDdealer.hand);
+        let dealerScore = evaluateHand(bjState.bjDealer.hand);
 
         while (dealerScore.value < 17) {
             const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
-                bjState.bjDdealer.hand.push(allocatedCard);
+                bjState.bjDealer.hand.push(allocatedCard);
 
                 this.room.clients.forEach(client => {
                     if (client?.view) {
@@ -220,15 +220,15 @@ export class BlackjackGameEngine {
                 this.needsReshuffle = true;
             }
 
-            dealerScore = evaluateHand(bjState.bjDdealer.hand);
+            dealerScore = evaluateHand(bjState.bjDealer.hand);
         }
-        bjState.bjDdealer.handValue = dealerScore.value;
+        bjState.bjDealer.handValue = dealerScore.value;
         this.finalizeRound();
     }
 
     private finalizeRound() {
         const bjState = this.getBjState();
-        const dealerHand = evaluateHand(bjState.bjDdealer.hand);
+        const dealerHand = evaluateHand(bjState.bjDealer.hand);
 
         this.state.playerOrder.forEach((playerId) => {
             const player = this.state.players.get(playerId);
@@ -261,7 +261,7 @@ export class BlackjackGameEngine {
         const bjState = this.getBjState();
         const dealerCards: BjCard[] = [];
 
-        bjState.bjDdealer.hand.forEach((c: BjCard) => dealerCards.push(c));
+        bjState.bjDealer.hand.forEach((c: BjCard) => dealerCards.push(c));
         this.deckManager.collectToDiscard(dealerCards);
 
         this.state.players.forEach((player) => {
