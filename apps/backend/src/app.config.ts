@@ -27,7 +27,7 @@ export const server = defineServer({
         maxPayload: MAX_WS_PAYLOAD_BYTES,
     }),
     rooms: {
-        uno: defineRoom(GameLobbyRoom).filterBy(['roomCode'])
+        game: defineRoom(GameLobbyRoom).filterBy(['roomCode'])
     },
     express: (app) => {
         app.set('trust proxy', 1);
