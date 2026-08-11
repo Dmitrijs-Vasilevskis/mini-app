@@ -1,11 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useGameStore } from "../../store/gameStore";
 
-type Props = {
-  winnerName: string;
-  isLocalWinner: boolean;
-};
+export function VictoryOverlay() {
+  const winner = useGameStore((s) => s.winner);
+  const localPlayer = useGameStore((s) => s.localPlayer);
 
-export function VictoryOverlay({ winnerName, isLocalWinner }: Props) {
+  if (!winner || !localPlayer) return;
+
+  const isLocalWinner = winner.id === localPlayer.id;
+
   return (
     <AnimatePresence>
       <motion.div
@@ -34,7 +37,7 @@ export function VictoryOverlay({ winnerName, isLocalWinner }: Props) {
           <div className="text-7xl mb-4">🏆</div>
 
           <h1 className="text-5xl font-black text-yellow-400">
-            {isLocalWinner ? "YOU WIN!" : `${winnerName} WINS!`}
+            {isLocalWinner ? "YOU WIN!" : `${winner.name} WINS!`}
           </h1>
 
           <p className="mt-4 text-gray-300">Game Over</p>
