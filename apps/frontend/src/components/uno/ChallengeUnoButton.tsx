@@ -1,4 +1,4 @@
-import { colyseusService } from "../../services/colyseus";
+import { unoService } from "../../services/colyseus/";
 import { useGameStore } from "../../store/gameStore";
 import { ReactionButton } from "./ReactionButton";
 
@@ -16,7 +16,7 @@ export function ChallengeUnoButton() {
       visible={visible}
       text="Challenge UNO!"
       color="red"
-      onClick={() => colyseusService.challengeUno()}
+      onClick={() => unoService.challengeUno()}
     />
   );
 }

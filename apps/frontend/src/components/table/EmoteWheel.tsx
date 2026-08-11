@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useGameContext } from "../../providers/game/GameProvider";
-import { colyseusService } from "../../services/colyseus";
+import { roomService } from "../../services/colyseus/";
 import { AnimatePresence, motion } from "framer-motion";
 import { EMOTES, type Emote } from "@uno/shared";
 
@@ -44,7 +44,7 @@ export function EmoteWheel() {
   );
 
   const handleSelectEmote = (id: string) => {
-    colyseusService.sendEmote(id);
+    roomService.sendEmote(id);
     setIsOpen(false);
     triggerHaptic("light");
   };
