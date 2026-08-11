@@ -11,7 +11,10 @@ export type BJCardValue = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | 
 export type Suit = "clubs" | "diamonds" | "hearts" | "spades";
 export type Rank = "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king" | "ace";
 
-export type GameType = "uno" | "blackjack";
+export enum GameType {
+  UNO = "uno",
+  BLACKJACK = "blackjack"
+}
 
 export class Card extends Schema {
   @type("string") id: string = "";
@@ -85,7 +88,7 @@ export class GameState extends Schema {
   @type("string") roomCode: string = "";
   @type("string") status: RoomStatus = RoomStatus.LOBBY;
   @type({ map: Player }) players = new MapSchema<Player>();
-  @type("string") gameType: GameType = "uno";
+  @type("string") gameType: GameType = GameType.UNO;
 
   @type(["string"]) playerOrder = new ArraySchema<string>();
   @type("string") currentTurn: string = "";
