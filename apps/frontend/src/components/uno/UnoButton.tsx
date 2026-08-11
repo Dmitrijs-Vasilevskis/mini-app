@@ -1,5 +1,5 @@
 import { useUnoLocalPlayer } from "../../games/uno/hooks";
-import { colyseusService } from "../../services/colyseus";
+import { unoService } from "../../services/colyseus/";
 import { ReactionButton } from "./ReactionButton";
 
 export function UnoButton() {
@@ -15,7 +15,7 @@ export function UnoButton() {
       visible={visible}
       text="UNO!!"
       color="yellow"
-      onClick={() => colyseusService.callUno()}
+      onClick={() => unoService.callUno()}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { RoomStatus } from '@uno/shared';
+import { GameType, RoomStatus } from '@uno/shared';
 import { useGameStore } from '../../../../store/gameStore';
 import type { GameRoom, StateCallbacks } from '../../types';
 
@@ -60,6 +60,13 @@ export function RegisterRoomEvents(
         "status",
         (status: RoomStatus) => {
             store.setStatus(status);
+        }
+    );
+
+    $(room.state).listen(
+        "gameType",
+        (gameType: GameType) => {
+            store.setGameType(gameType);
         }
     );
 }

@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Card } from "../card/Card";
 import type { CardDTO } from "../../types/game";
 import { useAnimationStore } from "../../store/animationStore";
-import { colyseusService } from "../../services/colyseus";
+import { unoService } from "../../services/colyseus/";
 
 type Props = {
   cards: CardDTO[];
@@ -49,7 +49,7 @@ export function HandCards({
       },
     });
 
-    colyseusService.playCard(card.id);
+    unoService.playCard(card.id);
     setSelectedCardId(null);
   };
 

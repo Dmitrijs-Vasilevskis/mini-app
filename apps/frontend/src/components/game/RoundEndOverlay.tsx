@@ -1,12 +1,16 @@
 import { motion } from "framer-motion";
-import type { RoundResults } from "../../types/game";
+import { useGameStore } from "../../store/gameStore";
 
-type Props = {
-  roundResults: RoundResults;
-  isLocalWinner: boolean;
-};
+export function RoundEndOverlay() {
+  const roundResults = useGameStore((s) => s.roundResults);
+  const localPlayer = useGameStore((s) => s.localPlayer);
 
-export function RoundEndOverlay({ roundResults, isLocalWinner }: Props) {
+  if (!roundResults) {
+    return null;
+  }
+
+  const isLocalWinner = roundResults.roundWinnerId === localPlayer?.id;
+
   const standings = [...roundResults.standings].sort(
     (a, b) => b.score - a.score
   );

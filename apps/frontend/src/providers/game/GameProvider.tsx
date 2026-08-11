@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTelegramUser } from "../../hooks/useTelegramUser";
-import { colyseusService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { GameEvents } from "../../game/GameEvents";
 import { getErrorMessage } from "../../utils/errors";
 import type { WebAppUser } from "../../types/TelegramWebApp";
+import { colyseusService } from "../../services/colyseus/";
 
 interface GameContextInterface {
   joining: boolean;

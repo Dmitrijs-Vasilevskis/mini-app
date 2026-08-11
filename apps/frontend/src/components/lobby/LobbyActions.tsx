@@ -1,4 +1,4 @@
-import { colyseusService } from "../../services/colyseus";
+import { roomService } from "../../services/colyseus/";
 
 interface Props {
   isReady: boolean;
@@ -6,13 +6,14 @@ interface Props {
   canStart: boolean;
   onLeave: () => void;
 }
+
 export function LobbyActions({ isReady, isHost, canStart, onLeave }: Props) {
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col gap-2 bg-black/30 backdrop-blur-md border border-white/5 p-3 rounded-2xl shadow-xl">
       {/* Host Start Game Trigger */}
       {isHost && (
         <button
-          onClick={() => colyseusService.startGame()}
+          onClick={() => roomService.startGame()}
           disabled={!canStart}
           className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 disabled:from-zinc-700 disabled:to-zinc-800 text-black font-extrabold text-sm tracking-widest active:scale-[0.98] transition-all disabled:text-white/30 disabled:pointer-events-none shadow-md shadow-orange-900/20"
         >
@@ -23,7 +24,7 @@ export function LobbyActions({ isReady, isHost, canStart, onLeave }: Props) {
       {/* Dual Mode Action Buttons Wrapper */}
       <div className="flex gap-2 w-full">
         <button
-          onClick={() => colyseusService.toggleReady()}
+          onClick={() => roomService.toggleReady()}
           className={`flex-1 h-12 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.97] border ${
             isReady
               ? "bg-amber-600/20 text-amber-400 border-amber-600/30"

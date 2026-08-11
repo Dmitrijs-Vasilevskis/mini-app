@@ -8,7 +8,6 @@ import { MATCH_WINNING_SCORE, ROUND_INTERMISSION_MS } from "./constants";
 
 export class UnoGameEngine {
     private roundStartTimer: ReturnType<typeof setTimeout> | null = null;
-    private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
 
     constructor(
         private room: Room,
@@ -34,13 +33,6 @@ export class UnoGameEngine {
 
     private getUnoState(): UnoGameState {
         return this.state.gameState as UnoGameState;
-    }
-
-    private clearPauseInterval() {
-        if (this.pauseIntervalTimer) {
-            clearInterval(this.pauseIntervalTimer);
-            this.pauseIntervalTimer = null;
-        }
     }
 
     private isGameplayBlocked(): boolean {
@@ -400,47 +392,7 @@ export class UnoGameEngine {
         unoState.unoPendingPlayerId = "";
     }
 
-    handlePlayerDisconnect(playerId: string, durationMs: number) {
-        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused) return;
-
-        this.state.isPaused = true;
-        this.state.pausedPlayerId = playerId;
-        this.state.pausedReconnectRemainingMs = durationMs;
-
-        this.clearPauseInterval();
-
-        this.pauseIntervalTimer = setInterval(() => {
-            if (this.state.pausedReconnectRemainingMs <= 1000) {
-                this.clearPauseInterval();
-                this.state.pausedReconnectRemainingMs = 0;
-                return;
-            }
-
-            this.state.pausedReconnectRemainingMs -= 1000;
-        }, 1000);
-    }
-
-    handlePlayerReconnect(playerId: string) {
-        if (this.state.isPaused && this.state.pausedPlayerId === playerId) {
-            this.clearPauseInterval();
-
-            this.state.isPaused = false;
-            this.state.pausedPlayerId = "";
-            this.state.pausedReconnectRemainingMs = 0;
-
-            // this.room.broadcast("gameResumed");
-        }
-    }
-
     handleTimeoutForfeit() {
-        this.clearPauseInterval();
-
-        this.state.isPaused = false;
-        this.state.pausedPlayerId = "";
-        this.state.pausedReconnectRemainingMs = 0;
-
         this.turnManager.nextTurn();
-
-        // this.room.broadcast("gameResumed");
     }
 }

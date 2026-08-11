@@ -1,138 +1,16 @@
-import { useState } from "react";
+import BjGameScreen from "../../games/blackjack/BjGameScreen";
+import { UnoGameScreen } from "../../games/uno/UnoGameScreen";
 import { useGameStore } from "../../store/gameStore";
-import { GameHUD } from "../hud/GameHUD";
-import { UnoTable3D } from "../../components/table/UnoTable3D";
-import { FloatingActionText } from "../../components/uno/FloatingActionText";
-import { HandCards } from "../../components/uno/HandCards";
-import { DrawButton } from "../../components/uno/DrawButton";
-import { UnoWildColorPicker } from "../../components/uno/UnoWildColorPicker";
-import type { CardDTO, Color } from "../../types/game";
-import { colyseusService } from "../../services/colyseus";
-import { UnoButton } from "../../components/uno/UnoButton";
-import { ChallengeUnoButton } from "../../components/uno/ChallengeUnoButton";
-import { VictoryOverlay } from "../../components/uno/VictoryOverlay";
-import { RoundEndOverlay } from "../../components/uno/RoundEndOverlay";
-import { LandscapeHandCards } from "../../components/uno/LandscapeHandCards";
-import { useGameContext } from "../../providers/game/GameProvider";
-import { EmoteWheel } from "../../components/table/EmoteWheel";
-import { useUnoLocalPlayer, useUnoPlayers } from "../../games/uno/hooks";
 
 export function GameScreen() {
-  const { isLandscape } = useGameContext();
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [wildCard, setWildCard] = useState<CardDTO | null>(null);
+  const gameType = useGameStore((s) => s.gameType);
 
-  const localPlayer = useUnoLocalPlayer();
-  const players = useUnoPlayers();
-  const roundResults = useGameStore((s) => s.roundResults);
-  const currentTurn = useGameStore((s) => s.currentTurn);
-  const activeColor = useGameStore((s) => s.activeColor);
-  const discardTop = useGameStore((s) => s.discardTop);
-  const winner = useGameStore((s) => s.winner);
-  const roomCode = useGameStore((s) => s.roomCode);
-
-  // todo: add reloader/name input field to a join screen
-  if (!localPlayer || !roomCode) {
-    return <div className="text-white">Loading game...</div>;
+  switch (gameType) {
+    case "uno":
+      return <UnoGameScreen />;
+    case "blackjack":
+      return <BjGameScreen />;
+    default:
+      return null;
   }
-
-  const currentTurnPlayer = players.find((p) => p.id === currentTurn) ?? null;
-  const isMyTurn = localPlayer.id === currentTurn;
-
-  const isPlayable = (card: CardDTO) => {
-    if (card.value === "wild" || card.value === "wildDrawFour") {
-      return true;
-    }
-
-    if (card.color === activeColor) {
-      return true;
-    }
-
-    if (card.value === discardTop?.value) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const onWilCard = (card: CardDTO) => {
-    setWildCard(card);
-  };
-
-  const onWildCardColorSelect = (color: Color) => {
-    if (!wildCard) return;
-
-    colyseusService.playCard(wildCard.id, color);
-
-    setWildCard(null);
-  };
-
-  return (
-    <div
-      className="relative h-screen w-screen text-white overflow-hidden bg-gradient-to-b from-[#ac61a3] to-[#2a57c0]"
-      onClick={() => {
-        setSelectedCardId(null);
-      }}
-    >
-      {/* 2D UI Overlay */}
-      <GameHUD
-        currentTurnPlayer={currentTurnPlayer}
-        discardTop={discardTop}
-        activeColor={activeColor}
-        isMyTurn={isMyTurn}
-      />
-
-      {winner && (
-        <VictoryOverlay
-          winnerName={winner.name}
-          isLocalWinner={winner.id === localPlayer.id}
-        />
-      )}
-
-      {roundResults && (
-        <RoundEndOverlay
-          roundResults={roundResults}
-          isLocalWinner={roundResults.roundWinnerId === localPlayer.id}
-        />
-      )}
-
-      {/* 3D Scene */}
-      <div className="absolute inset-0">
-        <UnoTable3D />
-      </div>
-      {/* Floating Ation Highlighting */}
-      <FloatingActionText />
-
-      <EmoteWheel />
-
-      {/* Hand Cards */}
-      {isLandscape ? (
-        <HandCards
-          cards={localPlayer.gameData.hand}
-          onWildCard={onWilCard}
-          isPlayable={isPlayable}
-          selectedCardId={selectedCardId}
-          setSelectedCardId={setSelectedCardId}
-        />
-      ) : (
-        <LandscapeHandCards
-          cards={localPlayer.gameData.hand}
-          isPlayable={isPlayable}
-          setSelectedCardId={setSelectedCardId}
-          onWildCard={onWilCard}
-        />
-      )}
-
-      <UnoButton />
-
-      <ChallengeUnoButton />
-
-      <DrawButton
-        isMyTurn={isMyTurn}
-        onDraw={() => colyseusService.drawCard()}
-      />
-
-      {wildCard && <UnoWildColorPicker onSelect={onWildCardColorSelect} />}
-    </div>
-  );
 }

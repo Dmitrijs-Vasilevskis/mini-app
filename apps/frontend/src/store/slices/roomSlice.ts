@@ -1,4 +1,4 @@
-import { RoomStatus, type GameType } from "@uno/shared";
+import { GameType, RoomStatus } from "@uno/shared";
 import type { BaseLocalPlayerDTO, BasePlayerDTO, StoreSlice } from "../types";
 
 export interface GameWinner {
@@ -61,7 +61,7 @@ export const initialRoomState: RoomState = {
     players: [],
     localPlayer: null,
     currentTurn: "",
-    gameType: "uno",
+    gameType: GameType.UNO,
     status: null,
     hostId: "",
     roomError: null,
@@ -79,7 +79,7 @@ export const createRoomSlice: StoreSlice<RoomSlice> = (set) => ({
     players: [],
     localPlayer: null,
     currentTurn: "",
-    gameType: "uno",
+    gameType: GameType.UNO,
     status: null,
     hostId: "",
     roomError: null,

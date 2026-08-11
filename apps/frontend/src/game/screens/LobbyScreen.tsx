@@ -4,15 +4,20 @@ import { useGameStore } from "../../store/gameStore";
 import { LobbyActions } from "../../components/lobby/LobbyActions";
 import { LobbyHeader } from "../../components/lobby/LobbyHeader";
 import { LobbyPlayers } from "../../components/lobby/LobbyPlayers";
+import { LobbyModal } from "../../components/lobby/LobbyModal";
+import { roomService } from "../../services/colyseus/";
+import type { GameType } from "@uno/shared";
 
 export function LobbyScreen() {
   const roomCode = useGameStore((s) => s.roomCode);
   const hostId = useGameStore((s) => s.hostId);
   const players = useGameStore((s) => s.players);
   const localPlayer = useGameStore((s) => s.localPlayer);
+  const gameType = useGameStore((s) => s.gameType);
 
   const { leaveRoom } = useGameContext();
   const [copied, setCopied] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isHost = localPlayer?.id === hostId;
 
@@ -22,8 +27,6 @@ export function LobbyScreen() {
   const copyInviteLink = async () => {
     if (!roomCode) return;
 
-    // const inviteLink = `https://t.me/mercuria_test_bot/play?startapp=${roomCode}`;
-
     try {
       await navigator.clipboard.writeText(roomCode);
       setCopied(true);
@@ -31,6 +34,16 @@ export function LobbyScreen() {
     } catch (err) {
       console.error("Failed to copy link", err);
     }
+  };
+
+  const handleSelectGame = (selectedGame: GameType) => {
+    console.log("Selected game:", selectedGame);
+    roomService.selectGame(selectedGame);
+    setIsModalOpen(false);
+  }
+
+  const handleToggleModal = () => {
+    setIsModalOpen((prev) => !prev);
   };
 
   return (
@@ -45,6 +58,8 @@ export function LobbyScreen() {
         roomCode={roomCode}
         copied={copied}
         copyInviteLink={copyInviteLink}
+        gameType={gameType}
+        onAction={handleToggleModal}
       />
 
       <LobbyPlayers
@@ -58,6 +73,14 @@ export function LobbyScreen() {
         isHost={isHost}
         canStart={canStart}
         onLeave={leaveRoom}
+      />
+
+      <LobbyModal
+        isOpen={isModalOpen}
+        currentGameType={gameType}
+        isHost={isHost}
+        onClose={() => handleToggleModal()}
+        onSelectGame={handleSelectGame}
       />
     </div>
   );
