@@ -26,6 +26,10 @@ export function UnoGameplay() {
   const [wildCard, setWildCard] = useState<CardDTO | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
+  if (!localPlayer) {
+    return null;
+  }
+
   const onWilCard = (card: CardDTO) => {
     setWildCard(card);
   };

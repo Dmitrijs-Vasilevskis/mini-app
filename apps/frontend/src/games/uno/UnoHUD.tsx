@@ -13,8 +13,11 @@ export default function UnoHUD() {
   const players = useUnoPlayers();
   const localPlayer = useUnoLocalPlayer();
   const currentTurn = useGameStore((s) => s.currentTurn);
-
   const currentTurnPlayer = players.find((p) => p.id === currentTurn) ?? null;
+
+  if (!localPlayer) {
+    return null;
+  }
 
   return (
     <>
