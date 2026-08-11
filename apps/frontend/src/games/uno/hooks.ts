@@ -7,10 +7,14 @@ export const useUnoPlayers = () =>
 export const useUnoLocalPlayer = () =>
     useGameStore(state => state.localPlayer as UnoLocalPlayerDTO | null);
 
-export const useUnoGameState = () =>
-    useGameStore(state => ({
-        direction: state.direction,
-        activeColor: state.activeColor,
-        discardTop: state.discardTop,
-        unoWindowPlayerId: state.unoWindowPlayerId,
-    }));
+export const useUnoDirection = () =>
+    useGameStore((state) => state.direction);
+
+export const useUnoActiveColor = () =>
+    useGameStore((state) => state.activeColor);
+
+export const useUnoDiscardTop = () =>
+    useGameStore((state) => state.discardTop);
+
+export const useUnoWindowPlayerId = () =>
+    useGameStore((state) => state.unoWindowPlayerId);
