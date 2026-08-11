@@ -9,6 +9,7 @@ import { GAME_REGISTRY } from "../game/GameRegistry";
 
 export class GameLobbyRoom extends Room<RoomOptions> {
     private gameEngine!: any;
+    private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
 
     onCreate(options: { gameType?: GameType }) {
         assertRoomCapacity();
@@ -20,7 +21,7 @@ export class GameLobbyRoom extends Room<RoomOptions> {
         if (options.gameType && GAME_REGISTRY[options.gameType]) {
             this.state.gameType = options.gameType;
         } else {
-            this.state.gameType = "uno";
+            this.state.gameType = GameType.UNO;
         }
 
         const roomCode = generateUniqueRoomCode(
@@ -172,22 +173,21 @@ export class GameLobbyRoom extends Room<RoomOptions> {
         player.isConnected = false;
         player.disconnectedAt = Date.now();
 
-        if (this.gameEngine) {
-            this.gameEngine.handlePlayerDisconnect(client.sessionId, 30000);
-        }
+
+        this.handlePlayerDisconnect(client.sessionId, 30000);
 
         try {
             await this.allowReconnection(client, 30);
             player.isConnected = true;
             player.disconnectedAt = 0;
 
-            if (this.gameEngine) {
-                this.gameEngine.handlePlayerReconnect(client.sessionId);
-            }
+            this.handlePlayerReconnect(client.sessionId);
         } catch {
             const wasPausedPlayer = this.state.pausedPlayerId === player.id;
             this.removePlayer(player.id);
             if (wasPausedPlayer && this.gameEngine) {
+
+                this.resumeGame();
                 this.gameEngine.handleTimeoutForfeit();
             }
         }
@@ -233,5 +233,50 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
     private findExistingPlayer(telegramId: string): Player | undefined {
         return Array.from(this.state.players.values()).find(p => p.telegramId === telegramId);
+    }
+
+    handlePlayerDisconnect(playerId: string, durationMs: number) {
+        if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused) return;
+
+        this.pauseGame(playerId, durationMs);
+        this.clearPauseInterval();
+
+        this.pauseIntervalTimer = setInterval(() => {
+            if (this.state.pausedReconnectRemainingMs <= 1000) {
+                this.clearPauseInterval();
+                this.state.pausedReconnectRemainingMs = 0;
+                return;
+            }
+
+            this.state.pausedReconnectRemainingMs -= 1000;
+        }, 1000);
+    }
+
+    handlePlayerReconnect(playerId: string) {
+        if (this.state.isPaused && this.state.pausedPlayerId === playerId) {
+            this.clearPauseInterval();
+            this.resumeGame();
+
+            // this.room.broadcast("gameResumed");
+        }
+    }
+
+    private pauseGame(playerId: string, durationMs: number) {
+        this.state.isPaused = true;
+        this.state.pausedPlayerId = playerId;
+        this.state.pausedReconnectRemainingMs = durationMs;
+    }
+
+    private resumeGame() {
+        this.state.isPaused = false;
+        this.state.pausedPlayerId = "";
+        this.state.pausedReconnectRemainingMs = 0;
+    }
+
+    private clearPauseInterval() {
+        if (this.pauseIntervalTimer) {
+            clearInterval(this.pauseIntervalTimer);
+            this.pauseIntervalTimer = null;
+        }
     }
 }
