@@ -1,17 +1,17 @@
 import { Canvas } from "@react-three/fiber";
-import { useBjLocalPlayer, useBjPlayers } from "../hooks";
+import { useBjLocalPlayer } from "../hooks";
 import { OrbitControls } from "@react-three/drei";
 import { OvalTable } from "../../../components/games/bj/table/OvalTable";
 
 export function BjTable() {
   const localPlayer = useBjLocalPlayer();
-  const players = useBjPlayers();
 
   if (!localPlayer) {
     return null;
   }
 
-  const otherPlayers = players.filter((p) => p.id !== localPlayer.id);
+  // todo: add player and opptonents avatar renderers, create a dealer avatar
+  // const opponents = players.filter((p) => p.id !== localPlayer.id);
 
   return (
     <Canvas
