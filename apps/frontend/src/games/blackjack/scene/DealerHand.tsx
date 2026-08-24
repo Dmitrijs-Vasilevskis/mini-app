@@ -3,7 +3,7 @@ import type { BjDealerDTO } from "../../../store/slices/bjSlice";
 import { ClassicCard } from "../../../components/games/bj/card/BjCard";
 
 interface Props {
-  dealer: BjDealerDTO;
+  dealer: BjDealerDTO | null;
 }
 
 export function DealerHand({ dealer }: Props) {

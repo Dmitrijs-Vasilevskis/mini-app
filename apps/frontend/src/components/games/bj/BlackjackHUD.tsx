@@ -14,6 +14,10 @@ export function BlackjackHUD() {
   const currentTurnPlayer =
     players.find((p) => p.id === currentTurn)?.name ?? "Dealer";
 
+  if (!localPlayer) {
+    return null;
+  }
+
   return (
     <>
       <MatchInfoPanel
