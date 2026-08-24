@@ -9,11 +9,15 @@ export interface HandEvaluation {
     isBust: boolean;
 }
 
-export function evaluateHand(hand: ArraySchema<BjCard>): HandEvaluation {
+export function evaluateHand(hand: BjCard[]): HandEvaluation {
     let total = 0;
     let aceCount = 0;
 
     for (const card of hand) {
+        if(card.isFaceDown) {
+            continue;
+        }
+        
         if (card.rank === 'ace') {
             aceCount++;
             total += 11;

@@ -1,12 +1,17 @@
 import { Room } from "@colyseus/core";
-import { GameState, BjCard, RoomStatus, Player, BjPlayerData, BjGameState } from '@uno/shared';
-import { MATCH_WINNING_SCORE } from "./constants";
+import { GameState, BjCard, RoomStatus, Player, BjPlayerData, BjGameState, BjDealerPublicCard } from '@uno/shared';
+import { BJ_TIMINGS, MATCH_WINNING_SCORE } from "./constants";
 import { DeckManager } from "./DeckManager";
 import { TurnManager } from "./TurnManager";
-import { evaluateHand } from "./utils/HandEvaluator";
+import { evaluateHand, HandEvaluation } from "./utils/HandEvaluator";
+import { BlackjackDealerRuntime } from "./BlackjackDealerRuntime";
+import { GameActionScheduler } from "../../game/GameActionScheduler";
+import { BjRoundResult, BjRoundResultType } from "./types";
 
 export class BlackjackGameEngine {
     private needsReshuffle = false;
+    private dealer = new BlackjackDealerRuntime();
+    private readonly scheduler = new GameActionScheduler();
 
     constructor(
         private room: Room,
@@ -49,7 +54,10 @@ export class BlackjackGameEngine {
         this.state.playerOrder.clear();
         shiftedOrder.forEach(id => this.state.playerOrder.push(id));
 
+        // clear hands and hand value
+        this.dealer.clear();
         bjState.bjDealer.hand.clear();
+        bjState.bjDealer.handValue = 0;
 
         // initial player states
         this.state.playerOrder.forEach((playerId) => {
@@ -69,7 +77,7 @@ export class BlackjackGameEngine {
             player.isTurn = false;
         });
 
-        // deal initial hands
+        // deal initial player hands
         this.state.playerOrder.forEach((playerId) => {
             const player = this.state.players.get(playerId);
             if (!player) return;
@@ -99,6 +107,10 @@ export class BlackjackGameEngine {
 
         this.turnManager.assignTurn(this.state.playerOrder[0]);
         this.state.status = RoomStatus.PLAYING;
+
+        this.room.broadcast("roundHighlight", {
+            roundNumber: this.state.roundNumber
+        });
     }
 
     private initDealer() {
@@ -107,11 +119,21 @@ export class BlackjackGameEngine {
         for (let i = 0; i < 2; i++) {
             const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
                 allocatedCard.isFaceDown = (i === 1);
-                bjState.bjDealer.hand.push(allocatedCard);
 
-                if (i === 0) {
-                    this.room.clients.forEach(client => client.view?.add(allocatedCard));
+                this.dealer.hand.push(allocatedCard);
+
+                const dealerCard = new BjDealerPublicCard();
+
+                dealerCard.id = allocatedCard.id;
+                dealerCard.isFaceDown = allocatedCard.isFaceDown;
+
+                if (!allocatedCard.isFaceDown) {
+                    dealerCard.suit = allocatedCard.suit;
+                    dealerCard.rank = allocatedCard.rank;
+                    dealerCard.value = allocatedCard.value;
                 }
+
+                bjState.bjDealer.hand.push(dealerCard);
             });
 
             if (crossedThreshold) {
@@ -119,8 +141,9 @@ export class BlackjackGameEngine {
             }
         }
 
-        const hand = evaluateHand(bjState.bjDealer.hand);
+        const hand = evaluateHand(this.dealer.hand);
 
+        this.dealer.handValue = hand.value;
         bjState.bjDealer.handValue = hand.value;
     }
 
@@ -192,43 +215,98 @@ export class BlackjackGameEngine {
 
     private executeDealerTurn() {
         const bjState = this.getBjState();
-        // reveal dealer hidden card
-        bjState.bjDealer.hand.forEach((card: BjCard) => {
-            if (card.isFaceDown === true) {
-                card.isFaceDown = false;
 
-                this.room.clients.forEach((client) => {
-                    client.view?.add(card);
-                })
-            }
+        this.scheduler.schedule(BJ_TIMINGS.dealerReveal, () => {
+            // reveal dealer hidden card
+            this.revealDealerCards();
+
+            this.scheduler.schedule(BJ_TIMINGS.dealerDraw, () => {
+                this.processDealerTurn();
+            });
+        });
+    }
+
+    private revealDealerCards() {
+        const bjState = this.getBjState();
+
+        this.dealer.hand.forEach((privateCard) => {
+
+            if (!privateCard.isFaceDown) return;
+
+            privateCard.isFaceDown = false;
+
+            const publicCard = bjState.bjDealer.hand.find((c) => c.id === privateCard.id);
+
+            if (!publicCard) return;
+
+            publicCard.isFaceDown = false;
+            publicCard.rank = privateCard.rank;
+            publicCard.suit = privateCard.suit;
+            publicCard.value = privateCard.value;
         });
 
-        let dealerScore = evaluateHand(bjState.bjDealer.hand);
+        const hand = evaluateHand(this.dealer.hand);
 
-        while (dealerScore.value < 17) {
-            const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
-                bjState.bjDealer.hand.push(allocatedCard);
+        this.dealer.handValue = hand.value;
+        bjState.bjDealer.handValue = hand.value;
 
-                this.room.clients.forEach(client => {
-                    if (client?.view) {
-                        client.view.add(allocatedCard);
-                    }
-                });
+        this.highlightDealerHandState(hand);
+    }
+
+    private processDealerTurn() {
+        if (this.dealer.handValue >= 17 || this.dealer.handValue > 21) {
+            this.scheduleRoundFinalization();
+            return;
+        }
+
+        this.drawDealerCard();
+
+        this.scheduler.schedule(BJ_TIMINGS.dealerDraw, () => {
+            this.processDealerTurn();
+        });
+    }
+
+    private drawDealerCard() {
+        const bjState = this.getBjState();
+
+        const { crossedThreshold } = this.deckManager.drawCard(
+            (allocatedCard: BjCard) => {
+                this.dealer.hand.push(allocatedCard);
+
+                const publicCard = new BjDealerPublicCard();
+
+                publicCard.id = allocatedCard.id;
+                publicCard.isFaceDown = false;
+                publicCard.suit = allocatedCard.suit;
+                publicCard.rank = allocatedCard.rank;
+                publicCard.value = allocatedCard.value;
+
+                bjState.bjDealer.hand.push(publicCard);
             });
 
-            if (crossedThreshold) {
-                this.needsReshuffle = true;
-            }
+        const hand = evaluateHand(this.dealer.hand);
 
-            dealerScore = evaluateHand(bjState.bjDealer.hand);
+        this.dealer.handValue = hand.value;
+        bjState.bjDealer.handValue = hand.value;
+
+        this.highlightDealerHandState(hand);
+
+        if (crossedThreshold) {
+            this.needsReshuffle = true;
         }
-        bjState.bjDealer.handValue = dealerScore.value;
-        this.finalizeRound();
     }
+
+    private scheduleRoundFinalization() {
+        this.scheduler.schedule(BJ_TIMINGS.roundResult, () => {
+            this.finalizeRound();
+        });
+    }
+
 
     private finalizeRound() {
         const bjState = this.getBjState();
-        const dealerHand = evaluateHand(bjState.bjDealer.hand);
+        const dealerHand = evaluateHand(this.dealer.hand);
+        const results: BjRoundResult[] = [];
 
         this.state.playerOrder.forEach((playerId) => {
             const player = this.state.players.get(playerId);
@@ -237,20 +315,40 @@ export class BlackjackGameEngine {
             const bjData = this.getBjData(player);
             const playerHand = evaluateHand(bjData.hand);
 
+            let result: BjRoundResultType;
+            let points = 0;
+
             if (playerHand.isBust) {
-                return;
+                result = "bust";
+            } else if (playerHand.isBlackJack) {
+                if (dealerHand.isBlackJack) {
+                    result = "push";
+                } else {
+                    result = "blackjack";
+                    points = 2;
+                }
+            } else if (
+                dealerHand.value > 21 ||
+                playerHand.value > dealerHand.value
+            ) {
+                result = "win";
+                points = playerHand.value === 21 ? 2 : 1;
+            } else {
+                result = "loss";
             }
 
-            if (playerHand.isBlackJack) {
-                if (dealerHand.isBlackJack) return;
+            player.score += points;
 
-                player.score += 2;
-                return;
-            }
+            results.push({
+                playerId,
+                result,
+                points,
+            });
+        });
 
-            if (dealerHand.value > 21 || playerHand.value > dealerHand.value) {
-                player.score += 1;
-            }
+        this.room.broadcast("roundResults", {
+            roundNumber: this.state.roundNumber,
+            results,
         });
 
         this.collectPlayedCardsToDiscard();
@@ -258,10 +356,9 @@ export class BlackjackGameEngine {
     }
 
     private collectPlayedCardsToDiscard() {
-        const bjState = this.getBjState();
         const dealerCards: BjCard[] = [];
 
-        bjState.bjDealer.hand.forEach((c: BjCard) => dealerCards.push(c));
+        this.dealer.hand.forEach((c: BjCard) => dealerCards.push(c));
         this.deckManager.collectToDiscard(dealerCards);
 
         this.state.players.forEach((player) => {
@@ -299,6 +396,28 @@ export class BlackjackGameEngine {
             }
 
             this.setupRound();
+        }
+    }
+
+    private highlightPlayerHandState(playerId: string, hand: HandEvaluation): void {
+        if (hand.isBust) {
+            this.room.broadcast("playerBust", { playerId });
+            return;
+        }
+
+        if (hand.isBlackJack) {
+            this.room.broadcast("playerBlackjack", { playerId });
+        }
+    }
+
+    private highlightDealerHandState(hand: HandEvaluation): void {
+        if (hand.isBust) {
+            this.room.broadcast("dealerBust");
+            return;
+        }
+
+        if (hand.isBlackJack) {
+            this.room.broadcast("dealerBlackjack");
         }
     }
 }
