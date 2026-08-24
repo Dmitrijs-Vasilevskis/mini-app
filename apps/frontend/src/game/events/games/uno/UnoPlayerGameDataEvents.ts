@@ -1,9 +1,9 @@
 import type { UnoPlayerData } from "@uno/shared";
 import type { CardSchema, GameRoom, PlayerSchema, StateCallbacks } from "../../types";
 import { updateLocalPlayerGameData, updatePlayerGameState } from "../../helpers/UnoPlayerStore";
-import type { UnoLocalPlayerDataDTO } from "../../../../store/slices/unoSlice";
+import type { UnoLocalPlayerDataDTO, UnoPlayerDataDTO } from "../../../../store/slices/unoSlice";
 import { useGameStore } from "../../../../store/gameStore";
-import { mapCardSchema } from "../../mappers/CardMapper";
+import { mapCardSchema } from "../../mappers/uno/CardMapper";
 
 export function UnoPlayerGameDataEvents(
     $: StateCallbacks,
@@ -36,11 +36,11 @@ function registerUnoPlayerDataEvents(
 
     const unlisteners = [
         $(gameData).listen("handCount", (handCount: number) => {
-            updatePlayerGameState(room.sessionId, player.id, { handCount });
+            updatePlayerGameState<UnoPlayerDataDTO>(room.sessionId, player.id, { handCount });
         }),
 
         $(gameData).listen("saidUno", (saidUno: boolean) => {
-            updatePlayerGameState(room.sessionId, player.id, { saidUno });
+            updatePlayerGameState<UnoPlayerDataDTO>(room.sessionId, player.id, { saidUno });
         }),
     ];
 

@@ -9,17 +9,5 @@ export const HTTP_RATE_LIMIT_WINDOW_MS = 60_000;
 export const HTTP_RATE_LIMIT_HEALTH_MAX = 120;
 export const HTTP_RATE_LIMIT_AVATAR_MAX = 30;
 
-export const ALLOWED_EMOTE_IDS = new Set([
-    'laugh',
-    'angry',
-    'wow',
-    'cry',
-    'flex',
-    'gg',
-    'heart',
-    'fire',
-    'mindblown',
-]);
-
 export const ROUND_INTERMISSION_MS = 10_000;
 export const MATCH_WINNING_SCORE = 500;

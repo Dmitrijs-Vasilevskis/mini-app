@@ -36,7 +36,7 @@ export function BasePlayerListeners(
         (score: number) => {
             update({ score });
         }
-    )
+    );
 
     $(player).listen(
         "isReady",

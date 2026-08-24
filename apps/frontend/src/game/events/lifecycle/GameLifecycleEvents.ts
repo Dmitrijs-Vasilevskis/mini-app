@@ -43,4 +43,12 @@ export function RegisterGameLifecycleEvents(room: GameRoom) {
             emphasis: "special",
         });
     });
+
+    room.onMessage(GameEvents.ROUND_HIGHLIGHT, ({ roundNumber }: { roundNumber: number }) => {
+        effects.addEffect({
+            text: `ROUND ${roundNumber}`,
+            color: "facc15",
+            emphasis: "special",
+        });
+    });
 }

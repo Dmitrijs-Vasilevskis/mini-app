@@ -1,12 +1,10 @@
 import { GameState } from "@uno/shared";
 
-
 export type TurnResult =
     | { type: "advanced"; playerId: string }
     | { type: "dealer" }
     | { type: "paused"; playerId: string; remainingMs: number }
     | undefined;
-
 
 export class TurnManager {
     constructor(private state: GameState) { }
@@ -56,8 +54,7 @@ export class TurnManager {
         if (nextPlayerId === "dealer") {
             this.assignTurn("dealer");
             return {
-                type: "advanced",
-                playerId: "dealer"
+                type: "dealer",
             };
         }
 
