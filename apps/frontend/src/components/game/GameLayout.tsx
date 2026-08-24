@@ -3,6 +3,7 @@ import { VictoryOverlay } from "./VictoryOverlay";
 import { RoundEndOverlay } from "./RoundEndOverlay";
 import { EmoteWheel } from "../table/EmoteWheel";
 import { PauseOverlay } from "../../game/hud/PauseOverlay";
+import { FloatingActionText } from "../uno/FloatingActionText";
 
 interface Props {
   scene: ReactNode;
@@ -28,6 +29,8 @@ export default function GameLayout({ scene, hud, children }: Props) {
 
       {/* emote wheel */}
       <EmoteWheel />
+
+      <FloatingActionText />
 
       {children}
     </div>
