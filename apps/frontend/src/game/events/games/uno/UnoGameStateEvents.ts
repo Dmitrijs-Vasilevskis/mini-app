@@ -32,8 +32,6 @@ export function UnoGameStateEvents(
         ),
 
         $(gameState).listen("unoPendingPlayerId", (currPendingPlayerId: string) => {
-            console.log(">>>unoPendingPlayerId", currPendingPlayerId);
-
             if (!currPendingPlayerId) {
                 store.setUnoWindowPlayerId(null);
                 return;
