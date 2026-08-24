@@ -19,6 +19,7 @@ export const GameEvents = {
 
     ROUND_ENDED: "roundEnded",
     ROUND_STARTED: "roundStarted",
+    ROUND_HIGHLIGHT: "roundHighlight",
 
     GAME_END: "gameEnd",
     GAME_START: "gameStarted",
