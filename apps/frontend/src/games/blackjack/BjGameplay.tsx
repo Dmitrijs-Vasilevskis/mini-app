@@ -1,6 +1,5 @@
 import { HitButton } from "../../components/games/bj/HitButton";
 import { StandButton } from "../../components/games/bj/StandButton";
-import { useGameContext } from "../../providers/game/GameProvider";
 import { bjService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { useBjDealer, useBjLocalPlayer } from "./hooks";
@@ -8,7 +7,6 @@ import { DealerHand } from "./scene/DealerHand";
 import { HandCards } from "./scene/HandCards";
 
 export function BjGameplay() {
-  const { isLandscape } = useGameContext();
   const localPlayer = useBjLocalPlayer();
   const currentTurn = useGameStore((s) => s.currentTurn);
   const bjDelaer = useBjDealer();
@@ -31,6 +29,8 @@ export function BjGameplay() {
   const stand = () => {
     bjService.stand();
   };
+
+  // todo: add landscape support for actions buttons
 
   return (
     <>

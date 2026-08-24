@@ -55,8 +55,8 @@ export function ClassicCard({ card, onClick, className = "" }: Props) {
   }
 
   const isRed = suit === "hearts" || suit === "diamonds";
-  const suitSymbol = SUIT_SYMBOLS[suit] || "♠";
-  const rankLabel = RANK_LABELS[rank] || rank;
+  const suitSymbol = suit ? SUIT_SYMBOLS[suit] : "♠";
+  const rankLabel = rank ? RANK_LABELS[rank] : rank;
 
   return (
     <button
