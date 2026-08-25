@@ -29,8 +29,6 @@ export function BjGameplay() {
     bjService.stand();
   };
 
-  // todo: add landscape support for actions buttons
-
   return (
     <>
       <ActionButtons
