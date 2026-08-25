@@ -22,7 +22,7 @@ export function LobbyModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 sm:p-4 transition-opacity">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-xs p-4 sm:p-4 transition-opacity">
       <div className="w-full h-full max-w-md bg-[#1f122e] border border-white/10 rounded-t-3xl sm:rounded-3xl p-3 shadow-2xl flex flex-col max-h-[85vh]">
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div>
@@ -120,7 +120,7 @@ export function LobbyModal({
             <button
               onClick={() => onSelectGame(selected)}
               disabled={selected === currentGameType}
-              className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition shadow-lg"
+              className="w-full py-3.5 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition shadow-lg"
             >
               Confirm Selection
             </button>

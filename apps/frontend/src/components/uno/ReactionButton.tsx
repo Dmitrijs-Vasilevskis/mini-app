@@ -116,7 +116,7 @@ export function ReactionButton({
           ${config.bg}
         `}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent" />
 
         <div className="relative flex items-center gap-3">
           <span className="text-lg">{text}</span>

@@ -32,7 +32,7 @@ export function ProfileInformationPanel({
         </span>
       </div>
 
-      <div className="ml-auto bg-green-500/20 text-green-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-green-500/30 flex items-center gap-1 flex-shrink-0">
+      <div className="ml-auto bg-green-500/20 text-green-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-green-500/30 flex items-center gap-1 shrink-0">
         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
         Verified
       </div>

@@ -11,7 +11,7 @@ interface Props {
           <span className="text-xs text-white/40 font-bold tracking-wider uppercase">
             Lobby Code
           </span>
-          <span className="text-3xl font-black font-mono tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-400">
+          <span className="text-3xl font-black font-mono tracking-widest bg-clip-text text-transparent bg-linear-to-r from-yellow-400 to-orange-400">
             {roomCode || "------"}
           </span>
         </div>
