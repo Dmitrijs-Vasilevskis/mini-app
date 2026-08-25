@@ -10,28 +10,15 @@ interface Props {
 
 export function ActionButtons({ onHit, onStand, isPlayerTurn, canHit }: Props) {
   return (
-    <div className="bottom-6 left-1/2 -translate-x-1/2 gap-4 contents z-50">
-      <div
-        className="
-      landscape:fixed
-      left-6
-      top-1/2
-      -translate-y-1/2
-      z-50
-    "
-      >
-        <StandButton onClick={onStand} isAvailable={isPlayerTurn} />
-      </div>
-      <div
-        className="
-          fixed
-          right-6
-          top-1/2
-          -translate-y-1/2
-          z-50
-        "
-      >
-        <HitButton onClick={onHit} isAvailable={canHit} />
+    <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 gap-4 landscape:contents">
+      <div className="flex gap-4 landscape:fixed landscape:right-6 landscape:bottom-1/4 landscape:flex-col landscape:gap-8">
+        <div className="w-28 landscape:w-auto">
+          <StandButton isAvailable={isPlayerTurn} onClick={onStand} />
+        </div>
+
+        <div className="w-28 landscape:w-auto">
+          <HitButton isAvailable={canHit} onClick={onHit} />
+        </div>
       </div>
     </div>
   );
