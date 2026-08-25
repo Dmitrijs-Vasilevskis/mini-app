@@ -41,7 +41,7 @@ export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
               }`}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-sm text-white/90 border border-white/10 flex-shrink-0">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-linear-to-tr from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-sm text-white/90 border border-white/10 shrink-0">
                   {proxiedAvatarUrl && !hasImageError ? (
                     <img
                       src={proxiedAvatarUrl}
@@ -70,14 +70,14 @@ export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
                     )}
                   </div>
                   {isPlayerHost && (
-                    <span className="text-[9px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded w-max mt-0.5 tracking-wider">
+                    <span className="text-[9px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-sm w-max mt-0.5 tracking-wider">
                       👑 HOST
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 {!player.isConnected ? (
                   <span className="text-xs font-bold text-red-400 animate-pulse bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
                     Disconnected
@@ -95,7 +95,7 @@ export function LobbyPlayers({ players, localPlayer, hostId }: Props) {
                 )}
 
                 <div
-                  className={`w-1.5 h-1.5 rounded-full ${player.isConnected ? "bg-green-400 shadow shadow-green-400" : "bg-red-500 animate-ping"}`}
+                  className={`w-1.5 h-1.5 rounded-full ${player.isConnected ? "bg-green-400 shadow-sm shadow-green-400" : "bg-red-500 animate-ping"}`}
                 />
               </div>
             </div>

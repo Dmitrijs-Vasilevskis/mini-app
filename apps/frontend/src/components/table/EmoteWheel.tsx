@@ -70,7 +70,7 @@ export function EmoteWheel() {
             exit={{ opacity: 0, x: -36, scale: 0.85 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => setIsOpen(true)}
-            className="absolute inset-0 w-12 h-12 bg-gradient-to-r from-purple-600/30 to-transparent border-l-transparent border-r-purple-400/30 flex items-center justify-center text-xl shadow-lg backdrop-blur-sm z-30"
+            className="absolute inset-0 w-12 h-12 bg-linear-to-r from-purple-600/30 to-transparent border-l-transparent border-r-purple-400/30 flex items-center justify-center text-xl shadow-lg backdrop-blur-xs z-30"
           >
             💬
           </motion.button>
@@ -214,7 +214,7 @@ const WheelBackground = ({ segments }: { segments: number }) => {
           <div
             key={`sep-${index}`}
             style={{ transform: `rotate(${angleDeg}deg)` }}
-            className="absolute top-1/2 bottom-0 left-0 w-[212px] h-[1px] bg-white/15 origin-top-left z-30"
+            className="absolute top-1/2 bottom-0 left-0 w-[212px] h-px bg-white/15 origin-top-left z-30"
           />
         );
       })}

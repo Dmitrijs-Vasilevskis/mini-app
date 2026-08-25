@@ -21,7 +21,7 @@ export function JoinRoomScreen() {
   const displayName = user?.username || user?.first_name || "Player";
 
   return (
-    <div className="h-screen w-full flex flex-col justify-between bg-gradient-to-b from-[#1c0a26] via-[#2a1b40] to-[#0f081d] text-white p-4 select-none overflow-hidden">
+    <div className="h-screen w-full flex flex-col justify-between bg-linear-to-b from-[#1c0a26] via-[#2a1b40] to-[#0f081d] text-white p-4 select-none overflow-hidden">
       <ProfileInformationPanel
         user={user}
         displayName={displayName}
@@ -31,7 +31,7 @@ export function JoinRoomScreen() {
 
       <div className="flex-1 flex flex-col justify-center items-center w-full max-w-sm mx-auto px-2 gap-6 my-4">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-yellow-400 to-blue-500 drop-shadow">
+          <h1 className="text-4xl font-extrabold tracking-wider bg-clip-text text-transparent bg-linear-to-r from-red-500 via-yellow-400 to-blue-500 drop-shadow-sm">
             UNO MINI
           </h1>
           <p className="text-xs text-white/50 mt-1">

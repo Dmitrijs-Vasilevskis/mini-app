@@ -47,7 +47,7 @@ export function LobbyScreen() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col justify-between bg-gradient-to-b from-[#1c0a26] via-[#2a1b40] to-[#0f081d] text-white p-4 select-none overflow-hidden">
+    <div className="h-screen w-full flex flex-col justify-between bg-linear-to-b from-[#1c0a26] via-[#2a1b40] to-[#0f081d] text-white p-4 select-none overflow-hidden">
       {roomError && (
         <div className="mb-2 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-center text-sm text-red-300">
           {roomError}
