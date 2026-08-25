@@ -15,7 +15,7 @@ export function LobbyActions({ isReady, isHost, canStart, onLeave }: Props) {
         <button
           onClick={() => roomService.startGame()}
           disabled={!canStart}
-          className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 disabled:from-zinc-700 disabled:to-zinc-800 text-black font-extrabold text-sm tracking-widest active:scale-[0.98] transition-all disabled:text-white/30 disabled:pointer-events-none shadow-md shadow-orange-900/20"
+          className="w-full h-12 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 disabled:from-zinc-700 disabled:to-zinc-800 text-black font-extrabold text-sm tracking-widest active:scale-[0.98] transition-all disabled:text-white/30 disabled:pointer-events-none shadow-md shadow-orange-900/20"
         >
           🚀 START BATTLE
         </button>

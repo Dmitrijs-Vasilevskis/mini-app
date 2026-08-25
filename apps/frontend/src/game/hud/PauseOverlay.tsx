@@ -64,7 +64,7 @@ export function PauseOverlay() {
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
       <div className="relative w-full max-w-sm landscape:max-w-2xl flex flex-col landscape:flex-row gap-6 items-center rounded-2xl border border-white/10 bg-zinc-950 p-6 shadow-2xl text-center landscape:text-left">
         <div className="flex flex-col items-center shrink-0 w-full landscape:w-1/2">
           <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500 animate-pulse">
@@ -107,7 +107,7 @@ export function PauseOverlay() {
                   </span>
                 </div>
 
-                <span className="inline-flex items-center gap-1 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-400">
+                <span className="inline-flex items-center gap-1 rounded-sm bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-400">
                   <span className="h-1 w-1 rounded-full bg-red-500 animate-ping" />
                   Offline
                 </span>

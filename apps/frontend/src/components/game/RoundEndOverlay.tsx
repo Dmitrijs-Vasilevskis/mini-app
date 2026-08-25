@@ -28,7 +28,7 @@ export function RoundEndOverlay() {
       exit={{
         opacity: 0,
       }}
-      className="absolute inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-center justify-center"
+      className="absolute inset-0 z-90 bg-black/70 backdrop-blur-xs flex items-center justify-center"
     >
       <motion.div
         initial={{
