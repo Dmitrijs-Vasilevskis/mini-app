@@ -5,11 +5,10 @@ interface Props {
 
 export function StandButton({ onClick, isAvailable }: Props) {
   return (
-    <div className="fixed sm:bot-1/2 sm:left-6 sm:translate-x-0 sm:-translate-y-1/2 bottom-1/4 translate-y-1/4 left-4 z-50">
-      <button
-        onClick={onClick}
-        disabled={!isAvailable}
-        className={`
+    <button
+      onClick={onClick}
+      disabled={!isAvailable}
+      className={`
         group relative overflow-hidden
         rounded-2xl px-6 py-4
         font-bold text-white
@@ -32,25 +31,24 @@ export function StandButton({ onClick, isAvailable }: Props) {
             `
         }
       `}
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-start leading-none">
-            <span className="text-lg">Stand</span>
-          </div>
+    >
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col items-start leading-none">
+          <span className="text-lg">Stand</span>
         </div>
+      </div>
 
-        {isAvailable && (
-          <div
-            className="
+      {isAvailable && (
+        <div
+          className="
             absolute inset-0
             bg-white/10
             opacity-0
             group-hover:opacity-100
             transition-opacity
           "
-          />
-        )}
-      </button>
-    </div>
+        />
+      )}
+    </button>
   );
 }

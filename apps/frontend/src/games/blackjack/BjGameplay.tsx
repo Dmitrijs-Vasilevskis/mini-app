@@ -1,10 +1,9 @@
-import { HitButton } from "../../components/games/bj/HitButton";
-import { StandButton } from "../../components/games/bj/StandButton";
 import { bjService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { useBjDealer, useBjLocalPlayer } from "./hooks";
 import { DealerHand } from "./scene/DealerHand";
 import { HandCards } from "./scene/HandCards";
+import { ActionButtons } from "./scene/ActionButtons";
 
 export function BjGameplay() {
   const localPlayer = useBjLocalPlayer();
@@ -15,12 +14,12 @@ export function BjGameplay() {
     return null;
   }
 
-  const canTakeAction = currentTurn === localPlayer.id;
+  const isPlayerTurn = currentTurn === localPlayer.id;
   const hasNaturalBlackjack =
     localPlayer.gameData.handValue === 21 &&
     localPlayer.gameData.hand.length === 2;
 
-  const isActionAvailable = canTakeAction && !hasNaturalBlackjack;
+  const canHit = isPlayerTurn && !hasNaturalBlackjack;
 
   const hit = () => {
     bjService.hit();
@@ -34,8 +33,12 @@ export function BjGameplay() {
 
   return (
     <>
-      <StandButton onClick={stand} isAvailable={canTakeAction} />
-      <HitButton onClick={hit} isAvailable={isActionAvailable} />
+      <ActionButtons
+        onHit={hit}
+        onStand={stand}
+        isPlayerTurn={isPlayerTurn}
+        canHit={canHit}
+      />
       <HandCards
         cards={localPlayer.gameData.hand}
         handValue={localPlayer.gameData.handValue}
