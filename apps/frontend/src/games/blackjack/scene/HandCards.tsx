@@ -13,7 +13,7 @@ export function HandCards({ cards, handValue }: Props) {
   const centerIndex = (cards.length - 1) / 2;
 
   return (
-    <div className="absolute bottom-[max(6rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+    <div className="absolute bottom-[max(12rem,env(safe-area-inset-bottom))] landscape:bottom-[max(4rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
       <div className="relative flex justify-center items-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.5, y: 10 }}
