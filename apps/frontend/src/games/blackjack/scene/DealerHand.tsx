@@ -62,7 +62,7 @@ export function DealerHand({ dealer }: Props) {
   const centerIndex = (dealer.hand.length - 1) / 2;
 
   return (
-    <div className="absolute top-[max(10rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+    <div className="absolute top-[max(10rem,env(safe-area-inset-top))] landscape:top-[max(6rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
       <div className="relative flex items-center justify-center">
         <motion.div
           initial={{
