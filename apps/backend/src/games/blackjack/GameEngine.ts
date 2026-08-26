@@ -6,12 +6,14 @@ import { TurnManager } from "./TurnManager";
 import { evaluateHand, HandEvaluation } from "./utils/HandEvaluator";
 import { BlackjackDealerRuntime } from "./BlackjackDealerRuntime";
 import { GameActionScheduler } from "../../game/GameActionScheduler";
-import { BjRoundResult, BjRoundResultType } from "./types";
+import { BjRoundResult, BjRoundResultType, InitialDealTarget } from "./types";
 
 export class BlackjackGameEngine {
     private needsReshuffle = false;
     private dealer = new BlackjackDealerRuntime();
     private readonly scheduler = new GameActionScheduler();
+    private initialDealSequence: InitialDealTarget[] = [];
+    private initialDealIndex = 0;
 
     constructor(
         private room: Room,
@@ -77,68 +79,136 @@ export class BlackjackGameEngine {
             player.isTurn = false;
         });
 
-        // deal initial player hands
-        this.state.playerOrder.forEach((playerId) => {
-            const player = this.state.players.get(playerId);
-            if (!player) return;
-
-            const client = this.room.clients.find(c => c.sessionId === player.id);
-            const bjData = this.getBjData(player);
-
-            for (let i = 0; i < 2; i++) {
-                const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
-                    bjData.hand.push(allocatedCard);
-
-                    if (client?.view) {
-                        client.view.add(allocatedCard);
-                    }
-                });
-
-                if (crossedThreshold) {
-                    this.needsReshuffle = true;
-                };
-            }
-
-            const hand = evaluateHand(bjData.hand);
-            bjData.handValue = hand.value;
-        });
-
-        this.initDealer();
-
-        this.turnManager.assignTurn(this.state.playerOrder[0]);
-        this.state.status = RoomStatus.PLAYING;
+        this.dealInitialCards();
 
         this.room.broadcast("roundHighlight", {
             roundNumber: this.state.roundNumber
         });
     }
 
-    private initDealer() {
+    private dealInitialCards() {
+        this.initialDealSequence = this.createInitialDealSequence();
+        this.initialDealIndex = 0;
+
+        this.dealNextInitialCard();
+    }
+
+    private dealNextInitialCard() {
+        const target = this.initialDealSequence[this.initialDealIndex];
+
+        if (!target) {
+            this.finishInitialDeal()
+            return;
+        }
+
+        if (target.type === "player") {
+            this.dealCardToPlayer(target.playerId);
+        } else {
+            this.dealCardToDealer(target.isFaceDown);
+        }
+
+        this.initialDealIndex++;
+
+        this.scheduler.schedule(
+            BJ_TIMINGS.initialDeal,
+            () => {
+                this.dealNextInitialCard();
+            }
+        );
+    }
+
+    private finishInitialDeal() {
+        this.initialDealSequence = [];
+        this.initialDealIndex = 0;
+
+        const firstPlayerOrder = this.state.playerOrder[0];
+
+        if (firstPlayerOrder) {
+            this.turnManager.assignTurn(firstPlayerOrder);
+        }
+
+        this.state.status = RoomStatus.PLAYING;
+    }
+
+    private createInitialDealSequence(): InitialDealTarget[] {
+        const sequence: InitialDealTarget[] = [];
+
+        // first circle
+        this.state.playerOrder.forEach((playerId) => {
+            sequence.push({
+                type: "player",
+                playerId: playerId
+            });
+        });
+
+        sequence.push({
+            type: "dealer",
+            isFaceDown: false,
+        });
+
+        // second circle
+        this.state.playerOrder.forEach((playerId) => {
+            sequence.push({
+                type: "player",
+                playerId: playerId
+            });
+        });
+
+        sequence.push({
+            type: "dealer",
+            isFaceDown: true,
+        });
+
+        return sequence;
+    }
+
+    private dealCardToPlayer(playerId: string): void {
+        const player = this.state.players.get(playerId);
+        if (!player) return;
+
+        const client = this.room.clients.find(c => c.sessionId === player.id);
+        const bjData = this.getBjData(player);
+
+        const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
+            bjData.hand.push(allocatedCard);
+
+            if (client?.view) {
+                client.view.add(allocatedCard);
+            }
+        });
+
+        if (crossedThreshold) {
+            this.needsReshuffle = true;
+        };
+
+        const hand = evaluateHand(bjData.hand);
+        bjData.handValue = hand.value;
+    }
+
+    private dealCardToDealer(isFaceDown: boolean): void {
         const bjState = this.getBjState();
 
-        for (let i = 0; i < 2; i++) {
-            const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
-                allocatedCard.isFaceDown = (i === 1);
+        const { crossedThreshold } = this.deckManager.drawCard((allocatedCard: BjCard) => {
+            allocatedCard.isFaceDown = isFaceDown;
 
-                this.dealer.hand.push(allocatedCard);
+            this.dealer.hand.push(allocatedCard);
 
-                const dealerCard = new BjDealerPublicCard();
+            const dealerCard = new BjDealerPublicCard();
 
-                dealerCard.id = allocatedCard.id;
-                dealerCard.isFaceDown = allocatedCard.isFaceDown;
+            dealerCard.id = allocatedCard.id;
+            dealerCard.isFaceDown = allocatedCard.isFaceDown;
 
-                if (!allocatedCard.isFaceDown) {
-                    dealerCard.suit = allocatedCard.suit;
-                    dealerCard.rank = allocatedCard.rank;
-                    dealerCard.value = allocatedCard.value;
-                }
-
-                bjState.bjDealer.hand.push(dealerCard);
-            });
-
-            if (crossedThreshold) {
-                this.needsReshuffle = true;
+            if (!allocatedCard.isFaceDown) {
+                dealerCard.suit = allocatedCard.suit;
+                dealerCard.rank = allocatedCard.rank;
+                dealerCard.value = allocatedCard.value;
             }
+
+            bjState.bjDealer.hand.push(dealerCard);
+        });
+
+        if (crossedThreshold) {
+            this.needsReshuffle = true;
         }
 
         const hand = evaluateHand(this.dealer.hand);

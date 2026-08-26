@@ -10,3 +10,13 @@ export interface BjRoundResult {
     result: BjRoundResultType;
     points: number;
 }
+
+export type InitialDealTarget =
+    | {
+        type: "player";
+        playerId: string;
+    }
+    | {
+        type: "dealer";
+        isFaceDown: boolean;
+    };

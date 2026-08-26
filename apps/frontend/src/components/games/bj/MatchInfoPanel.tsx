@@ -33,7 +33,7 @@ export function MatchInfoPanel({
         className="
         absolute z-30 top-4 left-1/2 -translate-x-1/2 flex flex-row items-center gap-4
         landscape:top-2 landscape:left-4 landscape:translate-x-0
-        landscape:flex-col landscape:items-start landscape:gap-2
+        landscape:flex-col landscape:items-start landscape:gap-1
         "
       >
         {players.map((player, index) => {
@@ -42,7 +42,7 @@ export function MatchInfoPanel({
           return (
             <div
               key={player.id}
-              className="flex items-center gap-3 text-xs landscape:rounded-lg landscape:px-3 landscape:py-1.5 landscape:backdrop-blur-sm landscape:bg-white/15"
+              className="flex items-center text-xs landscape:rounded-lg landscape:px-1.5 landscape:py-1 landscape:backdrop-blur-sm landscape:bg-white/15"
             >
               <div
                 className={
