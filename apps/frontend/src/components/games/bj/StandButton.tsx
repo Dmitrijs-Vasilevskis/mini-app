@@ -12,7 +12,7 @@ export function StandButton({ onClick, isAvailable }: Props) {
         backdrop-blur-md border border-white/10 shadow-2xl transition-all duration-150 active:scale-95
         ${
           isAvailable
-            ? `bg-yellow-500/90 hover:bg-yellow-400 hover:scale-105 hover:shadow-yellow-500/30`
+            ? `bg-amber-500/90 hover:bg-amber-400 hover:scale-105 hover:shadow-amber-500/30`
             : `bg-gray-700/70 opacity-50 cursor-not-allowed`
         }
       `}
