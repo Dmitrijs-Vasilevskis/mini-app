@@ -372,7 +372,6 @@ export class BlackjackGameEngine {
         });
     }
 
-
     private finalizeRound() {
         const bjState = this.getBjState();
         const dealerHand = evaluateHand(this.dealer.hand);

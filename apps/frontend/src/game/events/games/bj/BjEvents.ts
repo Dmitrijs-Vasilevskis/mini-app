@@ -31,8 +31,6 @@ export function BjEvents(
             });
         }),
         room.onMessage("dealerBust", () => {
-            console.log(">> dealerBust");
-            
             effects.addEffect({
                 text: "DEALER BUST!",
                 color: "#ef4444",
@@ -40,8 +38,6 @@ export function BjEvents(
             });
         }),
         room.onMessage("dealerBlackjack", () => {
-            console.log(">> dealerBlackjack");
-
             effects.addEffect({
                 text: "DEALER BLACKJACK",
                 color: "#facc15",
