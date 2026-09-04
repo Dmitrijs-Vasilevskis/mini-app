@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function PlayerModel({
-  avatarId = "astronaut",
+  avatarId,
   animationQueue = [],
 }: Props) {
   const avatar = AVATARS[avatarId];

@@ -25,7 +25,7 @@ export function PlayerAvatar({
   isConnected = true,
   showName = true,
   showTurnIndicator = true,
-  avatarId,
+  avatarId = "astronaut",
   ...props
 }: Props) {
   const animationQueue = usePlayerAnimationStore(
