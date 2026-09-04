@@ -1,5 +1,5 @@
-import { useUnoLocalPlayer } from "../../games/uno/hooks";
-import { unoService } from "../../services/colyseus/";
+import { useUnoLocalPlayer } from "../../../games/uno/hooks";
+import { unoService } from "../../../services/colyseus";
 import { ReactionButton } from "./ReactionButton";
 
 export function UnoButton() {

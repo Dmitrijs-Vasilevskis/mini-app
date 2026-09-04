@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue } from "framer-motion";
-import { Card } from "../card/Card";
-import type { CardDTO } from "../../types/game";
-import { useAnimationStore } from "../../store/animationStore";
-import { unoService } from "../../services/colyseus/";
+import { Card } from "../../../card/Card";
+import type { CardDTO } from "../../../../types/game";
+import { useAnimationStore } from "../../../../store/animationStore";
+import { unoService } from "../../../../services/colyseus";
+import { usePlayerAnimationStore } from "../../../../store/playerAnimationStore";
 
 type Props = {
+  playerId: string;
   cards: CardDTO[];
   isPlayable: (card: CardDTO) => boolean;
   onWildCard: (card: CardDTO) => void;
@@ -13,6 +15,7 @@ type Props = {
 };
 
 export function LandscapeHandCards({
+  playerId,
   cards,
   isPlayable,
   onWildCard,
@@ -87,7 +90,13 @@ export function LandscapeHandCards({
       },
     });
 
-    unoService.playCard(card.id);
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(playerId, "Hit", actionId);
+
+    unoService.playCard(card.id, actionId);
     setSelectedCardId(null);
   };
 

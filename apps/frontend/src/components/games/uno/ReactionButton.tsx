@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   generateRandomButtonPosition,
   type ButtonPosition,
-} from "../../game/Helpers";
+} from "../../../game/Helpers";
 
 interface ReactionButtonProps {
   visible: boolean;

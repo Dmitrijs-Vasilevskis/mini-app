@@ -1,24 +1,28 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { UnoDrawPile } from "./UnoDrawPile";
-import { UnoDiscardPile } from "./UnoDiscardPile";
-import { AvatarPlayer } from "../player/AvatarPlayer";
-import { useGameStore } from "../../store/gameStore";
-import { DirectionIndicator } from "./DirectionIndicator";
-import { useUnoLocalPlayer, useUnoPlayers } from "../../games/uno/hooks";
+import { UnoDrawPile } from "../../../components/table/UnoDrawPile";
+import { UnoDiscardPile } from "../../../components/table/UnoDiscardPile";
+import { useGameStore } from "../../../store/gameStore";
+import { DirectionIndicator } from "../../../components/table/DirectionIndicator";
+import { useUnoLocalPlayer, useUnoPlayers } from "../hooks";
+import { UnoPlayerAvatar } from "../../../components/games/uno/player/UnoPlayerAvatar";
 
 const SEAT_POSITIONS = [
   {
-    position: [0, 0.5, -5],
-    rotation: [0, 0, 0],
+    position: [0, -0.5, 5] as [number, number, number],
+    rotation: [0, Math.PI, 0] as [number, number, number],
   },
   {
-    position: [5, 0.5, 0],
-    rotation: [0, -Math.PI / 2, 0],
+    position: [0, -0.5, -5] as [number, number, number],
+    rotation: [0, 0, 0] as [number, number, number],
   },
   {
-    position: [-5, 0.5, 0],
-    rotation: [0, Math.PI / 2, 0],
+    position: [5, -0.5, 0] as [number, number, number],
+    rotation: [0, -Math.PI / 2, 0] as [number, number, number],
+  },
+  {
+    position: [-5, -0.5, 0] as [number, number, number],
+    rotation: [0, Math.PI / 2, 0] as [number, number, number],
   },
 ];
 
@@ -32,7 +36,8 @@ export function UnoTable3D() {
     return null;
   }
 
-  const otherPlayers = players.filter((p) => p.id !== localPlayer.id);
+  const opponents = players.filter((p) => p.id !== localPlayer.id);
+  const seatedPlayers = [localPlayer, ...opponents];
 
   return (
     <Canvas
@@ -68,32 +73,23 @@ export function UnoTable3D() {
 
       <DirectionIndicator direction={direction} />
 
-      <AvatarPlayer
-        position={[0, 0.5, 5]}
-        rotation={[0, Math.PI, 0]}
-        active={currentTurn === localPlayer.id}
-        name={localPlayer?.name || "You"}
-        playerId={localPlayer.id}
-        cardCount={localPlayer.gameData.handCount}
-        photoUrl={localPlayer.photoUrl}
-      />
-
-      {otherPlayers.map((player, index) => {
+      {seatedPlayers.map((player, index) => {
         const seat = SEAT_POSITIONS[index];
 
         if (!seat) return null;
 
         return (
-          <AvatarPlayer
-            name={player.name}
+          <UnoPlayerAvatar
+            position={seat.position}
+            rotation={seat.rotation}
+            key={player.id}
             playerId={player.id}
-            photoUrl={player.photoUrl}
+            name={player.name}
             active={currentTurn === player.id}
-            position={seat.position as [number, number, number]}
-            rotation={seat.rotation as [number, number, number]}
+            isConnected={player.isConnected}
             cardCount={player.gameData.handCount}
             showCardsCount={true}
-            isConnected={player.isConnected}
+            avatarId="astronaut"
           />
         );
       })}

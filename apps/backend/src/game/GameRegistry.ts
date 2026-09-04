@@ -17,7 +17,7 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
     uno: {
         createGameState: () => new UnoGameState(),
         createPlayerData: () => new UnoPlayerData(),
-        createEngine: (room, state) => {
+        createEngine: (room, state, eventBus) => {
             const { DeckManager } = require("../games/uno/DeckManager");
             const { TurnManager } = require("../games/uno/TurnManager");
 
@@ -29,15 +29,16 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
                 state,
                 deckManager,
                 turnManager,
+                eventBus
             );
         },
         setupMessages: (room, engine) => {
-            room.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color }) => {
-                engine.playCard(client.sessionId, payload.cardId, payload.chosenColor);
+            room.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color, actionId: string }) => {
+                engine.playCard(client.sessionId, payload.cardId, payload.chosenColor, payload.actionId);
             });
 
-            room.onMessage('drawCard', (client) => {
-                engine.drawCard(client.sessionId);
+            room.onMessage('drawCard', (client, payload: { actionId: string }) => {
+                engine.drawCard(client.sessionId, payload.actionId);
             });
 
             room.onMessage('challengeUno', (client) => {
@@ -84,11 +85,11 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
             );
         },
         setupMessages: (room, engine) => {
-            room.onMessage('stand', (client, payload: {actionId: string}) => {
+            room.onMessage('stand', (client, payload: { actionId: string }) => {
                 engine.handlePlayerStand(client.sessionId, payload.actionId);
             });
 
-            room.onMessage('hit', (client, payload: {actionId: string}) => {
+            room.onMessage('hit', (client, payload: { actionId: string }) => {
                 engine.handlePlayerHit(client.sessionId, payload.actionId);
             });
         },
