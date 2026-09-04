@@ -89,7 +89,7 @@ export function UnoTable3D() {
             isConnected={player.isConnected}
             cardCount={player.gameData.handCount}
             showCardsCount={true}
-            avatarId="astronaut"
+            avatarId={player.avatarId}
           />
         );
       })}

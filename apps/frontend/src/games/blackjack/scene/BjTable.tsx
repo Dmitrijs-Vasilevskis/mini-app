@@ -96,7 +96,7 @@ export function BjTable() {
             rotation={seat.rotation}
             active={currentTurn === player.id}
             isConnected={player.isConnected}
-            avatarId="astronaut"
+            avatarId={player.avatarId}
           />
         );
       })}
