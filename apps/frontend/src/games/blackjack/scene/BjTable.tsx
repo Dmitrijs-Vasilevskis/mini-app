@@ -4,6 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import { OvalTable } from "../../../components/games/bj/table/OvalTable";
 import { PlayerAvatar } from "../../../components/player/PlayerAvatar";
 import { useGameStore } from "../../../store/gameStore";
+import { DealerAvatar } from "../../../components/games/bj/dealer/DealerAvatar";
 
 const PLAYER_SEATS = [
   {
@@ -75,11 +76,10 @@ export function BjTable() {
       {/* Table */}
       <OvalTable />
 
-      <PlayerAvatar
+      <DealerAvatar
         name="Dealer"
         position={DEALER_SEAT.position}
         rotation={DEALER_SEAT.rotation}
-        modelScale={1}
       />
 
       {seatedPlayers.map((player, index) => {
@@ -90,11 +90,13 @@ export function BjTable() {
         return (
           <PlayerAvatar
             key={player.id}
+            playerId={player.id}
             name={player.name}
             position={seat.position}
             rotation={seat.rotation}
             active={currentTurn === player.id}
             isConnected={player.isConnected}
+            avatarId="astronaut"
           />
         );
       })}

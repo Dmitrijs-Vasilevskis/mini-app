@@ -3,27 +3,34 @@ import type { ThreeElements } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
-import { PlayerModel } from "./PlayerModel";
 import { LostConnectionIcon } from "../uno/connection/LostConnectionIcon";
+import { PlayerModel } from "./PlayerModel";
+import type { AvatarId } from "@uno/shared";
+import { usePlayerAnimationStore } from "../../store/playerAnimationStore";
 
 type Props = ThreeElements["group"] & {
   name: string;
+  playerId: string;
   active?: boolean;
   isConnected?: boolean;
   showName?: boolean;
   showTurnIndicator?: boolean;
-  modelScale?: number;
+  avatarId?: AvatarId;
 };
 
 export function PlayerAvatar({
   name,
+  playerId,
   active = false,
   isConnected = true,
   showName = true,
   showTurnIndicator = true,
-  modelScale = 1,
+  avatarId,
   ...props
 }: Props) {
+  const animationQueue = usePlayerAnimationStore(
+    (state) => state.animationQueues[playerId]
+  );
   const animatedGroupRef = useRef<Group>(null);
   const textRef = useRef<Group>(null);
 
@@ -69,10 +76,12 @@ export function PlayerAvatar({
       )}
 
       <group ref={animatedGroupRef}>
-        <group scale={modelScale}>
-          <PlayerModel />
-        </group>
+        <PlayerModel
+          avatarId={avatarId}
+          animationQueue={animationQueue}
+        />
       </group>
+
       {showName && (
         <group ref={textRef} position={[0, 2.1, 0]}>
           <Text
