@@ -1,4 +1,4 @@
-import type { GameType, RoomStatus } from "@uno/shared";
+import type { AvatarId, GameType, RoomStatus } from "@uno/shared";
 import type { StateCreator } from "zustand";
 import type { UnoSlice } from "./slices/unoSlice";
 import type { BjSlice } from "./slices/bjSlice";
@@ -59,6 +59,7 @@ export interface BasePlayerDTO<TGameData = unknown> {
     isTurn: boolean;
     isReady: boolean;
     isConnected: boolean;
+    avatarId: AvatarId;
     gameData: TGameData;
 }
 

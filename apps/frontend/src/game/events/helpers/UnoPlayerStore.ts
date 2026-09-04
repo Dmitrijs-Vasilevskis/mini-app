@@ -10,6 +10,7 @@ export type BasePlayerUpdate = Partial<
         | "isReady"
         | "isConnected"
         | "photoUrl"
+        | "avatarId"
     >
 >;
 
