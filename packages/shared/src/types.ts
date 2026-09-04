@@ -1,4 +1,5 @@
-import { Schema, type, MapSchema, ArraySchema, view } from "@colyseus/schema";
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
+import { AvatarId } from "./avatar/playerAvatar";
 
 export enum GameType {
   UNO = "uno",
@@ -14,6 +15,7 @@ export class Player extends Schema {
   @type("string") connectionId: string = "";
   @type("string") name: string = "";
   @type("string") photoUrl: string = "";
+  @type("string") avatarId: AvatarId = "astronaut";
   @type("number") score: number = 0;
   @type("boolean") isConnected: boolean = true;
   @type("number") disconnectedAt: number = 0;

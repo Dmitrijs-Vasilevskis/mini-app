@@ -1,4 +1,4 @@
-import type { GameType } from "@uno/shared";
+import type { AvatarId, GameType } from "@uno/shared";
 import { ColyseusService } from "./ColyseusService";
 
 export class RoomService {
@@ -22,5 +22,9 @@ export class RoomService {
 
     sendEmote(emoteId: string) {
         this.colyseus.send("sendEmote", { emoteId });
+    }
+
+    changeAvatar(avatarId: AvatarId) {
+        this.colyseus.send("changeAvatar", { avatarId });
     }
 }

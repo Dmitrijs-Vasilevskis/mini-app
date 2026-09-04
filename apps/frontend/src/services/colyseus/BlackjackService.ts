@@ -7,11 +7,11 @@ export class BlackjackService {
         this.colyseus = colyseus;
     }
 
-    stand() {
-        this.colyseus.send("stand");
+    stand(actionId: string) {
+        this.colyseus.send("stand", { actionId });
     }
 
-    hit() {
-        this.colyseus.send("hit");
+    hit(actionId: string) {
+        this.colyseus.send("hit", { actionId });
     }
 }

@@ -4,6 +4,7 @@ import { useBjDealer, useBjLocalPlayer } from "./hooks";
 import { DealerHand } from "./scene/DealerHand";
 import { HandCards } from "./scene/HandCards";
 import { ActionButtons } from "./scene/ActionButtons";
+import { usePlayerAnimationStore } from "../../store/playerAnimationStore";
 
 export function BjGameplay() {
   const localPlayer = useBjLocalPlayer();
@@ -22,11 +23,23 @@ export function BjGameplay() {
   const canHit = isPlayerTurn && !hasNaturalBlackjack;
 
   const hit = () => {
-    bjService.hit();
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(localPlayer.id, "Hit", actionId);
+
+    bjService.hit(actionId);
   };
 
   const stand = () => {
-    bjService.stand();
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(localPlayer.id, "No", actionId);
+
+    bjService.stand(actionId);
   };
 
   return (

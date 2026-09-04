@@ -1,47 +1,27 @@
-import { Clone, useAnimations, useGLTF } from "@react-three/drei";
-import { useEffect, useRef } from "react";
-import type { Group } from "three";
+import { useGLTF } from "@react-three/drei";
+import type { AvatarId } from "@uno/shared";
+import { AVATARS } from "../../game/avatar/avatar.config";
+import { AvatarModelInstance } from "../../game/avatar/AvatarModelInstance";
+import type { PlayerAnimationEvent } from "../../store/playerAnimationStore";
 
-export type PlayerAnimation =
-  | "Idle"
-  | "Death"
-  | "Hit"
-  | "No"
-  | "Wave"
-  | "Yes";
+type Props = {
+  avatarId: AvatarId;
+  animationQueue?: PlayerAnimationEvent[];
+};
 
-  type Props = {
-    animation?: PlayerAnimation;
-    animationKey?: number;
-  };
-
-export function PlayerModel({ animation = "Idle" }: Props) {
-  const groupRef = useRef<Group>(null);
-  const { scene, animations } = useGLTF("/models/player/astronaut.glb");
-  const { actions, names } = useAnimations(animations, groupRef);
-
-  useEffect(() => {
-    console.log("Available animations:", names);
-
-    const action = actions[animation];
-
-    if (!action) {
-      console.warn(`Animation "${animation}" not found`);
-      return;
-    }
-
-    action.reset().fadeIn(0.2).play();
-
-    return () => {
-      action.fadeOut(0.2);
-    };
-  }, [actions, animation]);
+export function PlayerModel({
+  avatarId,
+  animationQueue = [],
+}: Props) {
+  const avatar = AVATARS[avatarId];
+  useGLTF.preload(avatar.modelPath);
 
   return (
-    <group ref={groupRef}>
-      <Clone object={scene} />
+    <group scale={avatar.scale}>
+      <AvatarModelInstance
+        avatar={avatar}
+        animationQueue={animationQueue}
+      />
     </group>
   );
 }
-
-useGLTF.preload("/models/player/astronaut.glb");
