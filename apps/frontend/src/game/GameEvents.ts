@@ -4,9 +4,9 @@ import { RegisterBasePlayerEvents } from './events/base/player/BasePlayerEvents'
 import { RegisterRoomEvents } from './events/base/room/RoomEvents';
 import type { GameRoom } from './events/types';
 import { RegisterPauseEvents } from './events/base/messages/PauseEvents';
-import { RegisterEmoteEvents } from './events/base/messages/EmotesEvents';
 import { RegisterGameLifecycleEvents } from './events/lifecycle/GameLifecycleEvents';
 import { RegisterGameModuleEvents } from './events/lifecycle/GameModuleEvents';
+import { RegisterPlayerPresentationEvents } from './events/base/messages/PlayerPresentationEvents';
 
 export class GameEvents {
     private static currentRoom: GameRoom | null = null;
@@ -21,7 +21,7 @@ export class GameEvents {
         RegisterRoomEvents(this.currentRoom, $);
         RegisterGameLifecycleEvents(this.currentRoom);
         RegisterPauseEvents(this.currentRoom, $);
-        RegisterEmoteEvents(this.currentRoom);
+        RegisterPlayerPresentationEvents(this.currentRoom);
         RegisterGameModuleEvents(this.currentRoom, $);
     }
 
