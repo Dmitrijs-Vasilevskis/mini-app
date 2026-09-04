@@ -14,10 +14,10 @@ export function CardFan({ count, fanColor }: Props) {
         return (
           <mesh
             key={i}
-            position={[offset * 0.08, 1.05, 0.5]}
-            rotation={[0.6, 0, offset * -0.12]}
+            position={[offset * 0.12, 1.05, 0.5]}
+            rotation={[0.8, 0.12, offset * -0.16]}
           >
-            <boxGeometry args={[0.22, 0.32, 0.02]} />
+            <boxGeometry args={[0.44, 0.64, 0.04]} />
             <meshStandardMaterial
               color={fanColor}
               emissive={fanColor}
