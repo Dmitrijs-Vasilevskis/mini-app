@@ -1,3 +1,4 @@
+import type { AvatarId } from "@uno/shared";
 import { useEffectStore } from "../../../../store/effectsStore";
 import { updatePlayerState, type BasePlayerUpdate } from "../../helpers/UnoPlayerStore";
 import type { GameRoom, PlayerSchema, StateCallbacks } from "../../types";
@@ -62,4 +63,8 @@ export function BasePlayerListeners(
             }
         }
     );
+
+    $(player).listen("avatarId", (avatarId: AvatarId) => {
+        update({ avatarId });
+    })
 }

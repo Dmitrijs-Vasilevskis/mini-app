@@ -6,7 +6,7 @@ import { LobbyHeader } from "../../components/lobby/LobbyHeader";
 import { LobbyPlayers } from "../../components/lobby/LobbyPlayers";
 import { LobbyModal } from "../../components/lobby/LobbyModal";
 import { roomService } from "../../services/colyseus/";
-import type { GameType } from "@uno/shared";
+import type { AvatarId, GameType } from "@uno/shared";
 
 export function LobbyScreen() {
   const roomCode = useGameStore((s) => s.roomCode);
@@ -35,6 +35,10 @@ export function LobbyScreen() {
       console.error("Failed to copy link", err);
     }
   };
+
+  const handleSelectAvatar = (avatarId: AvatarId) => {
+    roomService.changeAvatar(avatarId);
+  }
 
   const handleSelectGame = (selectedGame: GameType) => {
     console.log("Selected game:", selectedGame);
@@ -81,6 +85,8 @@ export function LobbyScreen() {
         isHost={isHost}
         onClose={() => handleToggleModal()}
         onSelectGame={handleSelectGame}
+        selectedAvatar={localPlayer?.avatarId ?? "astronaut"}
+        onSelectAvatar={handleSelectAvatar}
       />
     </div>
   );

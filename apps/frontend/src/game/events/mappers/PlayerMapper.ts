@@ -10,6 +10,7 @@ export function mapPlayer(player: PlayerSchema): BasePlayerDTO {
         isReady: player.isReady,
         score: player.score,
         photoUrl: player.photoUrl,
+        avatarId: player.avatarId,
         gameData: player.gameData,
     };
 }
