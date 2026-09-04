@@ -3,8 +3,10 @@ import type { CardDTO } from "../../../types/game";
 import { useAnimationStore } from "../../../store/animationStore";
 import { unoService } from "../../../services/colyseus";
 import { Card } from "../../../components/card/Card";
+import { usePlayerAnimationStore } from "../../../store/playerAnimationStore";
 
 type Props = {
+  playerId: string;
   cards: CardDTO[];
   isPlayable: (card: CardDTO) => boolean;
   onWildCard: (card: CardDTO) => void;
@@ -13,6 +15,7 @@ type Props = {
 };
 
 export function HandCards({
+  playerId,
   cards,
   isPlayable,
   onWildCard,
@@ -49,7 +52,13 @@ export function HandCards({
       },
     });
 
-    unoService.playCard(card.id);
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(playerId, "Hit", actionId);
+
+    unoService.playCard(card.id, actionId);
     setSelectedCardId(null);
   };
 

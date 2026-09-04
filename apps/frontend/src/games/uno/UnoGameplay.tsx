@@ -82,6 +82,7 @@ export function UnoGameplay() {
 
       {isLandscape ? (
         <HandCards
+          playerId={localPlayer.id}
           cards={localPlayer.gameData.hand}
           onWildCard={onWilCard}
           isPlayable={isPlayable}
@@ -90,6 +91,7 @@ export function UnoGameplay() {
         />
       ) : (
         <LandscapeHandCards
+          playerId={localPlayer.id}
           cards={localPlayer.gameData.hand}
           isPlayable={isPlayable}
           setSelectedCardId={setSelectedCardId}
