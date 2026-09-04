@@ -1,14 +1,18 @@
 import { Client, CloseCode, Room } from "@colyseus/core";
 import { TelegramAuthUser, validateTelegramInitData } from "../auth/telegram";
-import { GameState, GameType, Player, RoomOptions, RoomStatus } from "@uno/shared";
+import { AvatarId, GameState, GameType, Player, RoomOptions, RoomStatus } from "@uno/shared";
 import { StateView } from "@colyseus/schema";
 import { assertRoomCapacity, hasRoomCode, registerRoom, unregisterRoom } from "../utils/roomRegistry";
 import { ALLOWED_EMOTE_IDS, MAX_CLIENTS, ROOM_CODE_MAX_GENERATION_ATTEMPTS } from "../game/constants";
 import { generateUniqueRoomCode } from "../utils/roomCode";
 import { GAME_REGISTRY } from "../game/GameRegistry";
+import { GameEventBus } from "../game/event/GameEventBus";
+import { GameEventBroadcaster } from "../game/event/GameEventBroadcaster";
 
 export class GameLobbyRoom extends Room<RoomOptions> {
     private gameEngine!: any;
+    private gameEventBus!: GameEventBus;
+    private gameEventBroadcaster!: GameEventBroadcaster;
     private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
 
     onCreate(options: { gameType?: GameType }) {
@@ -34,6 +38,14 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
         this.state.roomCode = roomCode;
         this.setMetadata({ ...this.metadata, roomCode });
+
+        this.gameEventBus = new GameEventBus();
+        this.gameEventBroadcaster = new GameEventBroadcaster(
+            this.gameEventBus,
+            this
+        );
+
+        this.gameEventBroadcaster.start();
 
         this.onMessage('selectGame', (client, payload: { gameType: GameType }) => {
             if (client.sessionId !== this.state.hostId) return;
@@ -66,11 +78,19 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
         this.onMessage('sendEmote', (client, payload: { emoteId: string }) => {
             if (!payload?.emoteId || !ALLOWED_EMOTE_IDS.has(payload.emoteId)) return;
-            this.broadcast('onEmoteReceived', {
-                senderId: client.sessionId,
-                emoteId: payload.emoteId
+
+            this.gameEventBus.emit({
+                type: "player.emote",
+                playerId: client.sessionId,
+                emote: payload.emoteId,
             });
         });
+
+        this.onMessage('changeAvatar', (client, payload: { avatarId: AvatarId }) => {
+            const player = this.state.players.get(client.sessionId);
+
+            if (player) player.avatarId = payload.avatarId;
+        })
     }
 
     async onAuth(client: Client, options: { initData: string }) {
@@ -195,7 +215,13 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
     onDispose() {
         unregisterRoom(this.state.roomCode);
-        if (this.gameEngine) this.gameEngine.dispose();
+
+        this.gameEventBus?.clear();
+        this.gameEventBroadcaster?.stop();
+
+        if (this.gameEngine) {
+            this.gameEngine.dispose();
+        }
     }
 
     private handleStartGame(playerId: string) {
@@ -211,7 +237,11 @@ export class GameLobbyRoom extends Room<RoomOptions> {
 
         this.state.gameState = gameConfig.createGameState();
 
-        this.gameEngine = gameConfig.createEngine(this, this.state);
+        this.gameEngine = gameConfig.createEngine(
+            this,
+            this.state,
+            this.gameEventBus
+        );
         gameConfig.setupMessages(this, this.gameEngine);
 
         this.state.status = RoomStatus.PLAYING;

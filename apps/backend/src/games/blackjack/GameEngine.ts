@@ -1,5 +1,5 @@
 import { Room } from "@colyseus/core";
-import { GameState, BjCard, RoomStatus, Player, BjPlayerData, BjGameState, BjDealerPublicCard } from '@uno/shared';
+import { GameState, BjCard, RoomStatus, Player, BjPlayerData, BjGameState, BjDealerPublicCard, GameEventInput } from '@uno/shared';
 import { BJ_TIMINGS, MATCH_WINNING_SCORE } from "./constants";
 import { DeckManager } from "./DeckManager";
 import { TurnManager } from "./TurnManager";
@@ -7,6 +7,7 @@ import { evaluateHand, HandEvaluation } from "./utils/HandEvaluator";
 import { BlackjackDealerRuntime } from "./BlackjackDealerRuntime";
 import { GameActionScheduler } from "../../game/GameActionScheduler";
 import { BjRoundResult, BjRoundResultType, InitialDealTarget } from "./types";
+import { GameEventBus } from "../../game/event/GameEventBus";
 
 export class BlackjackGameEngine {
     private needsReshuffle = false;
@@ -20,6 +21,7 @@ export class BlackjackGameEngine {
         private state: GameState,
         private deckManager: DeckManager,
         private turnManager: TurnManager,
+        private eventBus: GameEventBus
     ) { }
 
     private getBjState(): BjGameState {
@@ -217,7 +219,7 @@ export class BlackjackGameEngine {
         bjState.bjDealer.handValue = hand.value;
     }
 
-    handlePlayerHit(playerId: string) {
+    handlePlayerHit(playerId: string, actionId: string) {
         const player = this.state.players.get(playerId);
 
         if (!player || !player.isTurn) return;
@@ -241,15 +243,28 @@ export class BlackjackGameEngine {
         const hand = evaluateHand(bjData.hand);
         bjData.handValue = hand.value;
 
+        this.eventBus.emit({
+            type: "player.animation",
+            playerId,
+            animation: "Hit",
+            actionId
+        });
+
         if (hand.isBust) {
             player.isTurn = false;
             bjData.blackjackStood = true;
+
+            this.eventBus.emit({
+                type: "player.animation",
+                playerId,
+                animation: "Death"
+            });
 
             this.moveToNextTurn();
         }
     }
 
-    handlePlayerStand(playerId: string) {
+    handlePlayerStand(playerId: string, actionId: string) {
         const player = this.state.players.get(playerId);
 
         if (!player || !player.isTurn) return;
@@ -258,6 +273,13 @@ export class BlackjackGameEngine {
 
         player.isTurn = false;
         bjData.blackjackStood = true;
+
+        this.eventBus.emit({
+            type: "player.animation",
+            playerId,
+            animation: "No",
+            actionId
+        });
 
         this.moveToNextTurn();
     }
@@ -489,4 +511,4 @@ export class BlackjackGameEngine {
             this.room.broadcast("dealerBlackjack");
         }
     }
-}
+}   

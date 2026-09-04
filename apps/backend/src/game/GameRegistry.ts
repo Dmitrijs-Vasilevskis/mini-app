@@ -2,11 +2,12 @@ import { BaseGameState, BasePlayerData, BjGameState, BjPlayerData, Color, GameSt
 import { Room } from "@colyseus/core";
 import { UnoGameEngine } from "../games/uno/GameEngine";
 import { BlackjackGameEngine } from "../games/blackjack/GameEngine";
+import { GameEventBus } from "./event/GameEventBus";
 
 export interface GameDefinition {
     createGameState: () => BaseGameState;
     createPlayerData: () => BasePlayerData;
-    createEngine: (room: Room, state: GameState) => void;
+    createEngine: (room: Room, state: GameState, eventBus: GameEventBus) => void;
     setupMessages: (room: Room, engine: any) => void;
     syncView?: (client: any, player: any) => void;
     onSessionIdSwapped?: (state: GameState, oldId: string, newId: string) => void;
@@ -23,7 +24,12 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
             const deckManager = new DeckManager(state);
             const turnManager = new TurnManager(state);
 
-            return new UnoGameEngine(room, state, deckManager, turnManager)
+            return new UnoGameEngine(
+                room,
+                state,
+                deckManager,
+                turnManager,
+            );
         },
         setupMessages: (room, engine) => {
             room.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color }) => {
@@ -62,22 +68,28 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
     blackjack: {
         createGameState: () => new BjGameState(),
         createPlayerData: () => new BjPlayerData(),
-        createEngine: (room, state) => {
+        createEngine: (room, state, eventBus) => {
             const { DeckManager } = require("../games/blackjack/DeckManager");
             const { TurnManager } = require("../games/blackjack/TurnManager");
 
             const deckManager = new DeckManager(state);
             const turnManager = new TurnManager(state);
 
-            return new BlackjackGameEngine(room, state, deckManager, turnManager);
+            return new BlackjackGameEngine(
+                room,
+                state,
+                deckManager,
+                turnManager,
+                eventBus
+            );
         },
         setupMessages: (room, engine) => {
-            room.onMessage('stand', (client) => {
-                engine.handlePlayerStand(client.sessionId);
+            room.onMessage('stand', (client, payload: {actionId: string}) => {
+                engine.handlePlayerStand(client.sessionId, payload.actionId);
             });
 
-            room.onMessage('hit', (client) => {
-                engine.handlePlayerHit(client.sessionId);
+            room.onMessage('hit', (client, payload: {actionId: string}) => {
+                engine.handlePlayerHit(client.sessionId, payload.actionId);
             });
         },
         syncView: (client, player) => {
