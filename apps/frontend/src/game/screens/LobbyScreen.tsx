@@ -85,7 +85,7 @@ export function LobbyScreen() {
         isHost={isHost}
         onClose={() => handleToggleModal()}
         onSelectGame={handleSelectGame}
-        selectedAvatar={localPlayer.avatarId || "astronaut"}
+        selectedAvatar={localPlayer?.avatarId ?? "astronaut"}
         onSelectAvatar={handleSelectAvatar}
       />
     </div>
