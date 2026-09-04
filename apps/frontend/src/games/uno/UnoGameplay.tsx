@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { ChallengeUnoButton } from "../../components/uno/ChallengeUnoButton";
-import { DrawButton } from "../../components/uno/DrawButton";
-import { HandCards } from "../../components/uno/HandCards";
-import { LandscapeHandCards } from "../../components/uno/LandscapeHandCards";
-import { UnoButton } from "../../components/uno/UnoButton";
-import { UnoWildColorPicker } from "../../components/uno/UnoWildColorPicker";
+import { ChallengeUnoButton } from "../../components/games/uno/ChallengeUnoButton";
+import { DrawButton } from "../../components/games/uno/DrawButton";
+import { LandscapeHandCards } from "../../components/games/uno/card/LandscapeHandCards";
 import { useGameContext } from "../../providers/game/GameProvider";
 import type { CardDTO } from "../../types/game";
 import {
@@ -15,6 +12,9 @@ import {
 import type { Color } from "@uno/shared";
 import { unoService } from "../../services/colyseus/";
 import { useGameStore } from "../../store/gameStore";
+import { UnoButton } from "../../components/games/uno/UnoButton";
+import { HandCards } from "./hud/HandCards";
+import { UnoWildColorPicker } from "../../components/games/uno/UnoWildColorPicker";
 
 export function UnoGameplay() {
   const { isLandscape } = useGameContext();

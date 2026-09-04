@@ -1,9 +1,9 @@
 import { bjService } from "../../services/colyseus";
 import { useGameStore } from "../../store/gameStore";
 import { useBjDealer, useBjLocalPlayer } from "./hooks";
-import { DealerHand } from "./scene/DealerHand";
-import { HandCards } from "./scene/HandCards";
-import { ActionButtons } from "./scene/ActionButtons";
+import { DealerHand } from "./hud/DealerHand";
+import { HandCards } from "./hud/HandCards";
+import { ActionButtons } from "./hud/ActionButtons";
 import { usePlayerAnimationStore } from "../../store/playerAnimationStore";
 
 export function BjGameplay() {

@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Card } from "../card/Card";
-import type { CardDTO } from "../../types/game";
-import { useAnimationStore } from "../../store/animationStore";
-import { unoService } from "../../services/colyseus/";
+import type { CardDTO } from "../../../types/game";
+import { useAnimationStore } from "../../../store/animationStore";
+import { unoService } from "../../../services/colyseus";
+import { Card } from "../../../components/card/Card";
 
 type Props = {
   cards: CardDTO[];
@@ -118,7 +118,6 @@ export function HandCards({
               style={{
                 zIndex: selected ? 999 : index,
               }}
-
               onClick={(e) => {
                 e.stopPropagation();
                 handlePlayCard(card);

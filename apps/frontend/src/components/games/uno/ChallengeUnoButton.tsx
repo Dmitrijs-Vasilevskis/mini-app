@@ -1,5 +1,5 @@
-import { unoService } from "../../services/colyseus/";
-import { useGameStore } from "../../store/gameStore";
+import { unoService } from "../../../services/colyseus";
+import { useGameStore } from "../../../store/gameStore";
 import { ReactionButton } from "./ReactionButton";
 
 export function ChallengeUnoButton() {

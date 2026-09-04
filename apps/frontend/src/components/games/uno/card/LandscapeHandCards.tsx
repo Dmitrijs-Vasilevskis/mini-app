@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue } from "framer-motion";
-import { Card } from "../card/Card";
-import type { CardDTO } from "../../types/game";
-import { useAnimationStore } from "../../store/animationStore";
-import { unoService } from "../../services/colyseus/";
+import { Card } from "../../../card/Card";
+import type { CardDTO } from "../../../../types/game";
+import { useAnimationStore } from "../../../../store/animationStore";
+import { unoService } from "../../../../services/colyseus";
 
 type Props = {
   cards: CardDTO[];
