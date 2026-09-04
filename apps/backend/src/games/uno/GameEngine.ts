@@ -171,7 +171,7 @@ export class UnoGameEngine {
 
     playCard(playerId: string, actionId: string, cardId: string, chosenColor?: Color) {
         if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused || this.isGameplayBlocked()) return;
-
+        
         this.resolveUnoWindow()
 
         const player = this.state.players.get(playerId);

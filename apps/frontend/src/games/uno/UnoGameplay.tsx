@@ -44,7 +44,7 @@ export function UnoGameplay() {
       .getState()
       .triggerOptimisticAnimation(localPlayer.id, "Hit", actionId);
 
-    unoService.playCard(wildCard.id, color, actionId);
+    unoService.playCard(actionId, wildCard.id, color);
 
     setWildCard(null);
   };

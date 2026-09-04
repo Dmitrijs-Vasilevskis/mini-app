@@ -16,7 +16,7 @@ export class UnoService {
     }
 
     playCard(actionId: string, cardId: string, chosenColor?: string) {
-        this.colyseus.send("playCard", { cardId, chosenColor, actionId });
+        this.colyseus.send("playCard", { actionId, cardId, chosenColor });
     }
 
     drawCard(actionId: string) {

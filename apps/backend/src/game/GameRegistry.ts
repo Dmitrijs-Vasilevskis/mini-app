@@ -33,8 +33,8 @@ export const GAME_REGISTRY: Record<GameType, GameDefinition> = {
             );
         },
         setupMessages: (room, engine) => {
-            room.onMessage('playCard', (client, payload: { cardId: string; chosenColor?: Color, actionId: string }) => {
-                engine.playCard(client.sessionId, payload.cardId, payload.chosenColor, payload.actionId);
+            room.onMessage('playCard', (client, payload: { actionId: string, cardId: string; chosenColor?: Color }) => {
+                engine.playCard(client.sessionId, payload.actionId, payload.cardId, payload.chosenColor);
             });
 
             room.onMessage('drawCard', (client, payload: { actionId: string }) => {
