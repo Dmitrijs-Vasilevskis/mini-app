@@ -96,7 +96,7 @@ export function LandscapeHandCards({
       .getState()
       .triggerOptimisticAnimation(playerId, "Hit", actionId);
 
-    unoService.playCard(card.id, actionId);
+    unoService.playCard(actionId, card.id);
     setSelectedCardId(null);
   };
 
