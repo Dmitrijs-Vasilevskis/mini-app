@@ -15,6 +15,7 @@ import { useGameStore } from "../../store/gameStore";
 import { UnoButton } from "../../components/games/uno/UnoButton";
 import { HandCards } from "./hud/HandCards";
 import { UnoWildColorPicker } from "../../components/games/uno/UnoWildColorPicker";
+import { usePlayerAnimationStore } from "../../store/playerAnimationStore";
 
 export function UnoGameplay() {
   const { isLandscape } = useGameContext();
@@ -37,9 +38,25 @@ export function UnoGameplay() {
   const onWildCardColorSelect = (color: Color) => {
     if (!wildCard) return;
 
-    unoService.playCard(wildCard.id, color);
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(localPlayer.id, "Hit", actionId);
+
+    unoService.playCard(wildCard.id, color, actionId);
 
     setWildCard(null);
+  };
+
+  const onDraw = () => {
+    const actionId = crypto.randomUUID();
+
+    usePlayerAnimationStore
+      .getState()
+      .triggerOptimisticAnimation(localPlayer.id, "Hit", actionId);
+
+    unoService.drawCard(actionId);
   };
 
   const isPlayable = (card: CardDTO) => {
@@ -80,10 +97,7 @@ export function UnoGameplay() {
         />
       )}
 
-      <DrawButton
-        isMyTurn={localPlayer.id === currentTurn}
-        onDraw={() => unoService.drawCard()}
-      />
+      <DrawButton isMyTurn={localPlayer.id === currentTurn} onDraw={onDraw} />
 
       {wildCard && <UnoWildColorPicker onSelect={onWildCardColorSelect} />}
     </>

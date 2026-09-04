@@ -15,11 +15,11 @@ export class UnoService {
         this.colyseus.send("challengeUno");
     }
 
-    playCard(cardId: string, chosenColor?: string) {
-        this.colyseus.send("playCard", { cardId, chosenColor });
+    playCard(actionId: string, cardId: string, chosenColor?: string) {
+        this.colyseus.send("playCard", { cardId, chosenColor, actionId });
     }
 
-    drawCard() {
-        this.colyseus.send("drawCard");
+    drawCard(actionId: string) {
+        this.colyseus.send("drawCard", { actionId });
     }
 }

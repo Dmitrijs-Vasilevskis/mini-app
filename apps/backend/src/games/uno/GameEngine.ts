@@ -5,6 +5,7 @@ import { TurnManager } from './TurnManager';
 import { CardValidator } from "./validators/CardValidator";
 import { ScodeCalculator } from "./ScoreCalculator";
 import { MATCH_WINNING_SCORE, ROUND_INTERMISSION_MS } from "./constants";
+import { GameEventBus } from "../../game/event/GameEventBus";
 
 export class UnoGameEngine {
     private roundStartTimer: ReturnType<typeof setTimeout> | null = null;
@@ -14,6 +15,7 @@ export class UnoGameEngine {
         private state: GameState,
         private deckManager: DeckManager,
         private turnManager: TurnManager,
+        private eventBus: GameEventBus
     ) { }
 
     dispose() {
@@ -107,7 +109,7 @@ export class UnoGameEngine {
         );
     }
 
-    drawCard(playerId: string) {
+    drawCard(playerId: string, actionId: string) {
         if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused || this.isGameplayBlocked()) return;
 
         this.resolveUnoWindow();
@@ -130,6 +132,13 @@ export class UnoGameEngine {
         if (card) {
             this.syncHandCount(player);
         }
+
+        this.eventBus.emit({
+            type: "player.animation",
+            playerId,
+            animation: "Hit",
+            actionId,
+        });
 
         const result = this.turnManager.nextTurn();
 
@@ -160,7 +169,7 @@ export class UnoGameEngine {
         this.syncHandCount(player);
     }
 
-    playCard(playerId: string, cardId: string, chosenColor?: Color) {
+    playCard(playerId: string, actionId: string, cardId: string, chosenColor?: Color) {
         if (this.state.status !== RoomStatus.PLAYING || this.state.isPaused || this.isGameplayBlocked()) return;
 
         this.resolveUnoWindow()
@@ -192,6 +201,13 @@ export class UnoGameEngine {
 
         unoData.hand.splice(cardIndex, 1);
         this.syncHandCount(player);
+
+        this.eventBus.emit({
+            type: "player.animation",
+            playerId,
+            animation: "Hit",
+            actionId,
+        });
 
         if (unoData.hand.length === 1) {
             unoData.saidUno = false;
