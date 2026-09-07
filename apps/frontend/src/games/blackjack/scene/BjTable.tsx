@@ -13,25 +13,25 @@ const PLAYER_SEATS = [
   },
 
   {
-    position: [-2.1, -1.1, 2.25] as [number, number, number],
+    position: [-3.5, -1.1, 3.1] as [number, number, number],
     rotation: [0, Math.PI * 0.8, 0] as [number, number, number],
   },
 
   {
-    position: [2.1, -1.1, 2.25] as [number, number, number],
+    position: [3.5, -1.1, 3.1] as [number, number, number],
     rotation: [0, -Math.PI * 0.8, 0] as [number, number, number],
   },
   {
-    position: [-2.6, -1.1, -1.0] as [number, number, number],
-    rotation: [0, Math.PI * 0.35, 0] as [number, number, number],
+    position: [-6, -1.1, 0] as [number, number, number],
+    rotation: [0, Math.PI * 0.5, 0] as [number, number, number],
   },
   {
-    position: [2.6, -1.1, -1.0] as [number, number, number],
-    rotation: [0, -Math.PI * 0.35, 0] as [number, number, number],
+    position: [6, -1.1, 0] as [number, number, number],
+    rotation: [0, -Math.PI * 0.5, 0] as [number, number, number],
   },
   {
-    position: [0, -1.1, -2.35] as [number, number, number],
-    rotation: [0, 0, 0] as [number, number, number],
+    position: [3.5, -1.1, -3.1] as [number, number, number],
+    rotation: [0, -Math.PI * 0.15, 0] as [number, number, number],
   },
 ];
 
@@ -48,10 +48,6 @@ export function BjTable() {
   if (!localPlayer) {
     return null;
   }
-
-  const opponents = players.filter((p) => p.id !== localPlayer.id);
-
-  const seatedPlayers = [localPlayer, ...opponents];
 
   return (
     <Canvas
@@ -82,8 +78,8 @@ export function BjTable() {
         rotation={DEALER_SEAT.rotation}
       />
 
-      {seatedPlayers.map((player, index) => {
-        const seat = PLAYER_SEATS[index];
+      {players.map((player) => {
+        const seat = PLAYER_SEATS[player.seatIndex];
 
         if (!seat) return null;
 
@@ -100,7 +96,7 @@ export function BjTable() {
           />
         );
       })}
-      
+
       <OrbitControls
         enablePan={false}
         minDistance={10}

@@ -11,6 +11,7 @@ export function mapPlayer(player: PlayerSchema): BasePlayerDTO {
         score: player.score,
         photoUrl: player.photoUrl,
         avatarId: player.avatarId,
+        seatIndex: player.seatIndex,
         gameData: player.gameData,
     };
 }

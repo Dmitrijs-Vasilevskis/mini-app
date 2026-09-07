@@ -21,6 +21,7 @@ export class Player extends Schema {
   @type("number") disconnectedAt: number = 0;
   @type("boolean") isReady: boolean = false;
   @type("boolean") isTurn: boolean = false;
+  @type("int8") seatIndex: number = -1;
   @type("string") telegramId?: string;
   @type("string") playerId?: string;
 
