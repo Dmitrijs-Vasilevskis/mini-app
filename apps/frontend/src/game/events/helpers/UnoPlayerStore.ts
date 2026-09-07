@@ -11,6 +11,7 @@ export type BasePlayerUpdate = Partial<
         | "isConnected"
         | "photoUrl"
         | "avatarId"
+        | "seatIndex"
     >
 >;
 

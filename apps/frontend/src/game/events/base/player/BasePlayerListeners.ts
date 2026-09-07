@@ -64,7 +64,17 @@ export function BasePlayerListeners(
         }
     );
 
-    $(player).listen("avatarId", (avatarId: AvatarId) => {
-        update({ avatarId });
-    })
+    $(player).listen(
+        "avatarId",
+        (avatarId: AvatarId) => {
+            update({ avatarId });
+        }
+    );
+
+    $(player).listen(
+        "seatIndex",
+        (seatIndex: number) => {
+            update({ seatIndex });
+        }
+    )
 }

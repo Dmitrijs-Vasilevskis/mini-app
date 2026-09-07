@@ -60,6 +60,7 @@ export interface BasePlayerDTO<TGameData = unknown> {
     isReady: boolean;
     isConnected: boolean;
     avatarId: AvatarId;
+    seatIndex: number;
     gameData: TGameData;
 }
 
