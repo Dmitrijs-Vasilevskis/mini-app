@@ -8,11 +8,13 @@ import { generateUniqueRoomCode } from "../utils/roomCode";
 import { GAME_REGISTRY } from "../game/GameRegistry";
 import { GameEventBus } from "../game/event/GameEventBus";
 import { GameEventBroadcaster } from "../game/event/GameEventBroadcaster";
+import { SeatManager } from "../game/SeatManager";
 
 export class GameLobbyRoom extends Room<RoomOptions> {
     private gameEngine!: any;
     private gameEventBus!: GameEventBus;
     private gameEventBroadcaster!: GameEventBroadcaster;
+    private seatManager!: SeatManager;
     private pauseIntervalTimer: ReturnType<typeof setInterval> | null = null;
 
     onCreate(options: { gameType?: GameType }) {
@@ -44,6 +46,7 @@ export class GameLobbyRoom extends Room<RoomOptions> {
             this.gameEventBus,
             this
         );
+        this.seatManager = new SeatManager(6);
 
         this.gameEventBroadcaster.start();
 
@@ -134,6 +137,8 @@ export class GameLobbyRoom extends Room<RoomOptions> {
             existingPlayer.isConnected = true;
             existingPlayer.disconnectedAt = 0;
 
+            this.seatManager.replacePlayerId(oldSessionId, newSessionId);
+
             this.state.players.set(newSessionId, existingPlayer);
 
             if (this.state.hostId === oldSessionId) this.state.hostId = newSessionId;
@@ -170,6 +175,14 @@ export class GameLobbyRoom extends Room<RoomOptions> {
         newPlayer.name = displayName;
         newPlayer.photoUrl = photoUrl;
         newPlayer.gameData = currentConfig.createPlayerData();
+
+        const seatIndex = this.seatManager.reserve(newPlayer.id);
+
+        if(seatIndex === null) {
+            throw new Error("No seats available");
+        }
+
+        newPlayer.seatIndex = seatIndex;
 
         this.state.players.set(client.sessionId, newPlayer);
         this.state.playerOrder.push(client.sessionId);
@@ -251,6 +264,8 @@ export class GameLobbyRoom extends Room<RoomOptions> {
     }
 
     private removePlayer(playerId: string) {
+        this.seatManager.release(playerId);
+        
         const playerIndex = this.state.playerOrder.indexOf(playerId);
         if (playerIndex !== -1) this.state.playerOrder.splice(playerIndex, 1);
 
